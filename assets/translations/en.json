@@ -181,6 +181,7 @@
     "customer_code_copied": "Code copied",
     "price_label": "Price : ",
     "items_count": "Items: {count}",
+    "vip_badge": "VIP",
     "tap_to_show_customer_code": "Tap to show order code",
     "no_current_orders": "No current orders",
     "cannot_identify_meal_or_restaurant": "Cannot identify meal or restaurant"

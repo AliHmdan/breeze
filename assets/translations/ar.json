@@ -185,6 +185,7 @@
     "customer_code_copied": "تم نسخ الكود",
     "price_label": "السعر : ",
     "items_count": "العناصر: {count}",
+    "vip_badge": "VIP",
     "tap_to_show_customer_code": "اضغط لعرض كود الطلب",
     "no_current_orders": "لا توجد طلبات حالية"
   },

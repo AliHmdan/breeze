@@ -67,25 +67,27 @@ class _CurrentOrdersState extends State<CurrentOrders> {
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
-         onTap: () {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (_) => MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => OrdersTrackingCubit(getIt<OrdersRepository>())
-              ..start(item.id),
-          ),
-          BlocProvider(
-            create: (_) => OrdersDetailsCubit(getIt<OrdersRepository>())
-              ..load(item.id), // ✅ نادِ myOrderDetails هون
-          ),
-        ],
-        child: OrderTrackingScreen(orderId: item.id),
-      ),
-    ),
-  );
-},
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) =>
+                          OrdersTrackingCubit(getIt<OrdersRepository>())
+                            ..start(item.id),
+                    ),
+                    BlocProvider(
+                      create: (_) =>
+                          OrdersDetailsCubit(getIt<OrdersRepository>())
+                            ..load(item.id), // ✅ نادِ myOrderDetails هون
+                    ),
+                  ],
+                  child: OrderTrackingScreen(orderId: item.id),
+                ),
+              ),
+            );
+          },
 
           child: Container(
             padding: const EdgeInsets.only(left: 1, right: 10, top: 4),
@@ -120,10 +122,46 @@ class _CurrentOrdersState extends State<CurrentOrders> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomSubTitle(
-                        subtitle: restaurant.name,
-                        color: colorScheme.onSurface,
-                        fontsize: 14.sp,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomSubTitle(
+                              subtitle: restaurant.name,
+                              color: colorScheme.onSurface,
+                              fontsize: 14.sp,
+                            ),
+                          ),
+                          if (item.isVip)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.emoji_events,
+                                    size: 14.sp,
+                                    color: colorScheme.onPrimary,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "orders.vip_badge".tr(),
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       CustomSubTitle(
@@ -202,7 +240,10 @@ class _CurrentOrdersState extends State<CurrentOrders> {
 
         if (errorMsg != null && orders.isEmpty) {
           return Center(
-            child: Text(errorMsg, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text(
+              errorMsg,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           );
         }
 
@@ -210,7 +251,9 @@ class _CurrentOrdersState extends State<CurrentOrders> {
           return Center(
             child: Text(
               "orders.no_current_orders".tr(),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
             ),
           );
         }
