@@ -1,5 +1,6 @@
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/pick_by_langu.dart';
+import 'package:breezefood/features/search/presentation/ui/search_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,6 +26,7 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
     required this.avgRatingText,
     required this.reviewsCountText,
     required this.onRateTap,
+    required this.onSearch,
   });
 
   final String deliveryTimeText;
@@ -42,6 +44,7 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
   final String avgRatingText;
   final String reviewsCountText;
   final VoidCallback onRateTap;
+  final VoidCallback onSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
           offset: Offset(0, roundedTop ? 0 : 0),
           child: Material(
             clipBehavior: Clip.antiAlias,
-            borderRadius: roundedTop ? BorderRadius.only(topLeft: Radius.circular(25.r), topRight: Radius.circular(25.r)) : BorderRadius.zero,
+            borderRadius: BorderRadius.zero,
             child: Container(
               color: roundedTop ? AppColor.Dark : AppColor.Dark,
               height: roundedTop ? null : 128.8.h,
@@ -66,10 +69,19 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                   ///
                   roundedTop
                       ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 8.h,
+                          ),
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                            decoration: BoxDecoration(color: AppColor.Dark, borderRadius: BorderRadius.circular(14.r)),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 8.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColor.Dark,
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
                             child: Row(
                               children: [
                                 Expanded(
@@ -81,9 +93,14 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                       children: [
                                         SizedBox(height: 12.h),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
-                                            const Icon(Icons.star, color: Colors.amber, size: 16),
+                                            const Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                              size: 16,
+                                            ),
                                             SizedBox(width: 4.w),
                                             Text(
                                               avgRatingText,
@@ -91,17 +108,23 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                                 color: AppColor.white,
                                                 fontSize: 11.5.sp,
                                                 // fontWeight: FontWeight.w900,
-                                                fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
                                               ),
                                             ),
                                             SizedBox(width: 6.w),
                                             Text(
                                               "($reviewsCountText)",
                                               style: TextStyle(
-                                                color: Colors.white.withOpacity(0.65),
+                                                color: Colors.white.withOpacity(
+                                                  0.65,
+                                                ),
                                                 fontSize: 11.sp,
                                                 fontWeight: FontWeight.w600,
-                                                fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
                                               ),
                                             ),
                                           ],
@@ -113,7 +136,9 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                             color: AppColor.gryLighter,
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w900,
-                                            fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                            fontFamily: context.isAr
+                                                ? 'Cairo'
+                                                : 'Inter',
                                           ),
                                         ),
                                       ],
@@ -128,7 +153,12 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       SizedBox(height: 9.h),
-                                      Image.asset("assets/icons/new_del.png", width: 20.w, height: 20.h, color: AppColor.white),
+                                      Image.asset(
+                                        "assets/icons/new_del.png",
+                                        width: 20.w,
+                                        height: 20.h,
+                                        color: AppColor.white,
+                                      ),
                                       // Image.asset("assets/icons/brezee_motor.png", width: 50.w, height: 50.h, color: Colors.white),
                                       SizedBox(height: 12.h),
                                       if (showTwoPrices) ...[
@@ -136,10 +166,13 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                           deliveryBaseText,
                                           style: TextStyle(
                                             color: AppColor.LightActive,
-                                            decoration: TextDecoration.lineThrough,
+                                            decoration:
+                                                TextDecoration.lineThrough,
                                             fontSize: 11.sp,
                                             fontWeight: FontWeight.w800,
-                                            fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                            fontFamily: context.isAr
+                                                ? 'Cairo'
+                                                : 'Inter',
                                           ),
                                         ),
                                         SizedBox(height: 2.h),
@@ -149,7 +182,9 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                             color: AppColor.red,
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w900,
-                                            fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                            fontFamily: context.isAr
+                                                ? 'Cairo'
+                                                : 'Inter',
                                           ),
                                         ),
                                       ] else
@@ -159,7 +194,9 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                             color: AppColor.gryLighter,
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w900,
-                                            fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                            fontFamily: context.isAr
+                                                ? 'Cairo'
+                                                : 'Inter',
                                           ),
                                         ),
                                     ],
@@ -174,7 +211,12 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       SizedBox(height: 10.h),
-                                      Image.asset("assets/icons/clock_new.png", width: 17.w, height: 17.h, color: AppColor.white),
+                                      Image.asset(
+                                        "assets/icons/clock_new.png",
+                                        width: 17.w,
+                                        height: 17.h,
+                                        color: AppColor.white,
+                                      ),
                                       SizedBox(height: 10.h),
                                       Text(
                                         deliveryTimeText,
@@ -182,7 +224,9 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                           color: AppColor.gryLighter,
                                           fontSize: 12.sp,
                                           fontWeight: FontWeight.w900,
-                                          fontFamily: context.isAr ? 'Cairo' : 'Inter',
+                                          fontFamily: context.isAr
+                                              ? 'Cairo'
+                                              : 'Inter',
                                         ),
                                       ),
                                     ],
@@ -193,11 +237,23 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                           ),
                         )
                       : Padding(
-                          padding: EdgeInsetsDirectional.only(start: 15.w, top: 15.h, bottom: 10.h),
+                          padding: EdgeInsetsDirectional.only(
+                            start: 15.w,
+                            top: 15.h,
+                            bottom: 10.h,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.arrow_back_ios, color: Colors.red),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.red,
+                                ),
+                              ),
                               SizedBox(height: 10.h),
                               Row(
                                 children: [
@@ -208,7 +264,11 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                     textColor: AppColor.white,
                                   ),
                                   Spacer(),
-                                  Icon(Icons.search, color: Colors.red),
+                                  IconButton(
+                                    onPressed: onSearch,
+
+                                    icon: Icon(Icons.search, color: Colors.red),
+                                  ),
                                   SizedBox(width: 12.w),
                                 ],
                               ),
@@ -219,7 +279,11 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                   // ===== Tabs =====
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4.w),
-                    child: RDTabsBar(categories: categories, activeIndex: activeIndex, onTap: onTapCategory),
+                    child: RDTabsBar(
+                      categories: categories,
+                      activeIndex: activeIndex,
+                      onTap: onTapCategory,
+                    ),
                   ),
                 ],
               ),
@@ -232,7 +296,12 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
 }
 
 class _TitleBlock extends StatelessWidget {
-  _TitleBlock({required this.restaurantName, required this.avgRatingText, required this.reviewsCountText, this.textColor});
+  _TitleBlock({
+    required this.restaurantName,
+    required this.avgRatingText,
+    required this.reviewsCountText,
+    this.textColor,
+  });
 
   final String restaurantName;
   final String avgRatingText;
@@ -257,8 +326,16 @@ class _TitleBlock extends StatelessWidget {
             fontWeight: FontWeight.w900,
             fontFamily: font,
             shadows: [
-              Shadow(color: AppColor.Dark.withOpacity(0.65), offset: const Offset(0, 3), blurRadius: 14),
-              Shadow(color: AppColor.Dark.withOpacity(0.35), offset: const Offset(0, 1), blurRadius: 4),
+              Shadow(
+                color: AppColor.Dark.withOpacity(0.65),
+                offset: const Offset(0, 3),
+                blurRadius: 14,
+              ),
+              Shadow(
+                color: AppColor.Dark.withOpacity(0.35),
+                offset: const Offset(0, 1),
+                blurRadius: 4,
+              ),
             ],
           ),
         ),
@@ -285,7 +362,11 @@ class _RDStickyDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 165.h;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return child;
   }
 }
