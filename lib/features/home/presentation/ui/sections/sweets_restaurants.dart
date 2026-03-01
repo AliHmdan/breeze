@@ -13,7 +13,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SweetsRestaurantCard extends StatefulWidget {
   final String? image;
@@ -105,7 +104,9 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                           color: Colors.white,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
-                          fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                          fontFamily:
+                              Localizations.localeOf(context).languageCode ==
+                                  'ar'
                               ? 'Cairo'
                               : 'Inter',
                         ),
@@ -125,7 +126,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
                 fontFamily: Localizations.localeOf(context).languageCode == 'ar'
@@ -138,11 +139,11 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/motor.svg",
+              Image.asset(
+                "assets/icons/new_del.png",
                 width: 16.w,
                 height: 16.h,
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(

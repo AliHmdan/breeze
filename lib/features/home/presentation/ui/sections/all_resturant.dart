@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:breezefood/features/home/model/home_response.dart' as home;
-import 'package:flutter_svg/flutter_svg.dart';
 
 class RestaurantCard extends StatefulWidget {
   final home.HomeRestaurantModel restaurant;
@@ -168,11 +167,11 @@ class _RestaurantCardState extends State<RestaurantCard> {
 
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    color: colorScheme.onSurface,
-                    "assets/icons/motor.svg",
+                  Image.asset(
+                    "assets/icons/new_del.png",
                     width: 16.w,
                     height: 16.h,
+                    color: colorScheme.onSurface,
                   ),
                   SizedBox(width: 8.w),
                   CustomSubTitle(

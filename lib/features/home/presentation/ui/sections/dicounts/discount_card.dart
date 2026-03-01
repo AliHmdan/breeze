@@ -183,46 +183,46 @@ class Discount extends StatelessWidget {
                   ),
                   if (isOpen == false) const ClosedOverlay(),
 
-                  if (hasFoodDiscount && discount.trim().isNotEmpty)
-                    PositionedDirectional(
-                      bottom: 0,
-                      start: 0,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 2.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColor.red,
-                          borderRadius: BorderRadiusDirectional.only(
-                            // topStart:  Radius.circular(12.r),
-                            bottomStart: Radius.circular(12.r),
-                            topEnd: Radius.circular(20.r),
-                            bottomEnd: Radius.circular(20.r),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              discount,
-                              style: TextStyle(
-                                color: AppColor.white,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            SvgPicture.asset(
-                              "assets/icons/nspah.svg",
-                              width: 18.w,
-                              height: 18.h,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  // if (hasFoodDiscount && discount.trim().isNotEmpty)
+                  //   PositionedDirectional(
+                  //     bottom: 0,
+                  //     start: 0,
+                  //     child: Container(
+                  //       padding: EdgeInsets.symmetric(
+                  //         horizontal: 8.w,
+                  //         vertical: 2.h,
+                  //       ),
+                  //       decoration: BoxDecoration(
+                  //         color: AppColor.red,
+                  //         borderRadius: BorderRadiusDirectional.only(
+                  //           // topStart:  Radius.circular(12.r),
+                  //           bottomStart: Radius.circular(12.r),
+                  //           topEnd: Radius.circular(20.r),
+                  //           bottomEnd: Radius.circular(20.r),
+                  //         ),
+                  //       ),
+                  //       child: Row(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         children: [
+                  //           Text(
+                  //             discount,
+                  //             style: TextStyle(
+                  //               color: AppColor.white,
+                  //               fontSize: 12.sp,
+                  //               fontWeight: FontWeight.w800,
+                  //             ),
+                  //           ),
+                  //           SizedBox(width: 4.w),
+                  //           SvgPicture.asset(
+                  //             "assets/icons/nspah.svg",
+                  //             width: 18.w,
+                  //             height: 18.h,
+                  //             color: Colors.white,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
               Padding(
@@ -251,11 +251,11 @@ class Discount extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SvgPicture.asset(
-                              "assets/icons/motor.svg",
-                              color: colorScheme.onSurface,
+                            Image.asset(
+                              "assets/icons/new_del.png",
                               width: 16.w,
                               height: 16.h,
+                              color: colorScheme.onSurface,
                             ),
                             SizedBox(width: 4.w),
 

@@ -4,7 +4,6 @@ import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_de
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
@@ -196,8 +195,8 @@ class DiscountDeliveryGridPage extends StatelessWidget {
                                     // delivery old/new price
                                     Row(
                                       children: [
-                                        SvgPicture.asset(
-                                          "assets/icons/motor.svg",
+                                        Image.asset(
+                                          "assets/icons/new_del.png",
                                           color: AppColor.white,
                                           width: 15,
                                           height: 15,
