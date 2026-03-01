@@ -8,7 +8,6 @@ import 'package:breezefood/features/home/presentation/ui/widgets/open_status_bad
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class Supermarketslider extends StatelessWidget {
   final List<HomeRestaurantModel> restaurants;
@@ -169,7 +168,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color:Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 15.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -180,16 +179,16 @@ class _SupermarketCardState extends State<_SupermarketCard> {
           /// التوصيل
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/motor.svg",
+              Image.asset(
+                "assets/icons/new_del.png",
                 width: 16.w,
                 height: 16.h,
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(
                 subtitle: feeText,
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontsize: 12.sp,
               ),
             ],

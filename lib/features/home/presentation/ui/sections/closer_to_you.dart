@@ -14,7 +14,6 @@ import 'package:breezefood/features/stores/presentation/ui/screens/resturant_det
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class CloserToYouCard extends StatefulWidget {
   final String? image;
@@ -132,8 +131,8 @@ class _CloserToYouCardState extends State<CloserToYouCard> {
 
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/motor.svg",
+              Image.asset(
+                "assets/icons/new_del.png",
                 width: 16.w,
                 height: 16.h,
                 color: Colors.white,

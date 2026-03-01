@@ -47,24 +47,23 @@ class DiscountDeliveryHome extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: CustomTitleSection(
-            title: "home.discount_delivery".tr(),
-            all: "common.all".tr(),
-            icon: Icons.arrow_forward_ios_outlined,
-            ontap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => DiscountDeliveryGridPage(
-                    discountDelivery: discountDelivery,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 10),
+        //   child: CustomTitleSection(
+        //     title: "home.discount_delivery".tr(),
+        //     all: "common.all".tr(),
+        //     icon: Icons.arrow_forward_ios_outlined,
+        //     ontap: () {
+        //       Navigator.of(context).push(
+        //         MaterialPageRoute(
+        //           builder: (_) => DiscountDeliveryGridPage(
+        //             discountDelivery: discountDelivery,
+        //           ),
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ),
         Padding(
           padding: EdgeInsetsDirectional.only(top: 10, start: 8, end: 0.2),
           child: SizedBox(
