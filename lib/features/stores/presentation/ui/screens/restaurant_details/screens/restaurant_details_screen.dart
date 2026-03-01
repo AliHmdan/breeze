@@ -610,54 +610,56 @@ class _ResturantDetailsState extends State<ResturantDetails>
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [BlocProvider(create: (_) => getIt<RatingSubmitCubit>())],
-      child: AndroidSwipeBack(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          extendBodyBehindAppBar: true,
-          bottomNavigationBar: SafeArea(
-            child: BottomCartAction(
-              haveOrder: null,
-              usePrimaryButton: true,
-              showCountAndTotal: true,
-              onViewCart: () async {
-                if (!_isRestaurantOpen) {
-                  EasyLoading.showInfo(
-                    "restaurant.closed_cannot_checkout".tr(),
-                  );
-                  return;
-                }
+      child: SafeArea(
+        child: AndroidSwipeBack(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBodyBehindAppBar: true,
+            bottomNavigationBar: SafeArea(
+              child: BottomCartAction(
+                haveOrder: null,
+                usePrimaryButton: true,
+                showCountAndTotal: true,
+                onViewCart: () async {
+                  if (!_isRestaurantOpen) {
+                    EasyLoading.showInfo(
+                      "restaurant.closed_cannot_checkout".tr(),
+                    );
+                    return;
+                  }
 
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MultiBlocProvider(
-                      providers: [
-                        BlocProvider.value(value: context.read<CartCubit>()),
-                        BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
-                      ],
-                      child: const RequestOrderScreen(),
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider.value(value: context.read<CartCubit>()),
+                          BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                        ],
+                        child: const RequestOrderScreen(),
+                      ),
                     ),
-                  ),
-                );
+                  );
 
-                if (context.mounted) {
-                  try {
-                    context.read<CartCubit>().loadCart();
-                  } catch (_) {}
-                }
+                  if (context.mounted) {
+                    try {
+                      context.read<CartCubit>().loadCart();
+                    } catch (_) {}
+                  }
+                },
+              ),
+            ),
+            body: BlocBuilder<RestaurantDetailsCubit, RestaurantDetailsState>(
+              bloc: cubit,
+              builder: (context, state) {
+                return state.when(
+                  initial: _loadingView,
+                  loading: _loadingView,
+                  error: _errorView,
+                  loaded: (data) => _buildLoaded(context, data),
+                );
               },
             ),
-          ),
-          body: BlocBuilder<RestaurantDetailsCubit, RestaurantDetailsState>(
-            bloc: cubit,
-            builder: (context, state) {
-              return state.when(
-                initial: _loadingView,
-                loading: _loadingView,
-                error: _errorView,
-                loaded: (data) => _buildLoaded(context, data),
-              );
-            },
           ),
         ),
       ),
