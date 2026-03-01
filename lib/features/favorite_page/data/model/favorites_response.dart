@@ -48,6 +48,7 @@ class FavoriteItem {
   final String restaurantName;
   final double price;
   final String image;
+  final int restaurantId;
 
   const FavoriteItem({
     required this.id,
@@ -55,13 +56,15 @@ class FavoriteItem {
     required this.restaurantName,
     required this.price,
     required this.image,
+    required this.restaurantId,
   });
 
   factory FavoriteItem.fromJson(Map<String, dynamic> json) => FavoriteItem(
-        id: FavoritesResponse._toInt(json["id"]),
-        price: FavoritesResponse._toDouble(json["price"]),
-        image: FavoritesResponse._toStringSafe(json["image"]),
-        nameAr: FavoritesResponse._toStringSafe(json["name_ar"]),
-        restaurantName: FavoritesResponse._toStringSafe(json["restaurant_name"]),
-      );
+    id: FavoritesResponse._toInt(json["id"]),
+    price: FavoritesResponse._toDouble(json["price"]),
+    image: FavoritesResponse._toStringSafe(json["image"]),
+    nameAr: FavoritesResponse._toStringSafe(json["name_ar"]),
+    restaurantName: FavoritesResponse._toStringSafe(json["restaurant_name"]),
+    restaurantId: FavoritesResponse._toInt(json["restaurant_id"]),
+  );
 }

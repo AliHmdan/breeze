@@ -3,13 +3,12 @@ import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/favorite_page/data/model/favorites_response.dart';
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
+import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../profile/presentation/widget/custom_appbar_profile.dart';
 
@@ -53,52 +52,30 @@ class FavoritePageState extends State<FavoritePage> {
     final imageUrl = UrlHelper.toFullUrl(item.image);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Slidable(
-        key: ValueKey(item.id),
-        endActionPane: ActionPane(
-          motion: const DrawerMotion(),
-          extentRatio: 0.25,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ResturantDetails(restaurant_id: item.restaurantId),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomSlidableAction(
-              onPressed: (context) => _deleteFavorite(item),
-              backgroundColor: colorScheme.error,
-              borderRadius: BorderRadius.circular(15.r),
-              child: Center(
-                child: SvgPicture.asset(
-                  "assets/icons/delete.svg",
-                  colorFilter: ColorFilter.mode(
-                    colorScheme.onError,
-                    BlendMode.srcIn,
-                  ),
-                  width: 30.w,
-                  height: 30.h,
-                ),
-              ),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsetsDirectional.only(end: 8),
-          child: Container(
-            padding: const EdgeInsetsDirectional.only(start: 1, end: 10),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-            ),
-            child: Row(
+            Row(
               children: [
+                /// صورة المنتج
                 ClipRRect(
-                  borderRadius: const BorderRadiusDirectional.only(
-                    topEnd: Radius.circular(40),
-                    bottomEnd: Radius.circular(40),
-                  ),
+                  borderRadius: BorderRadius.circular(12),
                   child: (imageUrl ?? "").trim().isEmpty
                       ? Container(
-                          width: 120.w,
-                          height: 100.h,
+                          width: 60.w,
+                          height: 60.h,
                           color: colorScheme.surfaceContainerHighest,
                           child: Center(
                             child: Icon(
@@ -110,12 +87,12 @@ class FavoritePageState extends State<FavoritePage> {
                         )
                       : Image.network(
                           imageUrl!,
-                          width: 120.w,
-                          height: 100.h,
+                          width: 60.w,
+                          height: 60.h,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            width: 111.w,
-                            height: 100.h,
+                            width: 60.w,
+                            height: 60.h,
                             color: colorScheme.surfaceContainerHighest,
                             child: Center(
                               child: Icon(
@@ -127,58 +104,45 @@ class FavoritePageState extends State<FavoritePage> {
                           ),
                         ),
                 ),
+
                 const SizedBox(width: 12),
+
+                /// النصوص
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomSubTitle(
-                        subtitle: item.nameAr,
-                        color: colorScheme.onSurface,
-                        fontsize: 14.sp,
+                      /// اسم المنتج
+                      Text(
+                        item.nameAr,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      CustomSubTitle(
-                        subtitle: item.restaurantName,
-                        color: colorScheme.onSurface.withOpacity(0.75),
-                        fontsize: 12.sp,
-                      ),
-                      const SizedBox(height: 4),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "favorites.price".tr(),
 
-                              style: TextStyle(
-                                color: colorScheme.onSurface,
-                                fontFamily:
-                                    Localizations.localeOf(
-                                          context,
-                                        ).languageCode ==
-                                        'ar'
-                                    ? 'Cairo'
-                                    : 'Inter',
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                            TextSpan(
-                              text: context.syp(item.price),
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontFamily:
-                                    Localizations.localeOf(
-                                          context,
-                                        ).languageCode ==
-                                        'ar'
-                                    ? 'Cairo'
-                                    : 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+
+                      /// اسم المطعم
+                      Text(
+                        item.restaurantName,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      /// السعر
+                      Text(
+                        "${item.price.toStringAsFixed(2)} ${"common.currency".tr()}",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -186,7 +150,25 @@ class FavoritePageState extends State<FavoritePage> {
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 2),
+
+            /// التاريخ
+            Text(
+              "Added to favorites",
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            /// Divider خفيف جداً
+            Divider(
+              color: colorScheme.outline.withOpacity(0.25),
+              thickness: 1,
+              height: 1,
+            ),
+          ],
         ),
       ),
     );
@@ -235,57 +217,50 @@ class FavoritePageState extends State<FavoritePage> {
 
             return RefreshIndicator(
               onRefresh: _handleRefresh,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    CustomAppbarProfile(
-                      ontap: () {},
-                      title: "favorites.title".tr(),
-                    ),
-
-                    Expanded(
-                      child: isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : items.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.favorite_border,
-                                    color: colorScheme.onSurface,
-                                    size: 50,
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    "favorites.empty".tr(),
-                                    style: TextStyle(
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.7,
-                                      ),
-                                      fontFamily:
-                                          Localizations.localeOf(
-                                                context,
-                                              ).languageCode ==
-                                              'ar'
-                                          ? 'Cairo'
-                                          : 'Inter',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              children: [
-                                for (final f in items) _buildOrderCard(f),
-                                const SizedBox(height: 40),
-                              ],
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  CustomAppbarProfile(
+                    ontap: () {},
+                    title: "favorites.title".tr(),
+                  ),
+                  if (isLoading && items.isEmpty)
+                    const Center(child: CircularProgressIndicator())
+                  else if (items.isEmpty)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Icon(
+                          //   Icons.favorite_border,
+                          //   color: colorScheme.onSurface,
+                          //   size: 50,
+                          // ),
+                          // SizedBox(height: 10.h),
+                          Text(
+                            "favorites.empty".tr(),
+                            style: TextStyle(
+                              color: colorScheme.onSurface.withOpacity(0.7),
+                              fontFamily:
+                                  Localizations.localeOf(
+                                        context,
+                                      ).languageCode ==
+                                      'ar'
+                                  ? 'Cairo'
+                                  : 'Inter',
                             ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Column(
+                      children: [
+                        for (final f in items) _buildOrderCard(f),
+                        const SizedBox(height: 40),
+                      ],
                     ),
-                  ],
-                ),
+                ],
               ),
             );
           },
