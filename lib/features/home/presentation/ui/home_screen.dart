@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:async';
 
 import 'package:breezefood/core/component/have_order.dart';
 import 'package:breezefood/core/di/di.dart';
@@ -40,6 +41,14 @@ import 'package:shimmer/shimmer.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+
+// Import the grid pages
+import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_meals/discount_home.dart'
+    show DiscountRestaurantsGridPage;
+import 'package:breezefood/features/home/presentation/ui/sections/sweets_restaurants_grid_page.dart';
+import 'package:breezefood/features/home/presentation/ui/sections/breakfast_restaurants_grid_page.dart';
+import 'package:breezefood/features/home/presentation/ui/sections/supermarkets_grid_page.dart';
+import 'package:breezefood/features/home/presentation/ui/sections/discounts_delivery/discount_delivery_grid_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -85,11 +94,7 @@ class _HomeState extends State<Home>
         await context.read<CartCubit>().loadCart(silent: true);
       } catch (_) {}
 
-      // 2) ابعت اللوكيشن مرة واحدة
-      await cubit.sendMyLocationOnce();
-      if (!mounted) return;
-
-      // 3) لا تعيد load للـ home إذا هو already loading/loaded
+      // 2) حمّل بيانات الهوم أولاً (أولوية قصوى لسرعة العرض)
       final isLoadedOrLoading = cubit.state.maybeWhen(
         loading: () => true,
         loaded: (_) => true,
@@ -100,6 +105,9 @@ class _HomeState extends State<Home>
         await cubit.load();
         if (!mounted) return;
       }
+
+      // 3) ابعت اللوكيشن في الخلفية بعد تحميل الهوم (لا يؤثر على عرض الهوم)
+      unawaited(cubit.sendMyLocationOnce());
 
       // 4) بعد ما تخلص أول فريم + تحميل البيانات:
       // اعمل refresh للـ offsets (بدون postFrame ثاني)
@@ -184,6 +192,9 @@ class _HomeState extends State<Home>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
     });
+
+    // ✅ أرسل اللوكيشن في الخلفية بعد الريفرش (لا يؤثر على الأداء)
+    unawaited(cubit.sendMyLocationOnce());
   }
 
   Future<void> _openRestaurant(dynamic r) async {
@@ -311,10 +322,26 @@ class _HomeState extends State<Home>
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomTitleSection(title: "home.open_now".tr()),
-                ),
+                if (homeData?.nearbyRestaurants.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomTitleSection(
+                      title: "home.open_now".tr(),
+                      all: "common.all".tr(),
+                      icon: Icons.arrow_forward_ios_outlined,
+                      ontap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AllResturant(
+                              restaurants: homeData?.nearbyRestaurants ?? [],
+                              onTap: _openRestaurant,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 SizedBox(height: 10.h),
                 loading
                     ? _shimmerBox(height: 178.h)
@@ -333,28 +360,79 @@ class _HomeState extends State<Home>
           _HomeSectionDef(
             id: "discounts",
             title: "home.filters.discounts".tr(),
-            builder: () => loading
-                ? _shimmerBox(height: 130.h)
-                : state.maybeWhen(
-                    loaded: (data) => DiscountHome(discounts: data.discounts),
-                    orElse: () => const SizedBox.shrink(),
+            builder: () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (homeData?.discounts.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomTitleSection(
+                      title: "home.filters.discounts".tr(),
+                      all: "common.all".tr(),
+                      icon: Icons.arrow_forward_ios_outlined,
+                      ontap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DiscountRestaurantsGridPage(
+                              discounts: homeData?.discounts ?? [],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
+                SizedBox(height: 10.h),
+                loading
+                    ? _shimmerBox(height: 130.h)
+                    : state.maybeWhen(
+                        loaded: (data) =>
+                            DiscountHome(discounts: data.discounts),
+                        orElse: () => const SizedBox.shrink(),
+                      ),
+              ],
+            ),
           ),
 
           // 4️⃣ Delivery Discounts
           _HomeSectionDef(
             id: "delivery_discounts",
             title: "home.filters.delivery".tr(),
-            builder: () => loading
-                ? _shimmerBox(height: 120.h)
-                : state.maybeWhen(
-                    loaded: (data) => DiscountDeliveryHome(
-                      discountDelivery: data.discountDelivery,
+            builder: () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (homeData?.discountDelivery.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomTitleSection(
+                      title: "home.filters.delivery".tr(),
+                      all: "common.all".tr(),
+                      icon: Icons.arrow_forward_ios_outlined,
+                      ontap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DiscountDeliveryGridPage(
+                              discountDelivery:
+                                  homeData?.discountDelivery ?? [],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    orElse: () => const SizedBox.shrink(),
                   ),
+                SizedBox(height: 10.h),
+                loading
+                    ? _shimmerBox(height: 130.h)
+                    : state.maybeWhen(
+                        loaded: (data) => DiscountDeliveryHome(
+                          discountDelivery: data.discountDelivery,
+                        ),
+                        orElse: () => const SizedBox.shrink(),
+                      ),
+              ],
+            ),
           ),
         ];
+
         final sweetsList = homeData?.sweets ?? const [];
 
         if (sweetsList.isNotEmpty) {
@@ -365,10 +443,25 @@ class _HomeState extends State<Home>
               builder: () => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(title: "home.sweets".tr()),
-                  ),
+                  if (homeData?.sweets.isNotEmpty == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: CustomTitleSection(
+                        title: "home.sweets".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SweetsRestaurantsGridPage(
+                                restaurants: sweetsList,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   SizedBox(height: 10.h),
                   loading
                       ? _shimmerBox(height: 178.h)
@@ -391,12 +484,25 @@ class _HomeState extends State<Home>
               builder: () => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.breakfast_restaurants".tr(),
+                  if (homeData?.breakfastRestaurants.isNotEmpty == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: CustomTitleSection(
+                        title: "home.breakfast_restaurants".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BreakfastRestaurantsGridPage(
+                                restaurants: breakfastList,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
                   SizedBox(height: 10.h),
                   BreakfastRestaurantsSection(restaurants: breakfastList),
                 ],
@@ -411,10 +517,25 @@ class _HomeState extends State<Home>
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomTitleSection(title: "home.super_market".tr()),
-                ),
+                if (homeData?.supermarkets.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomTitleSection(
+                      title: "home.super_market".tr(),
+                      all: "common.all".tr(),
+                      icon: Icons.arrow_forward_ios_outlined,
+                      ontap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SupermarketsGridPage(
+                              supermarkets: homeData?.supermarkets ?? [],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 SizedBox(height: 10.h),
                 state.maybeWhen(
                   loaded: (data) => Supermarketslider(
@@ -435,16 +556,32 @@ class _HomeState extends State<Home>
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomTitleSection(title: "home.all_resturant".tr()),
-                ),
+                if (homeData?.allRestaurants.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomTitleSection(
+                      title: "home.all_resturant".tr(),
+                      all: "common.all".tr(),
+                      icon: Icons.arrow_forward_ios_outlined,
+                      ontap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AllResturant(
+                              restaurants: homeData?.allRestaurants ?? [],
+                              onTap: _openRestaurant,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 SizedBox(height: 10.h),
                 loading
                     ? _shimmerBox(height: 320.h)
                     : state.maybeWhen(
                         loaded: (data) => AllResturant(
-                          restaurants: data.nearbyRestaurants,
+                          restaurants: data.allRestaurants,
                           onTap: _openRestaurant,
                         ),
                         orElse: () => const SizedBox.shrink(),

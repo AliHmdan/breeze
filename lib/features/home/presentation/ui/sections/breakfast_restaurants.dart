@@ -14,7 +14,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class BreakfastRestaurantCard extends StatefulWidget {
   final String? image;
@@ -63,8 +62,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child:
-                AppNetworkImage(
+                child: AppNetworkImage(
                   path: widget.image,
                   height: 100.h,
                   width: double.infinity,
@@ -79,7 +77,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                 ),
               ),
               // ✅ Open/Closed badge
-                  if (!widget.isOpen) const ClosedOverlay(),
+              if (!widget.isOpen) const ClosedOverlay(),
 
               // Rating
               PositionedDirectional(
@@ -114,8 +112,6 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                   ),
                 ),
               ),
-
-
             ],
           ),
           Padding(
@@ -126,7 +122,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -136,11 +132,11 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
 
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/motor.svg",
+              Image.asset(
+                "assets/icons/new_del.png",
                 width: 16.w,
                 height: 16.h,
-                color:Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(

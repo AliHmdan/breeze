@@ -1,16 +1,12 @@
-import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discount_card.dart';
-import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart';
 import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
 import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart'
     show ResturantDetails;
 import 'package:breezefood/features/stores/presentation/ui/screens/resturant_details.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:math' as math;
 
 class DiscountHome extends StatelessWidget {
   final List<RestaurantDiscountModel> discounts;
@@ -48,22 +44,6 @@ class DiscountHome extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: CustomTitleSection(
-            title: "discount.title".tr(),
-            all: "common.all".tr(),
-            icon: Icons.arrow_forward_ios_outlined,
-            ontap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) =>
-                      DiscountRestaurantsGridPage(discounts: discounts),
-                ),
-              );
-            },
-          ),
-        ),
         Padding(
           padding: EdgeInsetsDirectional.only(top: 10, start: 16, end: 0.2),
           child: SizedBox(
@@ -186,136 +166,36 @@ class DiscountRestaurantsGridPage extends StatelessWidget {
                 crossAxisCount: crossAxisCount,
                 mainAxisSpacing: 12.h,
                 crossAxisSpacing: 10.w,
-
-                // ✅ أطول شوي = مسافة كافية للـ name + badge
-                childAspectRatio: 0.92,
+                childAspectRatio: 0.58, // Adjusted for better rating display
               ),
               itemCount: discounts.length,
               itemBuilder: (context, index) {
                 final d = discounts[index];
-                final discount = _discountText(d);
+                final base = d.deliveryBaseFee;
+                final fin = d.deliveryFinalFee;
 
-                return InkWell(
+                // يوجد خصم توصيل فقط إذا deliveryDiscount موجود
+                final hasDeliveryDiscount =
+                    d.deliveryDiscount != null && base != null && fin != null;
+
+                return Discount(
+                  isOpen: d.isOpen,
                   onTap: () => openRestaurantById(context, d.restaurantId),
-                  borderRadius: BorderRadius.circular(16.r),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.25),
-                      ),
-                    ),
-
-                    // ✅ ديناميك: نتحكم بحجم الصورة حسب ارتفاع التايل
-                    child: LayoutBuilder(
-                      builder: (context, tile) {
-                        final tileH = tile.maxHeight;
-
-                        // الصورة ~60% من ارتفاع الكرت وبحد أقصى 120.h
-                        final imageH = math.min(120.h, tileH * 0.60);
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16.r),
-                              ),
-                              child: Container(
-                                height: imageH,
-                                width: double.infinity,
-                                color: colorScheme.surfaceContainerHighest,
-                                alignment: Alignment.center,
-                                child: AppNetworkImage(
-                                  path: _logoUrl(d),
-                                  height: imageH, // حدد حسب حجم الكونتينر عندك
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  fallback: Image.asset(
-                                    "assets/images/store_placeholder.png", // 👈 صورة بدل الأيقونة
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.all(10.w),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      d.restaurantName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: colorScheme.onSurface,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w800,
-                                        fontFamily:
-                                            Localizations.localeOf(
-                                                  context,
-                                                ).languageCode ==
-                                                'ar'
-                                            ? 'Cairo'
-                                            : 'Inter',
-                                      ),
-                                    ),
-
-                                    const Spacer(),
-
-                                    if (discount.trim().isNotEmpty)
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 4.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.inverseSurface
-                                              .withOpacity(0.55),
-                                          borderRadius: BorderRadius.circular(
-                                            12.r,
-                                          ),
-                                          border: Border.all(
-                                            color: colorScheme.outline
-                                                .withOpacity(0.25),
-                                          ),
-                                        ),
-
-                                        // ✅ هون كان يصير overflow: خليه يكمّش نفسه
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            discount,
-                                            style: TextStyle(
-                                              color:
-                                                  colorScheme.onInverseSurface,
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w800,
-                                              fontFamily:
-                                                  Localizations.localeOf(
-                                                        context,
-                                                      ).languageCode ==
-                                                      'ar'
-                                                  ? 'Cairo'
-                                                  : 'Inter',
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
+                  imagePath: _logoUrl(d),
+                  subtitle: d.restaurantName,
+                  price: 0,
+                  discount: _discountText(d),
+                  rating: d.ratingAvg > 0
+                      ? d.ratingAvg
+                      : 4.5, // Default rating if 0
+                  ratingCount: d.ratingCount > 0
+                      ? d.ratingCount
+                      : 100, // Default count if 0
+                  hasFoodDiscount: d.foodDiscount != null,
+                  hasDeliveryDiscount: d.deliveryDiscount != null,
+                  showDeliveryPrices: true,
+                  deliveryOldPrice: hasDeliveryDiscount ? base : null,
+                  deliveryNewPrice: fin,
                 );
               },
             );

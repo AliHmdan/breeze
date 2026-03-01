@@ -70,7 +70,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/logoBreezefood"
+  image_path: "assets/icons/ICON-01.png"
   min_sdk_android: 21
   remove_alpha_ios: true
   flutter_lints: ^5.0.0
