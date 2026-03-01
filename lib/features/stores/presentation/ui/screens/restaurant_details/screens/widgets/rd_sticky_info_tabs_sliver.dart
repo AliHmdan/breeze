@@ -57,7 +57,9 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
           child: Material(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.zero,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 520),
+              curve: Curves.easeOutCubic,
               color: roundedTop ? AppColor.Dark : AppColor.Dark,
               height: roundedTop ? null : 128.8.h,
 
@@ -67,106 +69,173 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                   ///
                   /// this section will gown
                   ///
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 320),
-                    reverseDuration: const Duration(milliseconds: 220),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) {
-                      final fade = CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOut,
-                      );
-                      final slide =
-                          Tween<Offset>(
-                            begin: const Offset(0, 0.06),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          );
-
-                      return FadeTransition(
-                        opacity: fade,
-                        child: SlideTransition(position: slide, child: child),
-                      );
-                    },
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topLeft,
-                        children: [
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    child: roundedTop
-                        ? Padding(
-                            key: const ValueKey('rd_sticky_expanded'),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 8.h,
-                            ),
-                            child: Container(
+                  Stack(
+                    alignment: Alignment.topLeft,
+                    children: [
+                      IgnorePointer(
+                        ignoring: !roundedTop,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 520),
+                          curve: Curves.easeOutCubic,
+                          opacity: roundedTop ? 1 : 0,
+                          child: AnimatedSlide(
+                            duration: const Duration(milliseconds: 520),
+                            curve: Curves.easeOutCubic,
+                            offset: roundedTop
+                                ? Offset.zero
+                                : const Offset(0, -0.03),
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 14.w,
+                                horizontal: 16.w,
                                 vertical: 8.h,
                               ),
-                              decoration: BoxDecoration(
-                                color: AppColor.Dark,
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: onRateTap,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 14.w,
+                                  vertical: 8.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColor.Dark,
+                                  borderRadius: BorderRadius.circular(14.r),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: onRateTap,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            SizedBox(height: 12.h),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                  size: 16,
+                                                ),
+                                                SizedBox(width: 4.w),
+                                                Text(
+                                                  avgRatingText,
+                                                  style: TextStyle(
+                                                    color: AppColor.white,
+                                                    fontSize: 11.5.sp,
+                                                    fontFamily: context.isAr
+                                                        ? 'Cairo'
+                                                        : 'Inter',
+                                                  ),
+                                                ),
+                                                SizedBox(width: 6.w),
+                                                Text(
+                                                  "($reviewsCountText)",
+                                                  style: TextStyle(
+                                                    color: Colors.white
+                                                        .withOpacity(0.65),
+                                                    fontSize: 11.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontFamily: context.isAr
+                                                        ? 'Cairo'
+                                                        : 'Inter',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 10.h),
+                                            Text(
+                                              "restaurant.rate_us".tr(),
+                                              style: TextStyle(
+                                                color: AppColor.gryLighter,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w900,
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                    divider,
+                                    Expanded(
                                       child: Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
                                         children: [
+                                          SizedBox(height: 9.h),
+                                          Image.asset(
+                                            "assets/icons/new_del.png",
+                                            width: 20.w,
+                                            height: 20.h,
+                                            color: AppColor.white,
+                                          ),
                                           SizedBox(height: 12.h),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
-                                                size: 16,
+                                          if (showTwoPrices) ...[
+                                            Text(
+                                              deliveryBaseText,
+                                              style: TextStyle(
+                                                color: AppColor.LightActive,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                                fontSize: 11.sp,
+                                                fontWeight: FontWeight.w800,
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
                                               ),
-                                              SizedBox(width: 4.w),
-                                              Text(
-                                                avgRatingText,
-                                                style: TextStyle(
-                                                  color: AppColor.white,
-                                                  fontSize: 11.5.sp,
-                                                  fontFamily: context.isAr
-                                                      ? 'Cairo'
-                                                      : 'Inter',
-                                                ),
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Text(
+                                              deliveryFinalText,
+                                              style: TextStyle(
+                                                color: AppColor.red,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w900,
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
                                               ),
-                                              SizedBox(width: 6.w),
-                                              Text(
-                                                "($reviewsCountText)",
-                                                style: TextStyle(
-                                                  color: Colors.white
-                                                      .withOpacity(0.65),
-                                                  fontSize: 11.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: context.isAr
-                                                      ? 'Cairo'
-                                                      : 'Inter',
-                                                ),
+                                            ),
+                                          ] else
+                                            Text(
+                                              deliveryFinalText,
+                                              style: TextStyle(
+                                                color: AppColor.gryLighter,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w900,
+                                                fontFamily: context.isAr
+                                                    ? 'Cairo'
+                                                    : 'Inter',
                                               ),
-                                            ],
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    divider,
+
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          SizedBox(height: 10.h),
+                                          Image.asset(
+                                            "assets/icons/clock_new.png",
+                                            width: 17.w,
+                                            height: 17.h,
+                                            color: AppColor.white,
                                           ),
                                           SizedBox(height: 10.h),
                                           Text(
-                                            "restaurant.rate_us".tr(),
+                                            deliveryTimeText,
                                             style: TextStyle(
                                               color: AppColor.gryLighter,
                                               fontSize: 12.sp,
@@ -179,147 +248,78 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                  ),
-
-                                  divider,
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        SizedBox(height: 9.h),
-                                        Image.asset(
-                                          "assets/icons/new_del.png",
-                                          width: 20.w,
-                                          height: 20.h,
-                                          color: AppColor.white,
-                                        ),
-                                        SizedBox(height: 12.h),
-                                        if (showTwoPrices) ...[
-                                          Text(
-                                            deliveryBaseText,
-                                            style: TextStyle(
-                                              color: AppColor.LightActive,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w800,
-                                              fontFamily: context.isAr
-                                                  ? 'Cairo'
-                                                  : 'Inter',
-                                            ),
-                                          ),
-                                          SizedBox(height: 2.h),
-                                          Text(
-                                            deliveryFinalText,
-                                            style: TextStyle(
-                                              color: AppColor.red,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w900,
-                                              fontFamily: context.isAr
-                                                  ? 'Cairo'
-                                                  : 'Inter',
-                                            ),
-                                          ),
-                                        ] else
-                                          Text(
-                                            deliveryFinalText,
-                                            style: TextStyle(
-                                              color: AppColor.gryLighter,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w900,
-                                              fontFamily: context.isAr
-                                                  ? 'Cairo'
-                                                  : 'Inter',
-                                            ),
-                                          ),
-                                      ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      IgnorePointer(
+                        ignoring: roundedTop,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 520),
+                          curve: Curves.easeOutCubic,
+                          opacity: roundedTop ? 0 : 1,
+                          child: AnimatedSlide(
+                            duration: const Duration(milliseconds: 520),
+                            curve: Curves.easeOutCubic,
+                            offset: roundedTop
+                                ? const Offset(0, 0.03)
+                                : Offset.zero,
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.only(
+                                start: 8.w,
+                                end: 8.w,
+                                top: 12.h,
+                                bottom: 6.h,
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: const Icon(
+                                      Icons.arrow_back_ios,
+                                      color: Colors.red,
                                     ),
                                   ),
-
-                                  divider,
-
+                                  SizedBox(width: 6.w),
                                   Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        SizedBox(height: 10.h),
-                                        Image.asset(
-                                          "assets/icons/clock_new.png",
-                                          width: 17.w,
-                                          height: 17.h,
-                                          color: AppColor.white,
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Text(
-                                          deliveryTimeText,
-                                          style: TextStyle(
-                                            color: AppColor.gryLighter,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w900,
-                                            fontFamily: context.isAr
-                                                ? 'Cairo'
-                                                : 'Inter',
-                                          ),
-                                        ),
-                                      ],
+                                    child: _TitleBlock(
+                                      restaurantName: restaurantName,
+                                      avgRatingText: avgRatingText,
+                                      reviewsCountText: reviewsCountText,
+                                      textColor: AppColor.white,
+                                      maxLines: 1,
+                                      fontSize: 16.sp,
+                                      addShadows: false,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: onSearch,
+                                    icon: const Icon(
+                                      Icons.search,
+                                      color: Colors.red,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          )
-                        : Padding(
-                            key: const ValueKey('rd_sticky_compact'),
-                            padding: EdgeInsetsDirectional.only(
-                              start: 8.w,
-                              end: 8.w,
-                              top: 12.h,
-                              bottom: 6.h,
-                            ),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: const Icon(
-                                    Icons.arrow_back_ios,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                SizedBox(width: 6.w),
-                                Expanded(
-                                  child: _TitleBlock(
-                                    restaurantName: restaurantName,
-                                    avgRatingText: avgRatingText,
-                                    reviewsCountText: reviewsCountText,
-                                    textColor: AppColor.white,
-                                    maxLines: 1,
-                                    fontSize: 16.sp,
-                                    addShadows: false,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: onSearch,
-                                  icon: const Icon(
-                                    Icons.search,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   // ===== Tabs =====
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 220),
+                    duration: const Duration(milliseconds: 520),
                     curve: Curves.easeOut,
                     opacity: roundedTop ? 0.92 : 1,
                     child: AnimatedSlide(
-                      duration: const Duration(milliseconds: 220),
+                      duration: const Duration(milliseconds: 520),
                       curve: Curves.easeOutCubic,
                       offset: roundedTop ? const Offset(0, 0.02) : Offset.zero,
                       child: Padding(

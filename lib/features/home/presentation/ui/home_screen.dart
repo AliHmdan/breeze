@@ -546,7 +546,7 @@ class _HomeState extends State<Home>
                           children: [
                             AppbarHome(home: homeData, homeCubit: cubit),
 
-                            SizedBox(height: 12.h),
+                            SizedBox(height: 14.h),
                           ],
                         ),
                       ),
@@ -580,18 +580,21 @@ class _HomeState extends State<Home>
                       // ===== Sections =====
                       SliverToBoxAdapter(
                         child: Column(
-                          children: List.generate(sections.length, (i) {
-                            return Column(
-                              children: [
-                                SizedBox(
-                                  key: homeScroll.sectionKeys[i],
-                                  height: 1,
-                                ), // ✅ فقط هون
-                                sections[i].builder(),
-                                SizedBox(height: 14.h),
-                              ],
-                            );
-                          }),
+                          children: [
+                            SizedBox(height: 14.h),
+                            ...List.generate(sections.length, (i) {
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    key: homeScroll.sectionKeys[i],
+                                    height: 0,
+                                  ), // ✅ فقط هون
+                                  sections[i].builder(),
+                                  SizedBox(height: 14.h),
+                                ],
+                              );
+                            }),
+                          ],
                         ),
                       ),
 

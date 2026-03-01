@@ -209,7 +209,7 @@ class OpenNow extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsetsDirectional.only(top: 10, start: 8, end: 0.2),
+      padding: EdgeInsetsDirectional.only(top: 10, start: 16, end: 0.2),
       child: SizedBox(
         height: 160.h, // نفس منطق الخصومات
         child: LayoutBuilder(
