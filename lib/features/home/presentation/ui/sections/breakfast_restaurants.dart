@@ -126,7 +126,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white,
+                color:Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -140,7 +140,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                 "assets/icons/motor.svg",
                 width: 16.w,
                 height: 16.h,
-                color: Colors.white,
+                color:Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(

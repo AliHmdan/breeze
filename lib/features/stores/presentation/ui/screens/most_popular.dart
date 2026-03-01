@@ -137,7 +137,7 @@ class MostPopularSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 200.h,
+          height: 220.h,
           // width: containerWidth,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -364,11 +364,11 @@ class _PopularItemCardState extends State<PopularItemCard> {
               //   child: Container(color: Colors.black.withOpacity(0.25)),
               // ),
               SizedBox(
-                width: 145.h,
+                width: 135.h,
                 height: 145.h,
                 child: AppNetworkImage(
                   path: imageUrl,
-                  height: 145.h,
+                  height: 135.h,
                   width: 145.h,
                   fit: BoxFit.cover,
                   radius: BorderRadius.circular(16.r),
@@ -394,6 +394,8 @@ class _PopularItemCardState extends State<PopularItemCard> {
                     ),
                     child: Text(
                       _discountBadgeText(context),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppColor.white,
                         fontSize: 11.sp,
@@ -441,10 +443,10 @@ class _PopularItemCardState extends State<PopularItemCard> {
 
           // ================= TEXT AREA =================
           Container(
-            height: 55.h,
+            // height: 60.h,
 
-            width: 145.h,
-            padding: EdgeInsets.symmetric(vertical: 5),
+            width: 142.w,
+            // padding: EdgeInsets.symmetric(vertical: 5),
 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,11 +454,11 @@ class _PopularItemCardState extends State<PopularItemCard> {
               children: [
                 Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColor.white,
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     fontFamily:
                         Localizations.localeOf(context).languageCode == 'ar'

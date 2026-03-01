@@ -37,7 +37,7 @@ class _MainShellState extends State<MainShell> {
       ],
       child: const Home(),
     ),
-    StoresNavTab(),
+    // StoresNavTab(),
     FavoritePage(),
     BlocProvider(create: (_) => getIt<OrdersCubit>(), child: Orders()),
     Profile(),

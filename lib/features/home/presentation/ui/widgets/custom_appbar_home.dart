@@ -147,60 +147,58 @@ class CustomAppbarHome extends StatelessWidget {
         // ),
 
         // ✅ العنوان + سطر تلميح
-        Expanded(
-          child: InkWell(
-            onTap: onLocationTap,
-            borderRadius: BorderRadius.circular(12.r),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (image != null)
-                        SvgPicture.asset(
-                          image!,
-                          color: colorScheme.onSurface.withOpacity(0.7),
-                          width: 20,
-                          height: 20,
-                        ),
-                      SizedBox(width: image != null ? 6.w : 0),
-                      Flexible(
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: colorScheme.onSurface,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-
-                      if (icon != null)
-                        Icon(icon, color: colorScheme.onSurface.withOpacity(0.7), size: 22.sp),
-                    ],
-                  ),
-
-                  if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
-                    SizedBox(height: 2.h),
-                    Text(
-                      subtitle!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+        InkWell(
+          onTap: onLocationTap,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (image != null)
+                      SvgPicture.asset(
+                        image!,
                         color: colorScheme.onSurface.withOpacity(0.7),
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w500,
+                        width: 20,
+                        height: 20,
+                      ),
+                    SizedBox(width: image != null ? 6.w : 0),
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
+
+                    if (icon != null)
+                      Icon(icon, color: colorScheme.onSurface.withOpacity(0.7), size: 22.sp),
                   ],
+                ),
+
+                if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         ),

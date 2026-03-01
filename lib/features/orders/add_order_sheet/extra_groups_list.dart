@@ -69,7 +69,9 @@ class ExtraGroupsList extends StatelessWidget {
                     MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Row(
+                        child:
+
+                        Row(
                           children: [
                             Checkbox(
                               materialTapTargetSize:
@@ -84,7 +86,9 @@ class ExtraGroupsList extends StatelessWidget {
                               AppColor.primaryColor,
                               side: BorderSide(
                                 color:
-                                AppColor.LightActive,
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? AppColor.gry
+                                    : const Color(0xFF262626) ,
                                 width: 1.5,
                               ),
                               shape:
@@ -105,7 +109,7 @@ class ExtraGroupsList extends StatelessWidget {
                               },
                             ),
 
-                            SizedBox(width: 6.w),
+                            // SizedBox(width: 2.w),
 
                             Expanded(
                               child: GestureDetector(
@@ -119,24 +123,24 @@ class ExtraGroupsList extends StatelessWidget {
                                         it.id);
                                   }
                                 },
-                                child: CustomSubTitle(
-                                  subtitle: name,
-                                  color:
-                                  AppColor.LightActive,
-                                  fontsize: 12,
-                                ),
+                                child:Text(name,style: TextStyle( fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color:       Theme.of(context).brightness == Brightness.dark
+                                      ?  Colors.white
+                                      : const Color(0xFF262626)
+                                  ,),)
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      CustomSubTitle(
-                        subtitle:
-                        context.money(it.price),
-                        color: AppColor.LightActive,
-                        fontsize: 14,
-                      ),
+                      Text(context.money(it.price),style: TextStyle( fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color:     Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            :
+                        Color(0xFF373737),),)
                     ],
                   ),
                 );

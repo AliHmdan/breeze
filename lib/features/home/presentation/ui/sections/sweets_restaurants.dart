@@ -105,6 +105,9 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                           color: Colors.white,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
+                          fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                              ? 'Cairo'
+                              : 'Inter',
                         ),
                       ),
                     ],
@@ -122,9 +125,12 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white,
+                color:Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
+                fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'Cairo'
+                    : 'Inter',
               ),
             ),
           ),
@@ -136,7 +142,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 "assets/icons/motor.svg",
                 width: 16.w,
                 height: 16.h,
-                color: Colors.white,
+                color:Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(

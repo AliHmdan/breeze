@@ -53,6 +53,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   like_button: ^2.1.0
   scrollable_positioned_list: ^0.3.8
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:
@@ -92,7 +93,10 @@ flutter:
   fonts:
     - family: Inter
       fonts:
-        - asset: assets/fonts/Inter/static/Inter_18pt-Bold.ttf
+        - asset: assets/fonts/Inter/static/Inter_18pt-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Inter/static/Inter_18pt-Medium.ttf
+          weight: 500
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo/static/Cairo-Bold.ttf

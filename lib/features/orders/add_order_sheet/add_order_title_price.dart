@@ -42,22 +42,25 @@ class AddOrderTitlePrice extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 20.h),
+        SizedBox(height: 10.h),
 
         /// TITLE
-        CustomSubTitle(
-          subtitle: title.isEmpty ? "Empty" : title,
-          color: AppColor.white,
-          fontsize: 20.sp,
-        ),
+        Text(
+          title.isEmpty ? "Empty" : title,
 
+          style: TextStyle(
+            color: AppColor.white,
+            fontSize: 22.sp,
+            fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                ? 'Cairo'
+                : 'Inter',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         SizedBox(height: 8.h),
 
         /// DESCRIPTION
-        AddOrderDescription(
-          description: description,
-          maxWidth: 300.w,
-        ),
+        AddOrderDescription(description: description, maxWidth: 300.w),
 
         SizedBox(height: 12.h),
 
@@ -75,6 +78,7 @@ class AddOrderTitlePrice extends StatelessWidget {
                       color: AppColor.gry,
                       fontSize: 14.sp,
                       decoration: TextDecoration.lineThrough,
+                      decorationColor: AppColor.gry,
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -83,11 +87,9 @@ class AddOrderTitlePrice extends StatelessWidget {
                 Text(
                   context.money(price),
                   style: TextStyle(
-                    color: hasDiscount
-                        ? AppColor.red
-                        : AppColor.white,
+                    color: hasDiscount ? AppColor.red : AppColor.white,
                     fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],

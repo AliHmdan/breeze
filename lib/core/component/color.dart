@@ -60,7 +60,7 @@ class AppColor {
   ///
   /// do not change
   ///
-  static const Color red = Color(0xffF95B5B);
+  static const Color red = Color(0xffB71C1C);
   static const Color green = Color(0xff77DD98);
   static const Color yellow = Color(0xffF2E665);
   static const Color primaryColor = Color(0xff2ECC71);
@@ -69,7 +69,8 @@ class AppColor {
   ///6B7280
   ///
   ///
-  static const Color gry = Color(0xffCFCFCF);
+  static const Color gry = Color(0xFF9E9E9E);
+  static const Color descraption = Color(0xFF707070);
   static const Color lightblack = Color(0xff6B7280);
   static Color get gryForNavBar {
     final ctx = NavigationKey.navigatorKey.currentContext;

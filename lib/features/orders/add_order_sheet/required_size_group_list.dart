@@ -41,7 +41,7 @@ class RequiredSizeGroupList extends StatelessWidget {
         CustomSubTitle(
           subtitle: title(),
           color: AppColor.white,
-          fontsize: 18,
+          fontsize: 17,
         ),
 
         SizedBox(height: 8.h),
@@ -87,7 +87,9 @@ class RequiredSizeGroupList extends StatelessWidget {
                           AppColor.primaryColor,
                           side: BorderSide(
                             color:
-                            AppColor.LightActive,
+                            Theme.of(context).brightness == Brightness.dark
+                                ? AppColor.gry
+                                : const Color(0xFF262626) ,
                             width: 1.5,
                           ),
                           shape:
@@ -108,23 +110,37 @@ class RequiredSizeGroupList extends StatelessWidget {
                         ),
 
                         Expanded(
-                          child: CustomSubTitle(
-                            subtitle: name,
+                          child:Text(name,style: TextStyle( fontSize: 14,
+                            fontWeight: FontWeight.w400,
                             color:
-                            AppColor.LightActive,
-                            fontsize: 11,
-                          ),
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                :
+                            const Color(0xFF262626) ,
+                            //   color: Color(0xFF2D2D2D)
+
+
+                            ),)
+
                         ),
                       ],
                     ),
                   ),
+                  Text(context.money(it.price),style: TextStyle( fontSize: 14,fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'Cairo'
+                      : 'Inter',
+                    fontWeight: FontWeight.w400,
+                    color:
+          Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
 
-                  CustomSubTitle(
-                    subtitle:
-                    context.money(it.price),
-                    color: AppColor.LightActive,
-                    fontsize: 12,
-                  ),
+                        :Color(0xFF373737),),)
+                  // CustomSubTitle(
+                  //   subtitle:
+                  //   context.money(it.price),
+                  //   color: AppColor.LightActive,
+                  //   fontsize: 12,
+                  // ),
                 ],
               ),
             ),

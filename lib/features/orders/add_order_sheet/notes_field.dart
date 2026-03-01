@@ -78,11 +78,11 @@ class _NotesFieldState extends State<NotesField> {
 
               enabledBorder:  UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: AppColor.white, width: 1),
+                BorderSide(color: Color(0xFF373737), width: 1),
               ),
               focusedBorder:  UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: AppColor.white, width: 1.5),
+                BorderSide(color: Color(0xFF373737), width: 1),
               ),
             ),
           ),

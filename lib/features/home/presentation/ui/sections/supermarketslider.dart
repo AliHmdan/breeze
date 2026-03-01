@@ -116,8 +116,11 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                           vertical: 6.h,
                         ),
 
-                        child: CustomSubTitle(subtitle:  "restaurant.closed".tr(), color: AppColor.white, fontsize: 13.sp)
-
+                        child: CustomSubTitle(
+                          subtitle: "restaurant.closed".tr(),
+                          color: AppColor.white,
+                          fontsize: 13.sp,
+                        ),
                       ),
                     ),
                   ),
@@ -166,7 +169,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: Colors.white,
+              color:Theme.of(context).colorScheme.onSurface,
               fontSize: 15.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -181,12 +184,12 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                 "assets/icons/motor.svg",
                 width: 16.w,
                 height: 16.h,
-                color: Colors.white,
+                color:Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
               CustomSubTitle(
                 subtitle: feeText,
-                color: AppColor.white,
+                color:Theme.of(context).colorScheme.onSurface,
                 fontsize: 12.sp,
               ),
             ],
