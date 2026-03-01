@@ -450,7 +450,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
             ),
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               scrollCtl.setStickyExtent(
-                120.h,
+                165.h,
               ); // نفس minExtent/maxExtent تبع RDStickyInfoTabsSliver
 
               return [
