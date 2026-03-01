@@ -102,14 +102,49 @@ class _OrdersHistoryState extends State<OrdersHistory> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// اسم المطعم
-                    Text(
-                      restaurant.name,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            restaurant.name,
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        if (item.isVip)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.emoji_events,
+                                  size: 14.sp,
+                                  color: colorScheme.onPrimary,
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  "orders.vip_badge".tr(),
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimary,
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
 
                     const SizedBox(height: 4),

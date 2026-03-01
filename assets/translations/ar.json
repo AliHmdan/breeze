@@ -148,6 +148,10 @@
   "cart": {
     "item_notes_optional": "ملاحظات الوجبة ",
     "item_notes_hint": "مثال: بدون بصل، سبايسي خفيف...",
+    "recommended_to_you": "مقترح لك",
+    "recommended_loading": "جارٍ تحميل المقترحات...",
+    "people_also_added": "أشخاص أضافوا أيضاً",
+    "popular": "الأكثر طلباً",
     "view_cart": "عرض السلة",
     "view_cart_loading": "عرض السلة ..."
   },
@@ -185,6 +189,7 @@
     "customer_code_copied": "تم نسخ الكود",
     "price_label": "السعر : ",
     "items_count": "العناصر: {count}",
+    "vip_badge": "VIP",
     "tap_to_show_customer_code": "اضغط لعرض كود الطلب",
     "no_current_orders": "لا توجد طلبات حالية"
   },

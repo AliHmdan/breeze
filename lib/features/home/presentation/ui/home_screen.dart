@@ -15,6 +15,7 @@ import 'package:breezefood/features/home/presentation/ui/sections/dicounts/disco
 import 'package:breezefood/features/home/presentation/ui/sections/sweets_restaurants.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/home_tabs_bar.dart';
 import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart';
+import 'package:breezefood/features/assistant/presentation/ui/assistant_chat_sheet.dart';
 
 import 'package:breezefood/features/home/presentation/ui/sections/supermarketslider.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/appbar_home.dart';
@@ -47,8 +48,12 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with RouteAware {
+class _HomeState extends State<Home>
+    with RouteAware, SingleTickerProviderStateMixin {
   bool _subscribed = false;
+
+  late final AnimationController _robotBobController;
+  late final Animation<double> _robotBob;
 
   // ✅ Controller تبع السكرول + tabs sync
   late final HomeScrollController homeScroll = HomeScrollController(
@@ -60,6 +65,15 @@ class _HomeState extends State<Home> with RouteAware {
   @override
   void initState() {
     super.initState();
+
+    _robotBobController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+
+    _robotBob = Tween<double>(begin: 0, end: -10).animate(
+      CurvedAnimation(parent: _robotBobController, curve: Curves.easeInOut),
+    );
 
     cubit = context.read<HomeCubit>();
 
@@ -109,6 +123,7 @@ class _HomeState extends State<Home> with RouteAware {
   void dispose() {
     if (_subscribed) routeObserver.unsubscribe(this);
     homeScroll.dispose();
+    _robotBobController.dispose();
     super.dispose();
   }
 
@@ -454,8 +469,69 @@ class _HomeState extends State<Home> with RouteAware {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
+        final fabBottomPadding =
+            (showBottom ? 90.h : 24.h) + MediaQuery.of(context).padding.bottom;
+
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
+          floatingActionButton: Padding(
+            padding: EdgeInsets.only(bottom: fabBottomPadding),
+            child: FloatingActionButton(
+              heroTag: 'assistant_robot_fab',
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              highlightElevation: 0,
+              onPressed: () => showAssistantChatSheet(context),
+              child: SizedBox(
+                width: 56.w,
+                height: 56.w,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: 30.w,
+                        height: 8.h,
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.14),
+                          borderRadius: BorderRadius.circular(999),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.25),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: _robotBob,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(0, _robotBob.value),
+                          child: child,
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/icons/pnj ROBOT.png',
+                        width: 56.w,
+                        height: 56.w,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           body: Stack(
             children: [
               SafeArea(

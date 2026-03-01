@@ -146,6 +146,10 @@
   "cart": {
     "item_notes_optional": "Item notes ",
     "item_notes_hint": "e.g. No onion, mild spicy...",
+    "recommended_to_you": "Recommended to you",
+    "recommended_loading": "Loading recommendations...",
+    "people_also_added": "People also added",
+    "popular": "Popular",
     "view_cart": "View Cart",
     "view_cart_loading": "View Cart ..."
   },
@@ -181,6 +185,7 @@
     "customer_code_copied": "Code copied",
     "price_label": "Price : ",
     "items_count": "Items: {count}",
+    "vip_badge": "VIP",
     "tap_to_show_customer_code": "Tap to show order code",
     "no_current_orders": "No current orders",
     "cannot_identify_meal_or_restaurant": "Cannot identify meal or restaurant"

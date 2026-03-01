@@ -27,8 +27,12 @@ class OrderBundle {
 
   factory OrderBundle.fromJson(Map<String, dynamic> json) {
     return OrderBundle(
-      order: OrderInfo.fromJson((json["order"] as Map?)?.cast<String, dynamic>() ?? {}),
-      restaurant: OrderRestaurant.fromJson((json["restaurant"] as Map?)?.cast<String, dynamic>() ?? {}),
+      order: OrderInfo.fromJson(
+        (json["order"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      restaurant: OrderRestaurant.fromJson(
+        (json["restaurant"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
       items: ((json["items"] as List?) ?? const [])
           .where((e) => e is Map)
           .map((e) => OrderItem.fromJson((e as Map).cast<String, dynamic>()))
@@ -36,6 +40,7 @@ class OrderBundle {
     );
   }
 }
+
 class OrderDetailsResponse {
   final OrderInfo order;
   final OrderDriver driver;
@@ -53,12 +58,21 @@ class OrderDetailsResponse {
 
   factory OrderDetailsResponse.fromJson(Map<String, dynamic> json) {
     return OrderDetailsResponse(
-      order: OrderInfo.fromJson((json["order"] as Map?)?.cast<String, dynamic>() ?? {}),
-      driver: OrderDriver.fromJson((json["driver"] as Map?)?.cast<String, dynamic>() ?? {}),
-      restaurant: OrderRestaurant.fromJson((json["restaurant"] as Map?)?.cast<String, dynamic>() ?? {}),
+      order: OrderInfo.fromJson(
+        (json["order"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      driver: OrderDriver.fromJson(
+        (json["driver"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      restaurant: OrderRestaurant.fromJson(
+        (json["restaurant"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
       timeline: ((json["timeline"] as List?) ?? const [])
           .where((e) => e is Map)
-          .map((e) => OrderTimelineStep.fromJson((e as Map).cast<String, dynamic>()))
+          .map(
+            (e) =>
+                OrderTimelineStep.fromJson((e as Map).cast<String, dynamic>()),
+          )
           .toList(),
       items: ((json["items"] as List?) ?? const [])
           .where((e) => e is Map)
@@ -99,7 +113,7 @@ class OrderDriver {
 }
 
 class OrderTimelineStep {
-  final String key;   // pending/preparing/inway/delivered
+  final String key; // pending/preparing/inway/delivered
   final String? time; // "12:25 pm" أو null
 
   OrderTimelineStep({required this.key, required this.time});
@@ -124,6 +138,8 @@ class OrderInfo {
   final String? notes;
   final String createdAt;
 
+  final bool isVip;
+
   final int? orderCustomerCode;
   final double itemsTotal;
 
@@ -139,6 +155,8 @@ class OrderInfo {
     required this.paymentStatus,
     required this.notes,
     required this.createdAt,
+
+    required this.isVip,
     required this.orderCustomerCode,
     required this.itemsTotal,
     required this.itemsCount,
@@ -157,6 +175,14 @@ class OrderInfo {
     return int.tryParse(v.toString()) ?? 0;
   }
 
+  static bool _toBool(dynamic v) {
+    if (v == null) return false;
+    if (v is bool) return v;
+    if (v is num) return v.toInt() == 1;
+    final s = v.toString().toLowerCase();
+    return s == "1" || s == "true" || s == "yes";
+  }
+
   factory OrderInfo.fromJson(Map<String, dynamic> json) {
     return OrderInfo(
       id: _toInt(json["id"]),
@@ -167,9 +193,14 @@ class OrderInfo {
       paymentStatus: (json["payment_status"] ?? "").toString(),
       notes: json["notes"]?.toString(),
       createdAt: (json["created_at"] ?? "").toString(),
-      orderCustomerCode: (json["order_customer_code"] == null) ? null : _toInt(json["order_customer_code"]),
+      isVip: _toBool(json["is_vip"]),
+      orderCustomerCode: (json["order_customer_code"] == null)
+          ? null
+          : _toInt(json["order_customer_code"]),
       itemsTotal: _toDouble(json["items_total"]),
-      itemsCount: (json["items_count"] == null) ? 0 : _toInt(json["items_count"]),
+      itemsCount: (json["items_count"] == null)
+          ? 0
+          : _toInt(json["items_count"]),
     );
   }
 }
