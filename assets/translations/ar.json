@@ -148,6 +148,10 @@
   "cart": {
     "item_notes_optional": "ملاحظات للوجبة (اختياري)",
     "item_notes_hint": "مثال: بدون بصل، سبايسي خفيف...",
+    "recommended_to_you": "مقترح لك",
+    "recommended_loading": "جارٍ تحميل المقترحات...",
+    "people_also_added": "أشخاص أضافوا أيضاً",
+    "popular": "الأكثر طلباً",
     "view_cart": "عرض السلة",
     "view_cart_loading": "عرض السلة ..."
   },

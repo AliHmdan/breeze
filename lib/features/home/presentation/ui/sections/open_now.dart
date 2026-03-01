@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/app_image.dart';
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/services/del_price_helper.dart'
     show deliveryFeeText;
@@ -157,11 +158,11 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/motor.svg",
-                      color: colorScheme.onSurface,
+                    Image.asset(
+                      "assets/icons/new_del.png",
                       width: 16.w,
                       height: 16.h,
+                      color: AppColor.white,
                     ),
                     SizedBox(width: 4.w),
                     Text(

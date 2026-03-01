@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/url_helper.dart';
+import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/services/shared_perfrences_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as mt;
@@ -6,10 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:breezefood/core/component/dialogs.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/features/orders/data/repo/appetizers_repository.dart';
 
 import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
+import 'package:breezefood/features/orders/model/appetizer.dart';
 import 'package:breezefood/features/orders/model/cart_response.dart';
 import 'package:breezefood/features/orders/model/store_order_request.dart';
 import 'package:breezefood/features/orders/payment_method.dart';
@@ -51,6 +55,17 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
   // VIP state
   bool _isVipEnabled = false;
 
+  // Appetizers (Recommended to you)
+  bool _loadingAppetizers = false;
+  String? _appetizersError;
+  int? _appetizersRestaurantId;
+  List<Appetizer> _appetizers = const [];
+
+  final Map<int, int> _appetizerQty = {}; // key=appetizerId
+  final Set<int> _syncingAppetizers = {};
+
+  int? _lastCartRestaurantId;
+
   final methods = const [
     PaymentMethod(
       id: 'cash',
@@ -75,6 +90,426 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     _tempDetailsFocus.dispose();
     _orderNotesCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAppetizers(int restaurantId) async {
+    if (_loadingAppetizers) return;
+    if (_appetizersRestaurantId == restaurantId && _appetizers.isNotEmpty) {
+      return;
+    }
+
+    setState(() {
+      _loadingAppetizers = true;
+      _appetizersError = null;
+      _appetizersRestaurantId = restaurantId;
+      _appetizers = const [];
+    });
+
+    try {
+      final repo = getIt<AppetizersRepository>();
+      final res = await repo.getAppetizers(restaurantId);
+
+      if (!mounted) return;
+
+      if (!res.ok) {
+        setState(() {
+          _appetizersError = res.message ?? "Failed to load appetizers";
+          _loadingAppetizers = false;
+        });
+        return;
+      }
+
+      final data = (res.data as List? ?? const []);
+      final items = data
+          .where((e) => e is Map)
+          .map((e) => Appetizer.fromJson((e as Map).cast<String, dynamic>()))
+          .toList();
+
+      setState(() {
+        _appetizers = items;
+        _loadingAppetizers = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _appetizersError = "Failed to load appetizers";
+        _loadingAppetizers = false;
+      });
+    }
+  }
+
+  Future<void> _syncAppetizer({
+    required int appetizerId,
+    required int quantity,
+  }) async {
+    if (_syncingAppetizers.contains(appetizerId)) return;
+
+    setState(() {
+      _syncingAppetizers.add(appetizerId);
+    });
+
+    try {
+      final repo = getIt<AppetizersRepository>();
+      final res = await repo.syncAppetizers(
+        appetizers: [
+          {"appetizer_id": appetizerId, "quantity": quantity},
+        ],
+      );
+
+      if (!mounted) return;
+
+      if (!res.ok) {
+        setState(() {
+          _syncingAppetizers.remove(appetizerId);
+        });
+        return;
+      }
+
+      await context.read<CartCubit>().loadCart(silent: true);
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _syncingAppetizers.remove(appetizerId);
+      });
+    }
+  }
+
+  Widget _recommendedAppetizersSection({
+    required bool isRTL,
+    required CartResponse cart,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_loadingAppetizers) {
+      return Padding(
+        padding: EdgeInsets.only(top: 6.h),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 18.w,
+              height: 18.w,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+            SizedBox(width: 10.w),
+            Text(
+              "cart.recommended_loading".tr(),
+              style: TextStyle(
+                color: colorScheme.onSurface.withOpacity(0.75),
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_appetizersError != null) {
+      return const SizedBox.shrink();
+    }
+
+    if (_appetizers.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "cart.people_also_added".tr(),
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          SizedBox(
+            height: 230.h,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _appetizers.length,
+              separatorBuilder: (_, __) => SizedBox(width: 10.w),
+              itemBuilder: (context, i) {
+                final a = _appetizers[i];
+                final qty = _appetizerQty[a.id] ?? 0;
+                final syncing = _syncingAppetizers.contains(a.id);
+                final disabled = syncing || !a.isAvailable;
+
+                final title = isRTL
+                    ? (a.nameAr.trim().isNotEmpty ? a.nameAr : a.nameEn)
+                    : (a.nameEn.trim().isNotEmpty ? a.nameEn : a.nameAr);
+
+                return SizedBox(
+                  width: 170.w,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(14.r),
+                      border: Border.all(
+                        color: colorScheme.outline.withOpacity(0.18),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(14.r),
+                            topRight: Radius.circular(14.r),
+                          ),
+                          child: Stack(
+                            children: [
+                              (a.image == null || a.image!.isEmpty)
+                                  ? Image.asset(
+                                      "assets/images/003.jpg",
+                                      width: double.infinity,
+                                      height: 120.h,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      a.image!,
+                                      width: double.infinity,
+                                      height: 120.h,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Image.asset(
+                                        "assets/images/003.jpg",
+                                        width: double.infinity,
+                                        height: 120.h,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                              Positioned(
+                                top: 8.h,
+                                left: 8.w,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w,
+                                    vertical: 4.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                  child: Text(
+                                    "cart.popular".tr(),
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 8.h),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                context.money(a.price),
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 5.h),
+                              Row(
+                                children: [
+                                  if (qty <= 0)
+                                    InkWell(
+                                      onTap: disabled
+                                          ? null
+                                          : () {
+                                              setState(() {
+                                                _appetizerQty[a.id] = 1;
+                                              });
+                                              _syncAppetizer(
+                                                appetizerId: a.id,
+                                                quantity: 1,
+                                              );
+                                            },
+                                      child: Container(
+                                        width: 38.w,
+                                        height: 38.w,
+                                        decoration: BoxDecoration(
+                                          color: disabled
+                                              ? colorScheme
+                                                    .surfaceContainerHighest
+                                              : colorScheme.surface,
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                          border: Border.all(
+                                            color: colorScheme.outline
+                                                .withOpacity(0.22),
+                                          ),
+                                        ),
+                                        child: syncing
+                                            ? Padding(
+                                                padding: EdgeInsets.all(10.w),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color:
+                                                          colorScheme.primary,
+                                                    ),
+                                              )
+                                            : Icon(
+                                                Icons.add,
+                                                color: disabled
+                                                    ? colorScheme.onSurface
+                                                          .withOpacity(0.35)
+                                                    : colorScheme.primary,
+                                              ),
+                                      ),
+                                    )
+                                  else
+                                    Container(
+                                      height: 38.w,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surface,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                        border: Border.all(
+                                          color: colorScheme.outline
+                                              .withOpacity(0.22),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          InkWell(
+                                            onTap: disabled
+                                                ? null
+                                                : () {
+                                                    final next = (qty - 1)
+                                                        .clamp(0, 99);
+                                                    setState(() {
+                                                      if (next == 0) {
+                                                        _appetizerQty.remove(
+                                                          a.id,
+                                                        );
+                                                      } else {
+                                                        _appetizerQty[a.id] =
+                                                            next;
+                                                      }
+                                                    });
+                                                    _syncAppetizer(
+                                                      appetizerId: a.id,
+                                                      quantity: next,
+                                                    );
+                                                  },
+                                            child: SizedBox(
+                                              width: 38.w,
+                                              height: 38.w,
+                                              child: Icon(
+                                                Icons.remove,
+                                                color: disabled
+                                                    ? colorScheme.onSurface
+                                                          .withOpacity(0.35)
+                                                    : colorScheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 28.w,
+                                            child: Center(
+                                              child: syncing
+                                                  ? SizedBox(
+                                                      width: 14.w,
+                                                      height: 14.w,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            color: colorScheme
+                                                                .primary,
+                                                          ),
+                                                    )
+                                                  : Text(
+                                                      qty.toString(),
+                                                      style: TextStyle(
+                                                        color: colorScheme
+                                                            .onSurface,
+                                                        fontSize: 13.sp,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: disabled
+                                                ? null
+                                                : () {
+                                                    final next = (qty + 1)
+                                                        .clamp(0, 99);
+                                                    setState(() {
+                                                      _appetizerQty[a.id] =
+                                                          next;
+                                                    });
+                                                    _syncAppetizer(
+                                                      appetizerId: a.id,
+                                                      quantity: next,
+                                                    );
+                                                  },
+                                            child: SizedBox(
+                                              width: 38.w,
+                                              height: 38.w,
+                                              child: Icon(
+                                                Icons.add,
+                                                color: disabled
+                                                    ? colorScheme.onSurface
+                                                          .withOpacity(0.35)
+                                                    : colorScheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ----------------------------
@@ -454,6 +889,26 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                       ),
                     ),
                     cartLoaded: (cart, updatingIds, toast, isRefreshing) {
+                      if (_lastCartRestaurantId != cart.restaurantId) {
+                        _appetizerQty.clear();
+                        _lastCartRestaurantId = cart.restaurantId;
+                      }
+
+                      for (final a in cart.appetizers) {
+                        if (a.appetizerId > 0 && a.quantity > 0) {
+                          _appetizerQty[a.appetizerId] = a.quantity;
+                        }
+                      }
+
+                      if (cart.restaurantId > 0 &&
+                          _appetizersRestaurantId != cart.restaurantId &&
+                          !_loadingAppetizers) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!mounted) return;
+                          _loadAppetizers(cart.restaurantId);
+                        });
+                      }
+
                       final isPlacingOrder = context
                           .watch<OrderFlowCubit>()
                           .state
@@ -502,6 +957,14 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 ),
 
                               SizedBox(height: 10.h),
+
+                              _recommendedAppetizersSection(
+                                isRTL: isRTL,
+                                cart: cart,
+                              ),
+
+                              if (_appetizers.isNotEmpty)
+                                SizedBox(height: 10.h),
 
                               if (_deliveryType == "delivery") ...[
                                 AddressSection(
@@ -803,6 +1266,13 @@ class _TotalsSection extends StatelessWidget {
             money: (n) => context.money(n),
             context: context,
           ),
+          if (cart.appetizersTotal > 0)
+            _totalLine(
+              title: isRTL ? "المقبلات" : "Appetizers",
+              value: cart.appetizersTotal,
+              money: (n) => context.money(n),
+              context: context,
+            ),
           _totalLine(
             title: isRTL ? "التوصيل" : "Delivery",
             value: cart.deliveryAfter,
@@ -925,22 +1395,12 @@ class _VipSection extends StatelessWidget {
         child: Row(
           children: [
             // VIP Crown Icon
-            Container(
-              width: 34.w,
-              height: 34.w,
-              decoration: BoxDecoration(
-                color: isVipEnabled
-                    ? colorScheme.primary.withOpacity(0.2)
-                    : colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(
-                Icons.emoji_events,
-                color: isVipEnabled
-                    ? colorScheme.primary
-                    : colorScheme.primary.withOpacity(0.7),
-                size: 20.sp,
-              ),
+            Icon(
+              Icons.emoji_events,
+              color: isVipEnabled
+                  ? const Color(0xFFFFD700)
+                  : const Color(0xFFFFD700).withOpacity(0.7),
+              size: 25.sp,
             ),
             SizedBox(width: 10.w),
             Expanded(
@@ -998,69 +1458,58 @@ class _VipSection extends StatelessWidget {
   void _showVipPopup(BuildContext context) {
     final isRTL = Directionality.of(context) == mt.TextDirection.rtl;
     final colorScheme = Theme.of(context).colorScheme;
+    final w = MediaQuery.of(context).size.width;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 24.h),
+        contentPadding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 10.h),
         backgroundColor: colorScheme.surface,
-        title: Text(
-          isRTL ? "خدمة VIP" : "VIP Service",
-          style: TextStyle(color: colorScheme.onSurface),
+        title: SizedBox(
+          width: w * 0.92,
+          child: Text(
+            isRTL ? "خدمة VIP" : "VIP Service",
+            style: TextStyle(color: colorScheme.onSurface),
+          ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // VIP Images
-            if (vip.images != null && vip.images!.isNotEmpty)
-              Container(
-                // height: 250.h,
-                child: GridView.builder(
+        content: SizedBox(
+          width: w * 0.92,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // VIP Images
+              if (vip.images != null && vip.images!.isNotEmpty)
+                GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 8.h,
                     crossAxisSpacing: 8.w,
+                    childAspectRatio: 0.6,
                   ),
-                  // scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: vip.images!.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     final image = vip.images![index];
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 8.h, right: 8.w),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.r),
-                        child: Image.network(
-                          UrlHelper.toFullUrl(image.path ?? '') ?? '',
-                          width: 100.w,
-                          height: 100.w,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 100.w,
-                            height: 100.w,
-                            color: colorScheme.surfaceContainerHighest,
-                            child: Icon(
-                              Icons.image_not_supported,
-                              color: colorScheme.onSurface.withOpacity(0.5),
-                            ),
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        UrlHelper.toFullUrl(image.path ?? '') ?? '',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: colorScheme.onSurface.withOpacity(0.5),
                           ),
                         ),
                       ),
                     );
                   },
                 ),
-              ),
-            SizedBox(height: 16.h),
-            Text(
-              isRTL
-                  ? "تفعيل خدمة VIP يضيف لك مميزات خاصة بسعر ${context.money(vip.price ?? 0)}"
-                  : "Enable VIP service for special features at ${context.money(vip.price ?? 0)}",
-              style: TextStyle(
-                color: colorScheme.onSurface.withOpacity(0.8),
-                fontSize: 14.sp,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(

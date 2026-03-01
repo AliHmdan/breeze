@@ -24,6 +24,7 @@ import 'package:breezefood/features/profile/presentation/cubit/profile_cubit.dar
 // ========== CART / ORDERS ==========
 import 'package:breezefood/features/orders/data/api/cart_api_service.dart';
 import 'package:breezefood/features/orders/data/api/orders_api_service.dart';
+import 'package:breezefood/features/orders/data/repo/appetizers_repository.dart';
 import 'package:breezefood/features/orders/data/repo/cart_repository.dart';
 import 'package:breezefood/features/orders/data/repo/orders_repository.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
@@ -77,6 +78,9 @@ import 'package:breezefood/features/notifications/data/api/notification_api_serv
 import 'package:breezefood/features/notifications/data/repo/notifications_repo.dart';
 import 'package:breezefood/features/notifications/presentation/cubit/notification_cubit.dart';
 
+import 'package:breezefood/features/assistant/data/repo/assistant_repository.dart';
+import 'package:breezefood/features/assistant/presentation/cubit/assistant_cubit.dart';
+
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupDi() async {
@@ -93,6 +97,23 @@ Future<void> setupDi() async {
   if (!getIt.isRegistered<Dio>()) {
     getIt.registerLazySingleton<Dio>(() => DioFactory.getDio());
   }
+
+  // =========================
+  // APPETIZERS
+  // =========================
+  getIt.registerLazySingleton<AppetizersRepository>(
+    () => AppetizersRepository(getIt<Dio>()),
+  );
+
+  // =========================
+  // ASSISTANT
+  // =========================
+  getIt.registerLazySingleton<AssistantRepository>(
+    () => AssistantRepository(getIt<Dio>()),
+  );
+  getIt.registerFactory<AssistantCubit>(
+    () => AssistantCubit(getIt<AssistantRepository>()),
+  );
 
   // =========================
   // AUTH

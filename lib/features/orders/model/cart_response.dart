@@ -13,10 +13,14 @@ class CartResponse {
   final List<CartUserAddress> addresses;
   final List<CartItem> items;
 
+  final List<CartAppetizer> appetizers;
+
   // ================= PRICING =================
   final double itemsTotalBefore;
   final double itemsTotalAfter;
   final double itemsDiscount;
+
+  final double appetizersTotal;
 
   final double deliveryBefore;
   final double deliveryAfter;
@@ -34,9 +38,11 @@ class CartResponse {
     required this.restaurantName,
     required this.restaurantLogo,
     required this.items,
+    required this.appetizers,
     required this.itemsTotalBefore,
     required this.itemsTotalAfter,
     required this.itemsDiscount,
+    required this.appetizersTotal,
     required this.deliveryBefore,
     required this.deliveryAfter,
     required this.deliveryDiscount,
@@ -73,6 +79,12 @@ class CartResponse {
         .map((e) => CartItem.fromJson((e as Map).cast<String, dynamic>()))
         .toList();
 
+    final appetizersJson = (json["appetizers"] as List? ?? const []);
+    final appetizers = appetizersJson
+        .where((e) => e is Map)
+        .map((e) => CartAppetizer.fromJson((e as Map).cast<String, dynamic>()))
+        .toList();
+
     final primaryJson = (json["primary_address"] as Map?)
         ?.cast<String, dynamic>();
     final primary = primaryJson == null
@@ -89,6 +101,11 @@ class CartResponse {
 
     // ✅ القيم الفعلية من السيرفر
     final itemsAfter = _toDouble(pricing["items_total_after"]);
+
+    final appetizersTotal = _toDouble(pricing["appetizers_total"]) > 0
+        ? _toDouble(pricing["appetizers_total"])
+        : _toDouble(pricing["appetizersTotal"]);
+
     final deliveryBefore = _toDouble(pricing["delivery_fee_before"]);
     final deliveryAfter = _toDouble(pricing["delivery_fee_after"]);
     final deliveryDiscount = _toDouble(pricing["delivery_discount"]);
@@ -110,11 +127,14 @@ class CartResponse {
       primaryAddress: primary,
       addresses: addresses,
       items: items,
+      appetizers: appetizers,
 
       // ❌ غير موجودة بالريسبونس → محسوبة
       itemsTotalBefore: itemsAfter,
       itemsTotalAfter: itemsAfter,
       itemsDiscount: 0,
+
+      appetizersTotal: appetizersTotal,
 
       deliveryBefore: deliveryBefore,
       deliveryAfter: deliveryAfter,
@@ -129,6 +149,7 @@ class CartResponse {
 
   // ================= Convenience =================
   double get itemsTotal => itemsTotalAfter;
+  double get appetizersTotalValue => appetizersTotal;
   double get deliveryFee => deliveryAfter;
   double get grandTotal => grandAfter;
 
@@ -143,9 +164,11 @@ class CartResponse {
     CartPrimaryAddress? primaryAddress,
     List<CartUserAddress>? addresses,
     List<CartItem>? items,
+    List<CartAppetizer>? appetizers,
     double? itemsTotalBefore,
     double? itemsTotalAfter,
     double? itemsDiscount,
+    double? appetizersTotal,
     double? deliveryBefore,
     double? deliveryAfter,
     double? deliveryDiscount,
@@ -161,15 +184,53 @@ class CartResponse {
       primaryAddress: primaryAddress ?? this.primaryAddress,
       addresses: addresses ?? this.addresses,
       items: items ?? this.items,
+      appetizers: appetizers ?? this.appetizers,
       itemsTotalBefore: itemsTotalBefore ?? this.itemsTotalBefore,
       itemsTotalAfter: itemsTotalAfter ?? this.itemsTotalAfter,
       itemsDiscount: itemsDiscount ?? this.itemsDiscount,
+      appetizersTotal: appetizersTotal ?? this.appetizersTotal,
       deliveryBefore: deliveryBefore ?? this.deliveryBefore,
       deliveryAfter: deliveryAfter ?? this.deliveryAfter,
       deliveryDiscount: deliveryDiscount ?? this.deliveryDiscount,
       grandBefore: grandBefore ?? this.grandBefore,
       grandAfter: grandAfter ?? this.grandAfter,
       vip: vip,
+    );
+  }
+}
+
+class CartAppetizer {
+  final int id;
+  final int appetizerId;
+  final int quantity;
+
+  CartAppetizer({
+    required this.id,
+    required this.appetizerId,
+    required this.quantity,
+  });
+
+  static int _toInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
+  factory CartAppetizer.fromJson(Map<String, dynamic> json) {
+    final nested = json["appetizer"];
+    final nestedMap = (nested is Map) ? nested.cast<String, dynamic>() : null;
+
+    final inferredAppetizerId = _toInt(json["appetizer_id"]) > 0
+        ? _toInt(json["appetizer_id"])
+        : _toInt(nestedMap?['id']) > 0
+        ? _toInt(nestedMap?['id'])
+        : _toInt(json["id"]);
+
+    return CartAppetizer(
+      id: _toInt(json["id"]),
+      appetizerId: inferredAppetizerId,
+      quantity: _toInt(json["quantity"]),
     );
   }
 }

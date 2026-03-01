@@ -146,6 +146,10 @@
   "cart": {
     "item_notes_optional": "Item notes (optional)",
     "item_notes_hint": "e.g. No onion, mild spicy...",
+    "recommended_to_you": "Recommended to you",
+    "recommended_loading": "Loading recommendations...",
+    "people_also_added": "People also added",
+    "popular": "Popular",
     "view_cart": "View Cart",
     "view_cart_loading": "View Cart ..."
   },
