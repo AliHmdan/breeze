@@ -1,4 +1,3 @@
-import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/assistant/presentation/cubit/assistant_cubit.dart';
 import 'package:breezefood/features/assistant/presentation/cubit/assistant_state.dart';
@@ -22,6 +21,7 @@ Future<void> showAssistantChatSheet(BuildContext context) async {
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
     builder: (sheetCtx) {
       final height = MediaQuery.of(sheetCtx).size.height * 0.82;
+      final colorScheme = Theme.of(sheetCtx).colorScheme;
 
       return MediaQuery.removePadding(
         context: sheetCtx,
@@ -34,7 +34,7 @@ Future<void> showAssistantChatSheet(BuildContext context) async {
           child: Container(
             height: height,
             decoration: BoxDecoration(
-              color: AppColor.Dark,
+              color: colorScheme.surface,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(24),
               ),
@@ -102,6 +102,8 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return BlocConsumer<AssistantCubit, AssistantState>(
       listener: (context, state) {
         if (state is AssistantLoaded) {
@@ -121,7 +123,7 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                     child: Text(
                       "AI Assistant",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onSurface,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w900,
                       ),
@@ -129,12 +131,15 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(Icons.close, color: colorScheme.onSurface),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, color: Colors.white.withOpacity(0.08)),
+            Divider(
+              height: 1,
+              color: colorScheme.outlineVariant.withOpacity(0.6),
+            ),
             Expanded(
               child: ListView(
                 controller: _scroll,
@@ -145,15 +150,22 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                       padding: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         state.message,
-                        style: TextStyle(color: Colors.red, fontSize: 13.sp),
+                        style: TextStyle(
+                          color: colorScheme.error,
+                          fontSize: 13.sp,
+                        ),
                       ),
                     ),
                   if (loaded != null)
                     ...loaded.messages.map((m) {
                       final isUser = m.role.toLowerCase() == "user";
                       final bg = isUser
-                          ? Colors.white.withOpacity(0.10)
-                          : Colors.white.withOpacity(0.06);
+                          ? colorScheme.primary.withOpacity(0.10)
+                          : colorScheme.surfaceContainerHighest.withOpacity(
+                              0.65,
+                            );
+                      final borderColor = colorScheme.outlineVariant
+                          .withOpacity(0.55);
                       final align = isUser
                           ? Alignment.centerRight
                           : Alignment.centerLeft;
@@ -170,14 +182,12 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                           decoration: BoxDecoration(
                             color: bg,
                             borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.08),
-                            ),
+                            border: Border.all(color: borderColor),
                           ),
                           child: Text(
                             m.message,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: colorScheme.onSurface,
                               fontSize: 13.sp,
                               height: 1.2,
                               fontWeight: FontWeight.w600,
@@ -191,13 +201,16 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                     Text(
                       "Restaurants",
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.75),
+                        color: colorScheme.onSurface.withOpacity(0.75),
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     SizedBox(height: 8.h),
                     ...loaded.restaurants.map((r) {
+                      final tileBorder = colorScheme.outlineVariant.withOpacity(
+                        0.6,
+                      );
                       return InkWell(
                         onTap: () => _openRestaurant(context, r.id),
                         borderRadius: BorderRadius.circular(14.r),
@@ -208,11 +221,10 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                             vertical: 12.h,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.06),
+                            color: colorScheme.surfaceContainerHighest
+                                .withOpacity(0.65),
                             borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.08),
-                            ),
+                            border: Border.all(color: tileBorder),
                           ),
                           child: Row(
                             children: [
@@ -220,12 +232,12 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                                 width: 34.w,
                                 height: 34.w,
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.18),
+                                  color: colorScheme.primaryContainer,
                                   borderRadius: BorderRadius.circular(10.r),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.storefront,
-                                  color: Colors.red,
+                                  color: colorScheme.onPrimaryContainer,
                                 ),
                               ),
                               SizedBox(width: 10.w),
@@ -235,7 +247,7 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: colorScheme.onSurface,
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -244,7 +256,7 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                               SizedBox(width: 8.w),
                               Icon(
                                 Icons.chevron_right,
-                                color: Colors.white.withOpacity(0.65),
+                                color: colorScheme.onSurface.withOpacity(0.65),
                               ),
                             ],
                           ),
@@ -260,16 +272,16 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                           SizedBox(
                             width: 16.w,
                             height: 16.w,
-                            child: const CircularProgressIndicator(
+                            child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: colorScheme.primary,
                             ),
                           ),
                           SizedBox(width: 10.w),
                           Text(
                             "Typing...",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
+                              color: colorScheme.onSurface.withOpacity(0.7),
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -287,24 +299,33 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                   Expanded(
                     child: TextField(
                       controller: _ctrl,
-                      style: TextStyle(color: Colors.white, fontSize: 13.sp),
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 13.sp,
+                      ),
                       decoration: InputDecoration(
                         hintText: "اكتب طلبك...",
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.45),
+                          color: colorScheme.onSurface.withOpacity(0.5),
                         ),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.06),
+                        fillColor: colorScheme.surfaceContainerHighest,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14.r),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.08),
+                            color: colorScheme.outlineVariant,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14.r),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.08),
+                            color: colorScheme.outlineVariant,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary.withOpacity(0.8),
                           ),
                         ),
                       ),
@@ -329,10 +350,10 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                         vertical: 12.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: colorScheme.primary,
                         borderRadius: BorderRadius.circular(14.r),
                       ),
-                      child: const Icon(Icons.send, color: Colors.white),
+                      child: Icon(Icons.send, color: colorScheme.onPrimary),
                     ),
                   ),
                 ],
