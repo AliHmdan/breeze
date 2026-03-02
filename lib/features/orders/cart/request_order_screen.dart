@@ -22,6 +22,9 @@ import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_
 
 import 'package:breezefood/features/orders/request_order/counter_request.dart';
 import 'package:breezefood/features/orders/request_order/meal_card.dart';
+import 'package:breezefood/features/ratings/presentation/cubit/rating_submit_cubit.dart';
+import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
+import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'address_section.dart';
@@ -82,6 +85,32 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prefillCurrentLocation();
     });
+  }
+
+  Future<void> _openRestaurantFromCart(int restaurantId) async {
+    if (restaurantId <= 0) return;
+
+    final changed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: context.read<CartCubit>()),
+            BlocProvider(create: (_) => getIt<RatingSubmitCubit>()),
+            BlocProvider(create: (_) => getIt<FavoritesCubit>()),
+          ],
+          child: ResturantDetails(restaurant_id: restaurantId),
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (changed == true) {
+      await context.read<CartCubit>().loadCart(silent: false);
+    } else {
+      context.read<CartCubit>().loadCart(silent: true);
+    }
   }
 
   @override
@@ -936,6 +965,9 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   isRTL: isRTL,
                                   updatingIds: updatingIds,
                                   itemNotes: _itemNotes,
+                                  onAddMore: () => _openRestaurantFromCart(
+                                    cart.restaurantId,
+                                  ),
                                   onEditNote: (it) =>
                                       _editItemNote(isRTL: isRTL, item: it),
                                   onDelete: (it) async {
@@ -1103,6 +1135,8 @@ class _CartItemsSection extends StatelessWidget {
   final Set<int> updatingIds;
   final Map<int, String> itemNotes;
 
+  final VoidCallback onAddMore;
+
   final void Function(CartItem it) onEditNote;
   final void Function(CartItem it) onDelete;
   final void Function(CartItem it, int newQty) onQtyChange;
@@ -1112,6 +1146,7 @@ class _CartItemsSection extends StatelessWidget {
     required this.isRTL,
     required this.updatingIds,
     required this.itemNotes,
+    required this.onAddMore,
     required this.onEditNote,
     required this.onDelete,
     required this.onQtyChange,
@@ -1120,17 +1155,19 @@ class _CartItemsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      children: cart.items.map((it) {
-        final isUpdating = updatingIds.contains(it.id);
+    final children = <Widget>[];
 
-        final title = isRTL
-            ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn)
-            : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
+    for (final it in cart.items) {
+      final isUpdating = updatingIds.contains(it.id);
 
-        final note = (it.specialNotes ?? "").trim();
+      final title = isRTL
+          ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn)
+          : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
 
-        return Padding(
+      final note = (it.specialNotes ?? "").trim();
+
+      children.add(
+        Padding(
           padding: EdgeInsets.only(bottom: 8.h),
           child: Slidable(
             key: ValueKey("cart_item_${it.id}"),
@@ -1167,70 +1204,51 @@ class _CartItemsSection extends StatelessWidget {
                       onChanged: (newQty) => onQtyChange(it, newQty),
                     ),
                   ),
-                  // Padding(
-                  //   padding: EdgeInsets.symmetric(
-                  //     horizontal: 12.w,
-                  //     vertical: 8.h,
-                  //   ),
-                  //   child: Row(
-                  //     children: [
-                  //       InkWell(
-                  //         onTap: () => onEditNote(it),
-                  //         borderRadius: BorderRadius.circular(10.r),
-                  //         child: Container(
-                  //           padding: EdgeInsets.symmetric(
-                  //             horizontal: 10.w,
-                  //             vertical: 6.h,
-                  //           ),
-                  //           decoration: BoxDecoration(
-                  //             color: Colors.white10,
-                  //             borderRadius: BorderRadius.circular(10.r),
-                  //             border: Border.all(color: Colors.white12),
-                  //           ),
-                  //           child: Row(
-                  //             children: [
-                  //               const Icon(
-                  //                 Icons.edit_note,
-                  //                 color: Colors.white70,
-                  //                 size: 18,
-                  //               ),
-                  //               SizedBox(width: 6.w),
-                  //               Text(
-                  //                 isRTL ? "ملاحظة" : "Note",
-                  //                 style: TextStyle(
-                  //                   color: Colors.white70,
-                  //                   fontSize: 12.sp,
-                  //                   fontWeight: FontWeight.w700,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       SizedBox(width: 10.w),
-                  //       Expanded(
-                  //         child: Text(
-                  //           note.isEmpty
-                  //               ? (isRTL ? "لا توجد ملاحظة" : "No note")
-                  //               : note,
-                  //           maxLines: 2,
-                  //           overflow: TextOverflow.ellipsis,
-                  //           style: TextStyle(
-                  //             color: Colors.white54,
-                  //             fontSize: 12.sp,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                 ],
               ),
             ),
           ),
-        );
-      }).toList(),
-    );
+        ),
+      );
+    }
+
+    if (cart.items.isNotEmpty) {
+      children.add(
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+          ),
+          child: InkWell(
+            onTap: onAddMore,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.add_circle,
+                    color: colorScheme.primary,
+                    size: 24.sp,
+                  ),
+                  SizedBox(width: 10.w),
+                  Text(
+                    isRTL ? "أضف المزيد" : "Add more",
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(children: children);
   }
 }
 
