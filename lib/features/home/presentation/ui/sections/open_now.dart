@@ -1,6 +1,7 @@
 import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/del_price_helper.dart'
     show deliveryFeeText;
 import 'package:easy_localization/easy_localization.dart';
@@ -162,11 +163,11 @@ class _RestaurantCardState extends State<RestaurantCard> {
                       "assets/icons/new_del.png",
                       width: 16.w,
                       height: 16.h,
-                      color: AppColor.white,
+                      color: colorScheme.onSurface,
                     ),
                     SizedBox(width: 4.w),
                     Text(
-                      feeText,
+                      context.syp(feeText, decimals: 0),
                       style: TextStyle(
                         color: colorScheme.onSurface,
                         fontSize: 12.sp,

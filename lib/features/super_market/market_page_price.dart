@@ -150,7 +150,7 @@ class MarketPagePrice extends StatelessWidget {
               backgroundcolor: Colors.transparent,
             ),
           ),
-     
+
           body: Stack(
             children: [
               Padding(
@@ -220,20 +220,21 @@ class MarketPagePrice extends StatelessWidget {
                           child: state.loadingItems
                               ? const Center(child: CircularProgressIndicator())
                               : GridView.builder(
-                                  padding: EdgeInsets.fromLTRB(
-                                    12.w,
-                                    12.h,
-                                    12.w,
-                                    100.h,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    // vertical: 8.h,
                                   ),
                                   physics: const BouncingScrollPhysics(),
                                   itemCount: state.items.length,
                                   gridDelegate:
-                                      SliverGridDelegateWithMaxCrossAxisExtent(
-                                        maxCrossAxisExtent: 190.w,
-                                        crossAxisSpacing: 10.w,
-                                        mainAxisSpacing: 10.h,
-                                        childAspectRatio: 0.80,
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing:
+                                            16.w, // مسافة أفقية واضحة
+                                        mainAxisSpacing:
+                                            20.h, // 👈 مسافة عمودية متل الصورة
+                                        mainAxisExtent:
+                                            230.h, // 👈 ارتفاع ثابت للكرت
                                       ),
                                   itemBuilder: (context, index) {
                                     final it = state.items[index];
@@ -398,84 +399,53 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C),
-        borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Image
+        ClipRRect(
+          borderRadius: BorderRadius.circular(18.r),
+          child: SizedBox(
+            width: double.infinity,
+            height: 170.h, // 👈 أكبر شوي متل الصورة
+            child: product.isNetworkImage
+                ? Image.network(product.image, fit: BoxFit.cover)
+                : Image.asset(product.image, fit: BoxFit.cover),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
-              child: product.isNetworkImage
-                  ? Image.network(
-                      product.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        "assets/images/bread.png",
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                    )
-                  : Image.asset(
-                      product.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+        ),
+
+        SizedBox(height: 10.h),
+
+        /// Title
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6.w),
+          child: Text(
+            product.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: 6.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Text(
-              product.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF4CAF50),
-              ),
+        ),
+
+        SizedBox(height: 4.h),
+
+        /// Price
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6.w),
+          child: Text(
+            product.price,
+            style: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: 2.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Text(
-              product.desc,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10.5.sp,
-                color: Colors.white.withOpacity(0.6),
-              ),
-            ),
-          ),
-          SizedBox(height: 2.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Text(
-              product.price,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: Colors.white.withOpacity(0.75),
-              ),
-            ),
-          ),
-          SizedBox(height: 8.h),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

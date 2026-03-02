@@ -1,5 +1,6 @@
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:breezefood/features/orders/add_order_sheet/Counter.dart';
 // import 'package:breezefood/features/orders/add_order_sheet/Counter.dart';
@@ -73,7 +74,7 @@ class AddOrderTitlePrice extends StatelessWidget {
               children: [
                 if (hasDiscount) ...[
                   Text(
-                    context.money(oldPrice),
+                    context.syp(oldPrice),
                     style: TextStyle(
                       color: AppColor.gry,
                       fontSize: 14.sp,
@@ -85,7 +86,7 @@ class AddOrderTitlePrice extends StatelessWidget {
                 ],
 
                 Text(
-                  context.money(price),
+                  context.syp(price),
                   style: TextStyle(
                     color: hasDiscount ? AppColor.red : AppColor.white,
                     fontSize: 18.sp,

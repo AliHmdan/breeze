@@ -39,9 +39,10 @@ class DiscountDeliveryGridPage extends StatelessWidget {
             crossAxisCount: _getCrossAxisCount(
               MediaQuery.of(context).size.width,
             ),
-            mainAxisSpacing: 12.h,
+            mainAxisSpacing: 8.h,
             crossAxisSpacing: 10.w,
-            childAspectRatio: 0.58, // Adjusted for better rating display
+            childAspectRatio: 0.55, // More compact
+            mainAxisExtent: 150.h, // 👈 هون بتحدد الارتفاع مباشرة
           ),
           itemCount: discountDelivery.length,
           itemBuilder: (context, index) {

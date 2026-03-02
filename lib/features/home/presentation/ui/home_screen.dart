@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:breezefood/core/component/have_order.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart';
 import 'package:breezefood/features/home/presentation/ui/home_scroll_controller.dart';
@@ -795,7 +796,7 @@ class _HomeBottomAction extends StatelessWidget {
           final summary = CartSummary.from(cart);
           if (summary.hasCart) {
             final title =
-                "${'cart.view_cart'.tr()} • ${summary.count} • ${context.money(summary.total, decimals: 0)}";
+                "${'cart.view_cart'.tr()} • ${summary.count} • ${context.syp(summary.total, decimals: 0)}";
 
             return CustomButton(
               title: title,

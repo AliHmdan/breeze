@@ -81,28 +81,24 @@ class _CloserToYouCardState extends State<CloserToYouCard> {
                 top: 6,
                 end: 6,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2), //   خلفية خفيفة
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.inverseSurface.withOpacity(0.30),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                      Icon(Icons.star, color: Colors.amber, size: 12.sp),
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -120,30 +116,38 @@ class _CloserToYouCardState extends State<CloserToYouCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
 
-          SizedBox(height: 6.h),
+          SizedBox(height: 4.h),
 
-          Row(
-            children: [
-              Image.asset(
-                "assets/icons/new_del.png",
-                width: 16.w,
-                height: 16.h,
-                color: Colors.white,
-              ),
-              SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: AppColor.white,
-                fontsize: 12.sp,
-              ),
-            ],
+          // 🚚 Delivery row بنفس padding الداخلي
+          Padding(
+            padding: EdgeInsetsDirectional.only(start: 8.w),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  "assets/icons/new_del.png",
+                  width: 16.w,
+                  height: 16.h,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  context.syp(feeText, decimals: 0),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -181,7 +185,7 @@ class CloserToYou extends StatelessWidget {
           ),
           child: CustomSubTitle(
             subtitle: "No restaurants found",
-            color: AppColor.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontsize: 14.sp,
           ),
         ),

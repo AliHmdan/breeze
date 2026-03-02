@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+
 class MoneyFormatter {
   MoneyFormatter._();
 
@@ -33,7 +34,7 @@ class MoneyFormatter {
   /// لاحقة العملة حسب اللغة
   static String _suffix(BuildContext context) {
     final code = context.locale.languageCode;
-    return code == 'ar' ? 'ل.س' : 'SP';
+    return code == 'ar' ? 'ل.س' : 'SYP';
   }
 
   /// السعر النهائي جاهز للعرض
@@ -71,7 +72,10 @@ class MoneyFormatter {
 /// Extension لطيف لتستخدمه مباشرة
 extension MoneyX on BuildContext {
   String syp(dynamic value, {bool withSymbol = true, int decimals = 0}) =>
-      MoneyFormatter.formatSyp(this, value, withSymbol: withSymbol, decimals: decimals);
+      MoneyFormatter.formatSyp(
+        this,
+        value,
+        withSymbol: withSymbol,
+        decimals: decimals,
+      );
 }
-
-

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:breezefood/core/component/color.dart';
-import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 
 // ✅ Badge الخصم: يظهر فقط إذا hasDiscount
 class DiscountBadge extends StatelessWidget {
@@ -62,7 +62,7 @@ class PriceLine extends StatelessWidget {
 
     if (!hasDiscount) {
       return Text(
-        context.money(price, decimals: 0),
+        context.syp(price, decimals: 0),
         style: TextStyle(
           color: AppColor.white,
           fontSize: 12.sp,
@@ -74,7 +74,7 @@ class PriceLine extends StatelessWidget {
     return Row(
       children: [
         Text(
-          context.money(before, decimals: 0),
+          context.syp(before, decimals: 0),
           style: TextStyle(
             color: AppColor.LightActive,
             fontSize: 11.sp,
@@ -83,7 +83,7 @@ class PriceLine extends StatelessWidget {
         ),
         SizedBox(width: 6.w),
         Text(
-          context.money(price, decimals: 0),
+          context.syp(price, decimals: 0),
           style: TextStyle(
             color: AppColor.red,
             fontSize: 12.sp,

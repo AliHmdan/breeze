@@ -1,6 +1,7 @@
 import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/del_price_helper.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -73,6 +74,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final imageUrl =
         UrlHelper.toFullUrl(widget.model.coverImage) ??
         UrlHelper.toFullUrl(widget.model.logo);
@@ -87,25 +89,27 @@ class _SupermarketCardState extends State<_SupermarketCard> {
           /// 🔥 الصورة
           Stack(
             children: [
-              // ✅ Open/Closed badge
-              AppNetworkImage(
-                path: imageUrl,
-                height: 100.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                radius: BorderRadius.circular(12.r), // إذا بدك حواف
-                fallback: Image.asset(
-                  "assets/images/meal_breeze.jpeg", // صورتك الافتراضية
-                  height: 100.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12.r), // نفس الخصومات
+                child: AspectRatio(
+                  aspectRatio: 16 / 9, //
+                  child: AppNetworkImage(
+                    path: imageUrl,
+                    height: 100.h, // نفس ارتفاع الصورة
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    fallback: Image.asset(
+                      "assets/images/meal_breeze.jpeg",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
               if (!widget.model.isOpen)
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.45),
+                      color: colorScheme.inverseSurface.withOpacity(0.45),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Center(
@@ -117,7 +121,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
 
                         child: CustomSubTitle(
                           subtitle: "restaurant.closed".tr(),
-                          color: AppColor.white,
+                          color: Colors.white,
                           fontsize: 13.sp,
                         ),
                       ),
@@ -129,28 +133,22 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                 top: 6,
                 end: 6,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+                    color: colorScheme.inverseSurface.withOpacity(0.30),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                      Icon(Icons.star, color: Colors.amber, size: 12.sp),
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onInverseSurface,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -160,38 +158,51 @@ class _SupermarketCardState extends State<_SupermarketCard> {
             ],
           ),
 
-          SizedBox(height: 6.h),
+          SizedBox(height: 6.h), // نفس gapH الطبيعي
+          // 🏷️ Name (center مثل Discount)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            child: Text(
+              widget.model.name,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
 
-          /// الاسم
-          Text(
-            widget.model.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
 
-          SizedBox(height: 6.h),
+          SizedBox(height: 4.h),
 
-          /// التوصيل
-          Row(
-            children: [
-              Image.asset(
-                "assets/icons/new_del.png",
-                width: 16.w,
-                height: 16.h,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: Theme.of(context).colorScheme.onSurface,
-                fontsize: 12.sp,
-              ),
-            ],
+          // 🚚 Delivery row بنفس padding الداخلي
+          Padding(
+            padding: EdgeInsetsDirectional.only(start: 8.w),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  "assets/icons/new_del.png",
+                  width: 16.w,
+                  height: 16.h,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  context.syp(feeText, decimals: 0),
+                  // feeText,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12.sp,
+
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

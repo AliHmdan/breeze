@@ -24,12 +24,11 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
-        child:
-        Text(
+        child: Text(
           title,
           style: TextStyle(
             fontSize: 14.sp,
-            color: AppColor.white,
+            color: Colors.white,
             fontFamily: Localizations.localeOf(context).languageCode == 'ar'
                 ? 'Cairo'
                 : 'Inter',

@@ -77,33 +77,29 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
               // ✅ Closed overlay (نفس الفطور)
               if (!widget.isOpen) const ClosedOverlay(),
 
-              // Rating (نفس الفطور)
+              // Rating ()
               PositionedDirectional(
                 top: 6,
                 end: 6,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.inverseSurface.withOpacity(0.30),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                      Icon(Icons.star, color: Colors.amber, size: 12.sp),
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
                           fontFamily:
                               Localizations.localeOf(context).languageCode ==
                                   'ar'
@@ -123,12 +119,12 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
             child: Text(
               widget.name,
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 fontFamily: Localizations.localeOf(context).languageCode == 'ar'
                     ? 'Cairo'
                     : 'Inter',
@@ -146,11 +142,27 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 color: Theme.of(context).colorScheme.onSurface,
               ),
               SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: AppColor.white,
-                fontsize: 12.sp,
+              Text(
+                context.syp(feeText, decimals: 0),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  fontFamily:
+                      Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'Cairo'
+                      : 'Inter',
+                ),
               ),
+
+              // CustomSubTitle(
+              //   subtitle: feeText,
+              //   color: AppColor.white,
+              //   fontsize: 12.sp,
+              // ),
             ],
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/color.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/money.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
@@ -6,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class CounterSheet extends StatelessWidget {
   final int count;
   final VoidCallback onInc;
@@ -40,9 +42,9 @@ class CounterSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<CartCubit>().state.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
+      loading: () => true,
+      orElse: () => false,
+    );
 
     final baseDisabled = isLoading || !isRestaurantOpen;
     // final sizeBlocked = isSizeRequired && !isSizeSelected;
@@ -134,9 +136,12 @@ class CounterSheet extends StatelessWidget {
                           onAdd(count);
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 3),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 3,
+                          ),
                           child: Row(
-mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Flexible(
                                 child: AnimatedSwitcher(
@@ -159,9 +164,8 @@ mainAxisAlignment: MainAxisAlignment.center,
                               ),
                               SizedBox(width: 6.w),
 
-
                               Text(
-                                context.money(total),
+                                context.syp(total),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(

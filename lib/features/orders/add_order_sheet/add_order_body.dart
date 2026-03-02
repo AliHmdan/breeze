@@ -1,4 +1,5 @@
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/orders/add_order_sheet/add_order_description.dart';
 import 'package:breezefood/features/orders/add_order_sheet/add_order_header_image.dart';
 import 'package:breezefood/features/orders/add_order_sheet/add_order_title_price.dart';
@@ -46,8 +47,6 @@ class AddOrderBody extends StatefulWidget {
   State<AddOrderBody> createState() => _AddOrderBodyState();
 }
 
-
-
 class _AddOrderBodyState extends State<AddOrderBody> {
   int _qty = 1;
   bool _withSpicy = false;
@@ -56,7 +55,7 @@ class _AddOrderBodyState extends State<AddOrderBody> {
   bool _highlightSizeRequired = false;
 
   // groupId -> selected extraId
-    Map<int, int?> _selectedGroupChoice = {};
+  Map<int, int?> _selectedGroupChoice = {};
 
   // legacy extras (إذا بدك تستعملها لاحقاً)
   final Set<int> _selectedExtrasIds = {};
@@ -111,21 +110,18 @@ class _AddOrderBodyState extends State<AddOrderBody> {
       ids.add(_selectedSizeExtraId!);
     }
 
-    ids.addAll(
-      _selectedGroupChoice.values.whereType<int>(),
-    );
+    ids.addAll(_selectedGroupChoice.values.whereType<int>());
 
     ids.addAll(_selectedExtrasIds);
 
     return ids
-        .map((id) =>
-        AddToCartExtraRequest(extraId: id, quantity: 1))
+        .map((id) => AddToCartExtraRequest(extraId: id, quantity: 1))
         .toList();
   }
 
   String _buildShareText() {
-    final price = context.money(widget.price);
-    final old = context.money(widget.oldPrice);
+    final price = context.syp(widget.price);
+    final old = context.syp(widget.oldPrice);
 
     final legacyNames = widget.extras
         .where((e) => _selectedExtrasIds.contains(e.id))
@@ -184,131 +180,152 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
           error: (msg) => EasyLoading.showError(msg),
         );
       },
-      child: Column(
+      child: Stack(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  AddOrderHeaderImage(
-                    imagePathOrUrl: widget.imagePathOrUrl,
-                    shareText: _buildShareText(),
-                    onClose: () => Navigator.pop(context),
-                  ),
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      AddOrderHeaderImage(
+                        imagePathOrUrl: widget.imagePathOrUrl,
+                        shareText: _buildShareText(),
+                      ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AddOrderTitlePrice(
-                          title: widget.title,
-                          price: widget.price,
-                          oldPrice: widget.oldPrice,
-                          hasDiscount: _hasDiscount,
-                          description: widget.description,
-                          count: _qty,
-                          onInc: () =>
-                              setState(() => _qty++),
-                          onDec: () {
-                            setState(() {
-                              if (_qty > 1) _qty--;
-                            });
-                          },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-
-                        SizedBox(height: 15.h),
-
-                        // AddOrderDescription(
-                        //   description: widget.description,
-                        //   maxWidth: 300.w,
-                        // ),
-
-                        SizedBox(height: 8.h),
-
-                        if (widget.extraGroups.isNotEmpty) ...[
-                          SizedBox(height: 8.h),
-
-                          if (sg != null && sg.items.isNotEmpty) ...[
-                            RequiredSizeGroupList(
-                              group: sg,
-                              selectedExtraId: _selectedSizeExtraId,
-                              highlightRequired: _highlightSizeRequired,
-                              onSelect: (id) => setState(() {
-                                _selectedSizeExtraId = id;
-                                _highlightSizeRequired =
-                                    false; // ✅ يطفي بعد الاختيار
-                              }),
-                            ),
-                            SizedBox(height: 12.h),
-                          ],
-
-                          if (_otherGroups.isNotEmpty)
-                            ExtraGroupsList(
-                              groups: _otherGroups,
-                              selectedChoice: _selectedGroupChoice,
-                              onChanged: (groupId, extraId) {
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AddOrderTitlePrice(
+                              title: widget.title,
+                              price: widget.price,
+                              oldPrice: widget.oldPrice,
+                              hasDiscount: _hasDiscount,
+                              description: widget.description,
+                              count: _qty,
+                              onInc: () => setState(() => _qty++),
+                              onDec: () {
                                 setState(() {
-                                  if (extraId == null) {
-                                    _selectedGroupChoice.remove(groupId);
-                                  } else {
-                                    _selectedGroupChoice[groupId] = extraId;
-                                  }
+                                  if (_qty > 1) _qty--;
                                 });
                               },
                             ),
 
-                          SizedBox(height: 8.h),
-                        ],
+                            SizedBox(height: 15.h),
 
-                        SizedBox(height: 10.h),
+                            // AddOrderDescription(
+                            //   description: widget.description,
+                            //   maxWidth: 300.w,
+                            // ),
+                            SizedBox(height: 8.h),
 
-                        NotesField(controller: _noteCtrl),
+                            if (widget.extraGroups.isNotEmpty) ...[
+                              SizedBox(height: 8.h),
 
-                        SizedBox(height: 10.h),
-                       
+                              if (sg != null && sg.items.isNotEmpty) ...[
+                                RequiredSizeGroupList(
+                                  group: sg,
+                                  selectedExtraId: _selectedSizeExtraId,
+                                  highlightRequired: _highlightSizeRequired,
+                                  onSelect: (id) => setState(() {
+                                    _selectedSizeExtraId = id;
+                                    _highlightSizeRequired =
+                                        false; // ✅ يطفي بعد الاختيار
+                                  }),
+                                ),
+                                SizedBox(height: 12.h),
+                              ],
 
-                        SizedBox(height: 8.h),
-                      ],
-                    ),
+                              if (_otherGroups.isNotEmpty)
+                                ExtraGroupsList(
+                                  groups: _otherGroups,
+                                  selectedChoice: _selectedGroupChoice,
+                                  onChanged: (groupId, extraId) {
+                                    setState(() {
+                                      if (extraId == null) {
+                                        _selectedGroupChoice.remove(groupId);
+                                      } else {
+                                        _selectedGroupChoice[groupId] = extraId;
+                                      }
+                                    });
+                                  },
+                                ),
+
+                              SizedBox(height: 8.h),
+                            ],
+
+                            SizedBox(height: 10.h),
+
+                            NotesField(controller: _noteCtrl),
+
+                            SizedBox(height: 10.h),
+
+                            SizedBox(height: 8.h),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+              ),
+              SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  color: Theme.of(context).colorScheme.surface,
+                  child: CounterSheet(
+                    count: _qty,
+                    onInc: () => setState(() => _qty++),
+                    onDec: () => setState(() {
+                      if (_qty > 1) _qty--;
+                    }),
+
+                    isRestaurantOpen: widget.isRestaurantOpen,
+                    basePrice: widget.price,
+                    extrasTotal: _extrasTotal,
+                    isSizeRequired: sg != null && sg.items.isNotEmpty,
+                    isSizeSelected: _selectedSizeExtraId != null,
+                    onMissingSize: () =>
+                        setState(() => _highlightSizeRequired = true),
+                    onAdd: (qty) {
+                      final req = AddToCartRequest(
+                        restaurantId: widget.restaurantId,
+                        menuItemId: widget.menuItemId,
+                        quantity: qty,
+                        specialNotes: _noteCtrl.text.trim(),
+                        withSpicy: _withSpicy,
+                        extras: _selectedExtrasPayload(),
+                      );
+                      context.read<CartCubit>().add(req);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Fixed close button overlay
+          PositionedDirectional(
+            top: 5,
+            end: 1,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close, color: Colors.white, size: 16),
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(Colors.black54),
+                padding: WidgetStateProperty.all(EdgeInsets.zero),
+                minimumSize: WidgetStateProperty.all(const Size(30, 30)),
+                fixedSize: WidgetStateProperty.all(const Size(30, 30)),
               ),
             ),
           ),
-          SafeArea(child:  Container( padding: const EdgeInsets.symmetric(
-              horizontal: 16, vertical: 10),
-            color:  Theme.of(context).colorScheme.surface,
-            child: CounterSheet(
-              count: _qty,
-              onInc: () => setState(() => _qty++),
-              onDec: () => setState(() {
-                if (_qty > 1) _qty--;
-              }),
-
-              isRestaurantOpen: widget.isRestaurantOpen,
-              basePrice: widget.price,
-              extrasTotal: _extrasTotal,
-              isSizeRequired: sg != null && sg.items.isNotEmpty,
-              isSizeSelected: _selectedSizeExtraId != null,
-              onMissingSize: () =>
-                  setState(() => _highlightSizeRequired = true),
-              onAdd: (qty) {
-                final req = AddToCartRequest(
-                  restaurantId: widget.restaurantId,
-                  menuItemId: widget.menuItemId,
-                  quantity: qty,
-                  specialNotes: _noteCtrl.text.trim(),
-                  withSpicy: _withSpicy,
-                  extras: _selectedExtrasPayload(),
-                );
-                context.read<CartCubit>().add(req);
-              },
-            ),
-          ),)
         ],
       ),
     );

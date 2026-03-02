@@ -20,24 +20,21 @@ class CounterWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF2A2A2A)
-            : const Color(0xFFEDEDED),
+        color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEDEDED),
         borderRadius: BorderRadius.circular(40), // pill shape
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-
           /// زر النقصان
           GestureDetector(
             onTap: (isLoading || count <= 1) ? null : onDec,
             child: Icon(
               Icons.remove,
               size: 26,
-              color: isDark ? Colors.white : Colors.black,
+              color: isDark ? Colors.white : AppColor.lightblack,
             ),
           ),
 

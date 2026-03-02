@@ -1,5 +1,6 @@
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -41,7 +42,7 @@ class AddToCartButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             onTap: baseDisabled ? null : () => onAdd(count),
             child: Padding(
-              padding: EdgeInsets.symmetric( vertical: 3),
+              padding: EdgeInsets.symmetric(vertical: 3),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -57,10 +58,10 @@ class AddToCartButton extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 20.w,),
+                  SizedBox(width: 20.w),
                   Text(
-                    context.money(total),
-                    style:  TextStyle(
+                    context.syp(total),
+                    style: TextStyle(
                       color: AppColor.white,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,

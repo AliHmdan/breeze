@@ -4,6 +4,7 @@ import 'package:breezefood/core/component/bottom_cart_action.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/pick_by_langu.dart';
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
@@ -267,11 +268,11 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
     final del = g.delivery;
     if (del != null) {
-      deliveryBase = context.money(del.baseFee, decimals: 0);
-      deliveryFinal = context.money(del.finalFee, decimals: 0);
+      deliveryBase = context.syp(del.baseFee, decimals: 0);
+      deliveryFinal = context.syp(del.finalFee, decimals: 0);
     } else {
-      deliveryBase = context.money(g.deliveryCash, decimals: 0);
-      deliveryFinal = context.money(g.deliveryCash, decimals: 0);
+      deliveryBase = context.syp(g.deliveryCash, decimals: 0);
+      deliveryFinal = context.syp(g.deliveryCash, decimals: 0);
     }
 
     final avg = (g.avgRating > 0) ? g.avgRating : 0.0;

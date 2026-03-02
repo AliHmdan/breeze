@@ -290,7 +290,7 @@
       "delivery": "save on delivery",
       "supermarket": "Super Market",
       "open": "Available Now",
-      "sweets": "Sweets"
+      "sweets": "Sweet Cravings"
     },
     "discount_delivery": "save on delivery",
     "closer_to_you": "Closer to you",
@@ -302,7 +302,7 @@
     "breakfast_restaurants": "Breakfast Time",
     "breakfast_chip": "Breakfast",
     "empty_breakfast": "No breakfast restaurants available",
-    "sweets": "Sweets",
+    "sweets": "Sweet Cravings",
     "empty_sweets": "No sweets available",
     "empty_area_title": "No restaurants available in your area",
     "empty_area_hint": "Try changing your location or pull to refresh"

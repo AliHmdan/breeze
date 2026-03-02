@@ -97,7 +97,7 @@ class Discount extends StatelessWidget {
           "assets/images/meal_breeze.jpeg", // حط صورتك الافتراضية هون
           height: height,
           width: double.infinity,
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
         ),
       ),
     );
@@ -106,9 +106,7 @@ class Discount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final ratingText = (rating <= 0)
-        ? "no_ratings_yet".tr()
-        : rating.toStringAsFixed(1);
+    final ratingText = (rating <= 0) ? "0.0" : rating.toStringAsFixed(1);
     final openText = (isOpen == true)
         ? "restaurant.open".tr()
         : "restaurant.closed".tr();
@@ -138,15 +136,17 @@ class Discount extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12.r),
-                    child: AppNetworkImage(
-                      path: imagePath,
-                      height: imageH,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      radius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                      fallback: Image.asset(
-                        "assets/images/meal_breeze.jpeg",
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: AppNetworkImage(
+                        path: imagePath,
+                        height: imageH,
+                        width: double.infinity,
                         fit: BoxFit.cover,
+                        fallback: Image.asset(
+                          "assets/images/meal_breeze.jpeg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -182,47 +182,75 @@ class Discount extends StatelessWidget {
                     ),
                   ),
                   if (isOpen == false) const ClosedOverlay(),
-
-                  // if (hasFoodDiscount && discount.trim().isNotEmpty)
-                  //   PositionedDirectional(
-                  //     bottom: 0,
-                  //     start: 0,
-                  //     child: Container(
-                  //       padding: EdgeInsets.symmetric(
-                  //         horizontal: 8.w,
-                  //         vertical: 2.h,
-                  //       ),
-                  //       decoration: BoxDecoration(
-                  //         color: AppColor.red,
-                  //         borderRadius: BorderRadiusDirectional.only(
-                  //           // topStart:  Radius.circular(12.r),
-                  //           bottomStart: Radius.circular(12.r),
-                  //           topEnd: Radius.circular(20.r),
-                  //           bottomEnd: Radius.circular(20.r),
-                  //         ),
-                  //       ),
-                  //       child: Row(
-                  //         mainAxisSize: MainAxisSize.min,
-                  //         children: [
-                  //           Text(
-                  //             discount,
-                  //             style: TextStyle(
-                  //               color: AppColor.white,
-                  //               fontSize: 12.sp,
-                  //               fontWeight: FontWeight.w800,
-                  //             ),
-                  //           ),
-                  //           SizedBox(width: 4.w),
-                  //           SvgPicture.asset(
-                  //             "assets/icons/nspah.svg",
-                  //             width: 18.w,
-                  //             height: 18.h,
-                  //             color: Colors.white,
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
+                  PositionedDirectional(
+                    top: 6,
+                    end: 6,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.inverseSurface.withOpacity(0.30),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.amber, size: 12.sp),
+                          SizedBox(width: 3.w),
+                          Text(
+                            ratingText,
+                            style: TextStyle(
+                              color: colorScheme.onInverseSurface,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (hasFoodDiscount && discount.trim().isNotEmpty)
+                    PositionedDirectional(
+                      bottom: 0,
+                      start: 0,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 2.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColor.red,
+                          borderRadius: BorderRadiusDirectional.only(
+                            // topStart:  Radius.circular(12.r),
+                            bottomStart: Radius.circular(12.r),
+                            topEnd: Radius.circular(20.r),
+                            bottomEnd: Radius.circular(20.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              discount,
+                              style: TextStyle(
+                                color: AppColor.white,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(width: 4.w),
+                            SvgPicture.asset(
+                              "assets/icons/nspah.svg",
+                              width: 18.w,
+                              height: 18.h,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
               Padding(

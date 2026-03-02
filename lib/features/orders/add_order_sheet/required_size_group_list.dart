@@ -1,5 +1,6 @@
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/money.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:breezefood/features/stores/model/restaurant_details_model.dart';
 import 'package:flutter/material.dart';
@@ -23,40 +24,29 @@ class RequiredSizeGroupList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRTL =
-        Directionality.of(context) == mt.TextDirection.rtl;
+    final isRTL = Directionality.of(context) == mt.TextDirection.rtl;
 
     String title() {
-      final t =
-      isRTL ? (group.nameAr ?? "") : (group.nameEn ?? "");
-      return t.trim().isEmpty
-          ? (isRTL ? "الحجم" : "Size")
-          : t;
+      final t = isRTL ? (group.nameAr ?? "") : (group.nameEn ?? "");
+      return t.trim().isEmpty ? (isRTL ? "الحجم" : "Size") : t;
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         /// TITLE
-        CustomSubTitle(
-          subtitle: title(),
-          color: AppColor.white,
-          fontsize: 17,
-        ),
+        CustomSubTitle(subtitle: title(), color: AppColor.white, fontsize: 17),
 
         SizedBox(height: 8.h),
 
         /// ITEMS
         ...group.items.map((it) {
-          final name =
-          isRTL ? it.nameAr : it.nameEn;
+          final name = isRTL ? it.nameAr : it.nameEn;
 
-          final isSelected =
-              selectedExtraId == it.id;
+          final isSelected = selectedExtraId == it.id;
 
           return Padding(
-            padding:
-            EdgeInsets.symmetric(vertical: 4.h),
+            padding: EdgeInsets.symmetric(vertical: 4.h),
             child: GestureDetector(
               onTap: () {
                 HapticFeedback.vibrate();
@@ -68,34 +58,28 @@ class RequiredSizeGroupList extends StatelessWidget {
                 }
               },
               child: Row(
-                mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Row(
                       children: [
                         Checkbox(
                           materialTapTargetSize:
-                          MaterialTapTargetSize
-                              .shrinkWrap,
-                          visualDensity:
-                          const VisualDensity(
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: const VisualDensity(
                             horizontal: -4,
                             vertical: -4,
                           ),
-                          activeColor:
-                          AppColor.primaryColor,
+                          activeColor: AppColor.primaryColor,
                           side: BorderSide(
                             color:
-                            Theme.of(context).brightness == Brightness.dark
+                                Theme.of(context).brightness == Brightness.dark
                                 ? AppColor.gry
-                                : const Color(0xFF262626) ,
+                                : const Color(0xFF262626),
                             width: 1.5,
                           ),
-                          shape:
-                          RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           value: isSelected,
                           onChanged: (_) {
@@ -110,31 +94,38 @@ class RequiredSizeGroupList extends StatelessWidget {
                         ),
 
                         Expanded(
-                          child:Text(name,style: TextStyle( fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                :
-                            const Color(0xFF262626) ,
-                            //   color: Color(0xFF2D2D2D)
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF262626),
 
-
-                            ),)
-
+                              //   color: Color(0xFF2D2D2D)
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Text(context.money(it.price),style: TextStyle( fontSize: 14,fontFamily: Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'Cairo'
-                      : 'Inter',
-                    fontWeight: FontWeight.w400,
-                    color:
-          Theme.of(context).brightness == Brightness.dark
-          ? Colors.white
-
-                        :Color(0xFF373737),),)
+                  Text(
+                    context.syp(it.price),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily:
+                          Localizations.localeOf(context).languageCode == 'ar'
+                          ? 'Cairo'
+                          : 'Inter',
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Color(0xFF373737),
+                    ),
+                  ),
                   // CustomSubTitle(
                   //   subtitle:
                   //   context.money(it.price),

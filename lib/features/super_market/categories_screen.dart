@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/color.dart';
+import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_button_order.dart';
@@ -17,6 +18,7 @@ import 'package:breezefood/core/services/pick_by_langu.dart';
 import 'package:breezefood/features/orders/model/add_to_cart_request.dart';
 import 'package:breezefood/features/super_market/supermarket_add_order_dialog.dart';
 import '../profile/presentation/widget/custom_appbar_profile.dart';
+import 'package:breezefood/features/super_market/widgets/supermarket_info_widget.dart';
 
 class MarketCategoriesScreen extends StatelessWidget {
   final int marketId;
@@ -119,124 +121,136 @@ class MarketCategoriesScreen extends StatelessWidget {
                 );
               }
 
-              return GridView.builder(
-                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 100.h),
-                physics: const BouncingScrollPhysics(),
-                itemCount: cats.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12.w,
-                  mainAxisSpacing: 12.h,
-                  childAspectRatio: 1.05,
-                ),
-                itemBuilder: (context, i) {
-                  final c = cats[i];
-                  final selected = c.id == state.selectedCategoryId;
+              return Column(
+                children: [
+                  // Supermarket Info Widget
+                  SupermarketInfoWidget(
+                    supermarketName: title,
+                    marketId: marketId,
+                    ratingAvg:
+                        4.5, // placeholder - will be connected to real data
+                    ratingCount:
+                        150, // placeholder - will be connected to real data
+                    deliveryBaseFee:
+                        5000, // placeholder - will be connected to real data
+                    deliveryFinalFee:
+                        5000, // placeholder - will be connected to real data
+                    deliveryTime:
+                        30, // placeholder - will be connected to real data
+                    onSearch: () {
+                      // Handle search tap
+                    },
+                  ),
 
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(16.r),
-                    onTap: () async {
-                      // ✅ افتح صفحة الايتمز + اختار الكاتيغوري هناك
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => MultiBlocProvider(
-                            providers: [
-                              // ✅ نفس cubit (حتى ما تعيد جلب categories)
-                              BlocProvider.value(
-                                value: context.read<MarketDetailsCubit>(),
+                  SizedBox(height: 16.h),
+
+                  // Categories Grid
+                  Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 100.h),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: cats.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12.w,
+                        mainAxisSpacing: 12.h,
+                        childAspectRatio: 1.05,
+                      ),
+                      itemBuilder: (context, i) {
+                        final c = cats[i];
+                        final selected = c.id == state.selectedCategoryId;
+
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(16.r),
+                          onTap: () async {
+                            // ✅ افتح صفحة الايتمز + اختار الكاتيغوري هناك
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MultiBlocProvider(
+                                  providers: [
+                                    // ✅ نفس cubit (حتى ما تعيد جلب categories)
+                                    BlocProvider.value(
+                                      value: context.read<MarketDetailsCubit>(),
+                                    ),
+                                    // ✅ نفس cartCubit (حتى زر order يضل صحيح)
+                                    BlocProvider.value(
+                                      value: context.read<CartCubit>(),
+                                    ),
+                                  ],
+                                  child: MarketItemsScreen(
+                                    marketId: marketId,
+                                    marketTitle: title,
+                                    categoryId: c.id,
+                                    categoryName: c.name,
+                                  ),
+                                ),
                               ),
-                              // ✅ نفس cartCubit (حتى زر order يضل صحيح)
-                              BlocProvider.value(
-                                value: context.read<CartCubit>(),
+                            );
+
+                            // ✅ لما ترجع: رفّش السلة
+                            if (context.mounted)
+                              context.read<CartCubit>().loadCart();
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(14.r),
+                                  child: AppNetworkImage(
+                                    path: c.image,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.fill,
+                                    fallback: Image.asset(
+                                      "assets/images/bread.png",
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10.h),
+                              Text(
+                                c.name,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily:
+                                      Localizations.localeOf(
+                                            context,
+                                          ).languageCode ==
+                                          'ar'
+                                      ? 'Cairo'
+                                      : 'Inter',
+                                ),
                               ),
                             ],
-                            child: MarketItemsScreen(
-                              marketId: marketId,
-                              marketTitle: title,
-                              categoryId: c.id,
-                              categoryName: c.name,
-                            ),
                           ),
-                        ),
-                      );
-
-                      // ✅ لما ترجع: رفّش السلة
-                      if (context.mounted) context.read<CartCubit>().loadCart();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColor.black,
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(
-                          color: selected
-                              ? AppColor.primaryColor.withOpacity(0.7)
-                              : Colors.white10,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(14.w),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 46.w,
-                              height: 46.w,
-                              decoration: BoxDecoration(
-                                color: AppColor.primaryColor.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                              child: Icon(
-                                Icons.category,
-                                color: AppColor.primaryColor,
-                                size: 26.sp,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-                            Text(
-                              c.name,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
-                            Text(
-                              "Tap to view items".tr(),
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 10.5.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               );
             },
           ),
 
-         bottomNavigationBar: SafeArea(
-  top: false,
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 12),
-    child: SupermarketBottomButton(),
-  ),
-),
-
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SupermarketBottomButton(),
+            ),
+          ),
         ),
       ),
     );
@@ -285,7 +299,7 @@ class _MarketItemsScreenState extends State<MarketItemsScreen> {
             );
             context.read<CartCubit>().loadCart();
           },
-          cartLoaded:(cart, updatingIds, toast, isRefreshing) {
+          cartLoaded: (cart, updatingIds, toast, isRefreshing) {
             EasyLoading.dismiss();
             if (toast != null && toast.trim().isNotEmpty) {
               EasyLoading.showInfo(toast);
@@ -296,18 +310,18 @@ class _MarketItemsScreenState extends State<MarketItemsScreen> {
             EasyLoading.showError(
               message.isEmpty ? "something_wrong".tr() : message,
             );
-          }, addingToCart: () {  },
+          },
+          addingToCart: () {},
         );
       },
       child: Scaffold(
-       bottomNavigationBar: SafeArea(
-  top: false,
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 12),
-    child: SupermarketBottomButton(),
-  ),
-),
-
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SupermarketBottomButton(),
+          ),
+        ),
 
         backgroundColor: AppColor.Dark,
         appBar: PreferredSize(

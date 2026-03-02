@@ -60,11 +60,11 @@ class DiscountDeliveryGridPage extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 12.h,
+                mainAxisSpacing: 8.h,
                 crossAxisSpacing: 10.w,
 
-                // ✅ خليه أطول شوي ليعطي مساحة للـ bottom
-                childAspectRatio: 0.92,
+                // ✅ More compact aspect ratio
+                childAspectRatio: 0.85,
               ),
               itemCount: discountDelivery.length,
               itemBuilder: (context, index) {
@@ -94,22 +94,21 @@ class DiscountDeliveryGridPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16.r),
-                              ),
-                              child: Image.network(
-                                _logoUrl(d),
-                                height: imageH,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Image.network(
+                                  _logoUrl(d),
                                   height: imageH,
-                                  // color: Colors.grey.shade800,
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    Icons.store,
-                                    color: Colors.white70,
-                                    size: 30.sp,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    height: imageH,
+                                    alignment: Alignment.center,
+                                    child: Image.asset(
+                                      "assets/images/meal_breeze.jpeg",
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),

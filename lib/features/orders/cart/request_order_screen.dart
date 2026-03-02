@@ -1,5 +1,6 @@
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/shared_perfrences_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as mt;
@@ -332,7 +333,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                               ),
                               SizedBox(height: 8.h),
                               Text(
-                                context.money(a.price),
+                                context.syp(a.price),
                                 style: TextStyle(
                                   color: colorScheme.onSurface,
                                   fontSize: 13.sp,
@@ -1263,21 +1264,21 @@ class _TotalsSection extends StatelessWidget {
             title: isRTL ? "المجموع الفرعي" : "Sub total",
             value: cart.itemsTotalAfter,
             before: cart.itemsTotalBefore,
-            money: (n) => context.money(n),
+            money: (n) => context.syp(n),
             context: context,
           ),
           if (cart.appetizersTotal > 0)
             _totalLine(
               title: isRTL ? "المقبلات" : "Appetizers",
               value: cart.appetizersTotal,
-              money: (n) => context.money(n),
+              money: (n) => context.syp(n),
               context: context,
             ),
           _totalLine(
             title: isRTL ? "التوصيل" : "Delivery",
             value: cart.deliveryAfter,
             before: cart.deliveryBefore,
-            money: (n) => context.money(n),
+            money: (n) => context.syp(n),
             context: context,
           ),
 
@@ -1286,7 +1287,7 @@ class _TotalsSection extends StatelessWidget {
             _totalLine(
               title: isRTL ? "خدمة VIP" : "VIP Service",
               value: vipPrice.toDouble(),
-              money: (n) => context.money(n),
+              money: (n) => context.syp(n),
               context: context,
             ),
 
@@ -1305,7 +1306,7 @@ class _TotalsSection extends StatelessWidget {
             value: totalWithVip,
             before: vipPrice > 0 ? cart.grandBefore : null,
             isTotal: true,
-            money: (n) => context.money(n),
+            money: (n) => context.syp(n),
             context: context,
           ),
         ],

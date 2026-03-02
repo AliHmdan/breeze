@@ -34,14 +34,14 @@ class CustomButtonOrder extends StatelessWidget {
                 'assets/icons/box.svg',
                 width: 20.w,
                 height: 20.h,
-                color: AppColor.white,
+                color: Colors.white,
               ),
               SizedBox(width: 6.w),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: AppColor.white,
+                  color:Colors.white,
                   fontFamily: "Manrope",
                   fontWeight: FontWeight.w400,
                 ),

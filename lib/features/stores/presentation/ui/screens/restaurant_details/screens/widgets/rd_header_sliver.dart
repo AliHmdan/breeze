@@ -148,8 +148,7 @@ class RDHeaderSliver extends StatelessWidget {
               ),
             ),
 
-            // ///
-            // /// here new rating
+       
             // ///
             // PositionedDirectional(
             //   bottom: 0,

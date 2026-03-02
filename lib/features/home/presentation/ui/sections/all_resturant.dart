@@ -102,54 +102,32 @@ class _RestaurantCardState extends State<RestaurantCard> {
                     ),
 
                   PositionedDirectional(
-                    top: 10,
-                    end: 10,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // ⭐ Rating
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 2.h,
+                    top: 6,
+                    end: 6,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.inverseSurface.withOpacity(0.30),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.amber, size: 12.sp),
+                          SizedBox(width: 3.w),
+                          Text(
+                            _rating.toStringAsFixed(1),
+                            style: TextStyle(
+                              color: colorScheme.onInverseSurface,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.inverseSurface.withOpacity(0.25),
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                                size: 14,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                _rating.toStringAsFixed(1),
-                                style: TextStyle(
-                                  color: colorScheme.onInverseSurface,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 6.w),
-                              const Text(
-                                "|",
-                                style: TextStyle(color: Colors.white54),
-                              ),
-                              SizedBox(width: 6.w),
-                              CustomSubTitle(
-                                subtitle: ordersText,
-                                color: colorScheme.onInverseSurface.withOpacity(
-                                  0.85,
-                                ),
-                                fontsize: 12.sp,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

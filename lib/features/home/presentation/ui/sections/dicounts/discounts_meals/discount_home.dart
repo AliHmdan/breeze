@@ -5,6 +5,7 @@ import 'package:breezefood/features/profile/presentation/widget/custom_appbar_pr
 import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart'
     show ResturantDetails;
 import 'package:breezefood/features/stores/presentation/ui/screens/resturant_details.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -47,7 +48,7 @@ class DiscountHome extends StatelessWidget {
         Padding(
           padding: EdgeInsetsDirectional.only(top: 10, start: 16, end: 0.2),
           child: SizedBox(
-            height: 139.h,
+            height: 146.h,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final itemWidth = constraints.maxWidth / 2.2;
@@ -148,7 +149,7 @@ class DiscountRestaurantsGridPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CustomAppbarProfile(
-            title: "Discounts",
+            title: "home.filters.discounts".tr(),
             icon: Icons.arrow_back_ios,
             ontap: () => Navigator.of(context).pop(),
           ),
@@ -164,9 +165,10 @@ class DiscountRestaurantsGridPage extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 12.h,
-                crossAxisSpacing: 10.w,
-                childAspectRatio: 0.58, // Adjusted for better rating display
+                  mainAxisSpacing: 8.h,
+            crossAxisSpacing: 10.w,
+            childAspectRatio: 0.55, // More compact
+            mainAxisExtent: 150.h, // More compact
               ),
               itemCount: discounts.length,
               itemBuilder: (context, index) {

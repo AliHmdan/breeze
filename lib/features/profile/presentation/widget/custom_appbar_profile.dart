@@ -9,7 +9,14 @@ class CustomAppbarProfile extends StatelessWidget {
   final Color? backgroundcolor;
   final VoidCallback ontap;
 
-  const CustomAppbarProfile({super.key, this.icon, this.subtitle, this.title, required this.ontap, this.backgroundcolor});
+  const CustomAppbarProfile({
+    super.key,
+    this.icon,
+    this.subtitle,
+    this.title,
+    required this.ontap,
+    this.backgroundcolor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,33 +27,34 @@ class CustomAppbarProfile extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            /// 🔙 زر الرجوع (يسار)
-            // if (icon != null)
-            //   PositionedDirectional(
-            //     start: 0,
-            //     child: GestureDetector(
-            //       onTap: ontap,
-            //       child: Container(
-            //         padding: const EdgeInsets.all(4),
-            //         decoration: BoxDecoration(
-            //           color: AppColor.black,
-            //           shape: BoxShape.circle,
-            //           border: Border.all(
-            //             color: AppColor.LightActive,
-            //             width: 2,
-            //           ),
-            //         ),
-            //         child: Padding(
-            //           padding: const EdgeInsetsDirectional.only(start: 6),
-            //           child: Icon(
-            //             icon,
-            //             color: AppColor.white,
-            //             size: 16.sp,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
+            // / 🔙 زر الرجوع (يسار)
+            if (icon != null)
+              PositionedDirectional(
+                start: 0,
+                child: GestureDetector(
+                  onTap: ontap,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      // color: Theme.of(context).brightness == Brightness.dark
+                      //     ? Colors.black
+                      //     : Colors.white,
+                      shape: BoxShape.circle,
+                      // border: Border.all(width: 2),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.only(start: 6),
+                      child: Icon(
+                        icon,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                        size: 16.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
             /// 🏷️ العنوان (في منتصف الشاشة تمامًا)
             if (title != null)
@@ -59,7 +67,10 @@ class CustomAppbarProfile extends StatelessWidget {
                     fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColor.white,
-                    fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
+                    fontFamily:
+                        Localizations.localeOf(context).languageCode == 'ar'
+                        ? 'Cairo'
+                        : 'Inter',
                   ),
                 ),
               ),
