@@ -29,12 +29,15 @@ class MealCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadiusDirectional.only(
-                  topEnd: Radius.circular(40),
-                  bottomEnd: Radius.circular(40),
+              SizedBox(
+                height: 60.h,
+                width: 60.w,
+                child: ClipRRect(
+                  borderRadius: const BorderRadiusDirectional.all(
+                    Radius.circular(12),
+                  ),
+                  child: _MealImage(image: image),
                 ),
-                child: _MealImage(image: image),
               ),
               const SizedBox(width: 12),
 

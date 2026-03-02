@@ -31,11 +31,11 @@ class AddressSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-      ),
+      // decoration: BoxDecoration(
+      //   color: colorScheme.surface,
+      //   borderRadius: BorderRadius.circular(12.r),
+      //   border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+      // ),
       child: InkWell(
         onTap: onChangeTap,
         borderRadius: BorderRadius.circular(14.r),

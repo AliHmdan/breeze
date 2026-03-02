@@ -246,11 +246,11 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
+      // decoration: BoxDecoration(
+      //   color: colorScheme.surface,
+      //   border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+      //   borderRadius: BorderRadius.circular(14.r),
+      // ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -264,7 +264,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
           ),
           SizedBox(height: 10.h),
           SizedBox(
-            height: 230.h,
+            height: 220.h,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -281,44 +281,249 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                     : (a.nameEn.trim().isNotEmpty ? a.nameEn : a.nameAr);
 
                 return SizedBox(
-                  width: 170.w,
+                  width: 145.w,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.18),
-                      ),
+                      // color: colorScheme.surface,
+                      // borderRadius: BorderRadius.circular(14.r),
+                      // border: Border.all(
+                      //   color: colorScheme.outline.withOpacity(0.18),
+                      // ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(14.r),
-                            topRight: Radius.circular(14.r),
-                          ),
+                          borderRadius: BorderRadius.circular(14.r),
                           child: Stack(
                             children: [
-                              (a.image == null || a.image!.isEmpty)
-                                  ? Image.asset(
-                                      "assets/images/003.jpg",
-                                      width: double.infinity,
-                                      height: 120.h,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.network(
-                                      a.image!,
-                                      width: double.infinity,
-                                      height: 120.h,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Image.asset(
-                                        "assets/images/003.jpg",
-                                        width: double.infinity,
-                                        height: 120.h,
-                                        fit: BoxFit.cover,
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: SizedBox(
+                                  width: 145.w,
+                                  height: 145.w,
+                                  child: Stack(
+                                    children: [
+                                      (a.image == null || a.image!.isEmpty)
+                                          ? Image.asset(
+                                              "assets/images/003.jpg",
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.network(
+                                              a.image!,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Image.asset(
+                                                    "assets/images/003.jpg",
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                            ),
+                                      Positioned(
+                                        bottom: 5,
+                                        right: 5,
+                                        child: Row(
+                                          children: [
+                                            if (qty <= 0)
+                                              InkWell(
+                                                onTap: disabled
+                                                    ? null
+                                                    : () {
+                                                        setState(() {
+                                                          _appetizerQty[a.id] =
+                                                              1;
+                                                        });
+                                                        _syncAppetizer(
+                                                          appetizerId: a.id,
+                                                          quantity: 1,
+                                                        );
+                                                      },
+                                                child: Container(
+                                                  width: 38.w,
+                                                  height: 38.w,
+                                                  decoration: BoxDecoration(
+                                                    color: disabled
+                                                        ? colorScheme
+                                                              .surfaceContainerHighest
+                                                        : colorScheme.surface,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12.r,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: colorScheme.outline
+                                                          .withOpacity(0.22),
+                                                    ),
+                                                  ),
+                                                  child: syncing
+                                                      ? Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                10.w,
+                                                              ),
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                color:
+                                                                    colorScheme
+                                                                        .primary,
+                                                              ),
+                                                        )
+                                                      : Icon(
+                                                          Icons.add,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                ),
+                                              )
+                                            else
+                                              Container(
+                                                height: 38.w,
+                                                decoration: BoxDecoration(
+                                                  color: colorScheme.surface,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                  border: Border.all(
+                                                    color: colorScheme.outline
+                                                        .withOpacity(0.22),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: disabled
+                                                          ? null
+                                                          : () {
+                                                              final next =
+                                                                  (qty - 1)
+                                                                      .clamp(
+                                                                        0,
+                                                                        99,
+                                                                      );
+                                                              setState(() {
+                                                                if (next == 0) {
+                                                                  _appetizerQty
+                                                                      .remove(
+                                                                        a.id,
+                                                                      );
+                                                                } else {
+                                                                  _appetizerQty[a
+                                                                          .id] =
+                                                                      next;
+                                                                }
+                                                              });
+                                                              _syncAppetizer(
+                                                                appetizerId:
+                                                                    a.id,
+                                                                quantity: next,
+                                                              );
+                                                            },
+                                                      child: SizedBox(
+                                                        width: 38.w,
+                                                        height: 38.w,
+                                                        child: Icon(
+                                                          Icons.remove,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 28.w,
+                                                      child: Center(
+                                                        child: syncing
+                                                            ? SizedBox(
+                                                                width: 14.w,
+                                                                height: 14.w,
+                                                                child: CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      2,
+                                                                  color: colorScheme
+                                                                      .primary,
+                                                                ),
+                                                              )
+                                                            : Text(
+                                                                qty.toString(),
+                                                                style: TextStyle(
+                                                                  color: colorScheme
+                                                                      .onSurface,
+                                                                  fontSize:
+                                                                      13.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                ),
+                                                              ),
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: disabled
+                                                          ? null
+                                                          : () {
+                                                              final next =
+                                                                  (qty + 1)
+                                                                      .clamp(
+                                                                        0,
+                                                                        99,
+                                                                      );
+                                                              setState(() {
+                                                                _appetizerQty[a
+                                                                        .id] =
+                                                                    next;
+                                                              });
+                                                              _syncAppetizer(
+                                                                appetizerId:
+                                                                    a.id,
+                                                                quantity: next,
+                                                              );
+                                                            },
+                                                      child: SizedBox(
+                                                        width: 38.w,
+                                                        height: 38.w,
+                                                        child: Icon(
+                                                          Icons.add,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               Positioned(
                                 top: 8.h,
                                 left: 8.w,
@@ -355,8 +560,8 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: colorScheme.onSurface,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                               SizedBox(height: 8.h),
@@ -369,163 +574,6 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 ),
                               ),
                               SizedBox(height: 5.h),
-                              Row(
-                                children: [
-                                  if (qty <= 0)
-                                    InkWell(
-                                      onTap: disabled
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                _appetizerQty[a.id] = 1;
-                                              });
-                                              _syncAppetizer(
-                                                appetizerId: a.id,
-                                                quantity: 1,
-                                              );
-                                            },
-                                      child: Container(
-                                        width: 38.w,
-                                        height: 38.w,
-                                        decoration: BoxDecoration(
-                                          color: disabled
-                                              ? colorScheme
-                                                    .surfaceContainerHighest
-                                              : colorScheme.surface,
-                                          borderRadius: BorderRadius.circular(
-                                            12.r,
-                                          ),
-                                          border: Border.all(
-                                            color: colorScheme.outline
-                                                .withOpacity(0.22),
-                                          ),
-                                        ),
-                                        child: syncing
-                                            ? Padding(
-                                                padding: EdgeInsets.all(10.w),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color:
-                                                          colorScheme.primary,
-                                                    ),
-                                              )
-                                            : Icon(
-                                                Icons.add,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                      ),
-                                    )
-                                  else
-                                    Container(
-                                      height: 38.w,
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.surface,
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                        border: Border.all(
-                                          color: colorScheme.outline
-                                              .withOpacity(0.22),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          InkWell(
-                                            onTap: disabled
-                                                ? null
-                                                : () {
-                                                    final next = (qty - 1)
-                                                        .clamp(0, 99);
-                                                    setState(() {
-                                                      if (next == 0) {
-                                                        _appetizerQty.remove(
-                                                          a.id,
-                                                        );
-                                                      } else {
-                                                        _appetizerQty[a.id] =
-                                                            next;
-                                                      }
-                                                    });
-                                                    _syncAppetizer(
-                                                      appetizerId: a.id,
-                                                      quantity: next,
-                                                    );
-                                                  },
-                                            child: SizedBox(
-                                              width: 38.w,
-                                              height: 38.w,
-                                              child: Icon(
-                                                Icons.remove,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 28.w,
-                                            child: Center(
-                                              child: syncing
-                                                  ? SizedBox(
-                                                      width: 14.w,
-                                                      height: 14.w,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                            color: colorScheme
-                                                                .primary,
-                                                          ),
-                                                    )
-                                                  : Text(
-                                                      qty.toString(),
-                                                      style: TextStyle(
-                                                        color: colorScheme
-                                                            .onSurface,
-                                                        fontSize: 13.sp,
-                                                        fontWeight:
-                                                            FontWeight.w900,
-                                                      ),
-                                                    ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: disabled
-                                                ? null
-                                                : () {
-                                                    final next = (qty + 1)
-                                                        .clamp(0, 99);
-                                                    setState(() {
-                                                      _appetizerQty[a.id] =
-                                                          next;
-                                                    });
-                                                    _syncAppetizer(
-                                                      appetizerId: a.id,
-                                                      quantity: next,
-                                                    );
-                                                  },
-                                            child: SizedBox(
-                                              width: 38.w,
-                                              height: 38.w,
-                                              child: Icon(
-                                                Icons.add,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
                             ],
                           ),
                         ),
@@ -822,7 +870,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),
         child: Padding(
@@ -849,15 +897,15 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              "assets/images/background_auth.png",
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: colorScheme.surface.withOpacity(0.85)),
-          ),
+          // Positioned.fill(
+          //   child: Image.asset(
+          //     "assets/images/background_auth.png",
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
+          // Positioned.fill(
+          //   child: Container(color: colorScheme.surface.withOpacity(0.85)),
+          // ),
           SafeArea(
             child: BlocListener<OrderFlowCubit, OrderFlowState>(
               listener: (context, state) async {
@@ -989,14 +1037,16 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 ),
 
                               SizedBox(height: 10.h),
-
+                              Divider(),
                               _recommendedAppetizersSection(
                                 isRTL: isRTL,
                                 cart: cart,
                               ),
 
-                              if (_appetizers.isNotEmpty)
-                                SizedBox(height: 10.h),
+                              if (_appetizers.isNotEmpty) ...[
+                                // SizedBox(height: 10.h),
+                                Divider(),
+                              ],
 
                               if (_deliveryType == "delivery") ...[
                                 AddressSection(
@@ -1018,6 +1068,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   },
                                 ),
                                 SizedBox(height: 10.h),
+                                Divider(),
                               ],
 
                               // VIP Section
@@ -1186,10 +1237,10 @@ class _CartItemsSection extends StatelessWidget {
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border.all(
-                  color: colorScheme.outline.withOpacity(0.25),
-                ),
+                // color: colorScheme.surface,
+                // border: Border.all(
+                //   color: colorScheme.outline.withOpacity(0.25),
+                // ),
               ),
               child: Column(
                 children: [
@@ -1217,8 +1268,8 @@ class _CartItemsSection extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: colorScheme.surface,
-            border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+            // color: colorScheme.surface,
+            // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
           ),
           child: InkWell(
             onTap: onAddMore,
@@ -1271,9 +1322,9 @@ class _TotalsSection extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(11.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+        // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
       ),
       child: Column(
         children: [
@@ -1345,9 +1396,9 @@ class _OrderNotesSection extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+        // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
       ),
       child: TextField(
         controller: ctrl,
@@ -1397,9 +1448,9 @@ class _VipSection extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: isVipEnabled
-            ? colorScheme.primary.withOpacity(0.1)
-            : colorScheme.surface,
+        // color: isVipEnabled
+        //     ? colorScheme.primary.withOpacity(0.1)
+        //     : colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isVipEnabled

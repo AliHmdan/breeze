@@ -227,7 +227,7 @@ class _PaymentTile extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.h),
       decoration: BoxDecoration(
-        color: tileColor,
+        // color: tileColor,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: InkWell(
