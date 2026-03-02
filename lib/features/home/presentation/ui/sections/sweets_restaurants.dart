@@ -2,6 +2,7 @@ import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -47,9 +48,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
   @override
   Widget build(BuildContext context) {
-    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0)
-        ? context.syp(widget.deliveryFee, decimals: 0)
-        : "common.dash".tr();
+    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0) ? context.syp(widget.deliveryFee, decimals: 0) : "common.dash".tr();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -65,12 +64,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                   height: 100.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  fallback: Image.asset(
-                    "assets/images/meal_breeze.jpeg",
-                    height: 100.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  fallback: Image.asset("assets/images/meal_breeze.jpeg", height: 100.h, width: double.infinity, fit: BoxFit.cover),
                 ),
               ),
 
@@ -86,13 +80,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4, offset: const Offset(0, 2))],
                   ),
                   child: Row(
                     children: [
@@ -104,11 +92,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                           color: Colors.white,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Localizations.localeOf(context).languageCode ==
-                                  'ar'
-                              ? 'Cairo'
-                              : 'Inter',
+                          fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
                         ),
                       ),
                     ],
@@ -119,7 +103,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
           ),
 
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            padding: EdgeInsets.symmetric(horizontal: 0.w),
             child: Text(
               widget.name,
               textAlign: TextAlign.center,
@@ -129,28 +113,17 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
-                fontFamily: Localizations.localeOf(context).languageCode == 'ar'
-                    ? 'Cairo'
-                    : 'Inter',
+                fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
               ),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 1.h),
 
           Row(
             children: [
-              Image.asset(
-                "assets/icons/new_del.png",
-                width: 16.w,
-                height: 16.h,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: AppColor.white,
-                fontsize: 12.sp,
-              ),
+              CustomSubTitle(subtitle: feeText, color: AppColor.white, fontsize: 11.sp),
             ],
           ),
         ],
@@ -164,12 +137,7 @@ class SweetsRestaurantsSection extends StatelessWidget {
   final bool hideWhenEmpty;
   final ValueChanged<HomeRestaurantModel>? onTap;
 
-  const SweetsRestaurantsSection({
-    super.key,
-    required this.restaurants,
-    this.hideWhenEmpty = true,
-    this.onTap,
-  });
+  const SweetsRestaurantsSection({super.key, required this.restaurants, this.hideWhenEmpty = true, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -181,10 +149,7 @@ class SweetsRestaurantsSection extends StatelessWidget {
         child: Container(
           height: 100.h,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColor.black,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
+          decoration: BoxDecoration(color: AppColor.black, borderRadius: BorderRadius.circular(12.r)),
           child: CustomSubTitle(
             subtitle: "home.empty_sweets".tr(), // ✅ رسالة السويتس
             color: AppColor.white,
@@ -198,7 +163,7 @@ class SweetsRestaurantsSection extends StatelessWidget {
     final cardWidth = MediaQuery.of(context).size.width / 2.3;
 
     return SizedBox(
-      height: 160.h,
+      height: 150.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -208,14 +173,12 @@ class SweetsRestaurantsSection extends StatelessWidget {
 
           return Container(
             width: cardWidth,
-            margin: EdgeInsets.only(
-              left: index == 0 ? 9.w : 0,
-              right: index == restaurants.length - 1 ? 10.w : gap,
-            ),
+            margin: EdgeInsets.only(left: index == 0 ? 9.w : 0, right: index == restaurants.length - 1 ? 10.w : gap),
             child: SweetsRestaurantCard(
               image: restaurantImage(r),
               isOpen: r.isOpen,
-              name: r.name,
+              // name: r.name,
+              name: extractLocalizedText(r.name, context.locale),
               rating: r.ratingAvg <= 0 ? 4.0 : r.ratingAvg,
               deliveryFee: r.deliveryFinalFee?.toDouble(),
               onTap: () async {

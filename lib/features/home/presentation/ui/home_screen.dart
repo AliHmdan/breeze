@@ -23,8 +23,7 @@ import 'package:breezefood/features/home/presentation/ui/widgets/appbar_home.dar
 import 'package:breezefood/features/home/presentation/ui/widgets/cart_summary_model.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_button_order.dart';
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
-import 'package:breezefood/features/orders/model/active_orders_response.dart'
-    show OrderInfo;
+import 'package:breezefood/features/orders/model/active_orders_response.dart' show OrderInfo;
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_cubit.dart';
 import 'package:breezefood/features/profile/presentation/widget/custom_button.dart';
@@ -43,8 +42,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 // Import the grid pages
-import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_meals/discount_home.dart'
-    show DiscountRestaurantsGridPage;
+import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_meals/discount_home.dart' show DiscountRestaurantsGridPage;
 import 'package:breezefood/features/home/presentation/ui/sections/sweets_restaurants_grid_page.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/breakfast_restaurants_grid_page.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/supermarkets_grid_page.dart';
@@ -57,17 +55,14 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home>
-    with RouteAware, SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateMixin {
   bool _subscribed = false;
 
   late final AnimationController _robotBobController;
   late final Animation<double> _robotBob;
 
   // ✅ Controller تبع السكرول + tabs sync
-  late final HomeScrollController homeScroll = HomeScrollController(
-    debugEnabled: kDebugMode,
-  )..init();
+  late final HomeScrollController homeScroll = HomeScrollController(debugEnabled: kDebugMode)..init();
 
   late final HomeCubit cubit;
 
@@ -75,14 +70,9 @@ class _HomeState extends State<Home>
   void initState() {
     super.initState();
 
-    _robotBobController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+    _robotBobController = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
 
-    _robotBob = Tween<double>(begin: 0, end: -10).animate(
-      CurvedAnimation(parent: _robotBobController, curve: Curves.easeInOut),
-    );
+    _robotBob = Tween<double>(begin: 0, end: -10).animate(CurvedAnimation(parent: _robotBobController, curve: Curves.easeInOut));
 
     cubit = context.read<HomeCubit>();
 
@@ -95,11 +85,7 @@ class _HomeState extends State<Home>
       } catch (_) {}
 
       // 2) حمّل بيانات الهوم أولاً (أولوية قصوى لسرعة العرض)
-      final isLoadedOrLoading = cubit.state.maybeWhen(
-        loading: () => true,
-        loaded: (_) => true,
-        orElse: () => false,
-      );
+      final isLoadedOrLoading = cubit.state.maybeWhen(loading: () => true, loaded: (_) => true, orElse: () => false);
 
       if (!isLoadedOrLoading) {
         await cubit.load();
@@ -231,10 +217,7 @@ class _HomeState extends State<Home>
     if (id == 0) return;
 
     final title = _extractTitle(m).trim();
-    final homeData = cubit.state.maybeWhen(
-      loaded: (d) => d,
-      orElse: () => null,
-    );
+    final homeData = cubit.state.maybeWhen(loaded: (d) => d, orElse: () => null);
 
     await Navigator.push(
       context,
@@ -250,10 +233,7 @@ class _HomeState extends State<Home>
     context.read<CartCubit>().loadCart(silent: true);
   }
 
-  Widget _shimmerBox({
-    required double height,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 10),
-  }) {
+  Widget _shimmerBox({required double height, EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 10)}) {
     return Padding(
       padding: padding,
       child: Shimmer.fromColors(
@@ -264,9 +244,7 @@ class _HomeState extends State<Home>
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.35),
-            ),
+            border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.35)),
           ),
         ),
       ),
@@ -279,15 +257,9 @@ class _HomeState extends State<Home>
     return BlocBuilder<HomeCubit, HomeState>(
       bloc: cubit,
       builder: (context, state) {
-        final loading = state.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
+        final loading = state.maybeWhen(loading: () => true, orElse: () => false);
 
-        final homeData = state.maybeWhen(
-          loaded: (data) => data,
-          orElse: () => null,
-        );
+        final homeData = state.maybeWhen(loaded: (data) => data, orElse: () => null);
         final haveOrder = homeData?.haveOrder;
 
         final cartHasItems = context.watch<CartCubit>().state.maybeWhen(
@@ -309,8 +281,7 @@ class _HomeState extends State<Home>
             builder: () => loading
                 ? _shimmerBox(height: 178.h)
                 : state.maybeWhen(
-                    loaded: (data) =>
-                        StoriesSlider(stories: data.stories, onTap: (story) {}),
+                    loaded: (data) => StoriesSlider(stories: data.stories, onTap: (story) {}),
                     orElse: () => const SizedBox.shrink(),
                   ),
           ),
@@ -333,10 +304,7 @@ class _HomeState extends State<Home>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AllResturant(
-                              restaurants: homeData?.nearbyRestaurants ?? [],
-                              onTap: _openRestaurant,
-                            ),
+                            builder: (_) => AllResturant(restaurants: homeData?.nearbyRestaurants ?? [], onTap: _openRestaurant),
                           ),
                         );
                       },
@@ -346,10 +314,7 @@ class _HomeState extends State<Home>
                 loading
                     ? _shimmerBox(height: 178.h)
                     : state.maybeWhen(
-                        loaded: (data) => OpenNow(
-                          restaurants: data.nearbyRestaurants,
-                          onTap: _openRestaurant,
-                        ),
+                        loaded: (data) => OpenNow(restaurants: data.nearbyRestaurants, onTap: _openRestaurant),
                         orElse: () => const SizedBox.shrink(),
                       ),
               ],
@@ -371,13 +336,9 @@ class _HomeState extends State<Home>
                       all: "common.all".tr(),
                       icon: Icons.arrow_forward_ios_outlined,
                       ontap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => DiscountRestaurantsGridPage(
-                              discounts: homeData?.discounts ?? [],
-                            ),
-                          ),
-                        );
+                        Navigator.of(
+                          context,
+                        ).push(MaterialPageRoute(builder: (_) => DiscountRestaurantsGridPage(discounts: homeData?.discounts ?? [])));
                       },
                     ),
                   ),
@@ -385,8 +346,7 @@ class _HomeState extends State<Home>
                 loading
                     ? _shimmerBox(height: 130.h)
                     : state.maybeWhen(
-                        loaded: (data) =>
-                            DiscountHome(discounts: data.discounts),
+                        loaded: (data) => DiscountHome(discounts: data.discounts),
                         orElse: () => const SizedBox.shrink(),
                       ),
               ],
@@ -408,14 +368,9 @@ class _HomeState extends State<Home>
                       all: "common.all".tr(),
                       icon: Icons.arrow_forward_ios_outlined,
                       ontap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => DiscountDeliveryGridPage(
-                              discountDelivery:
-                                  homeData?.discountDelivery ?? [],
-                            ),
-                          ),
-                        );
+                        Navigator.of(
+                          context,
+                        ).push(MaterialPageRoute(builder: (_) => DiscountDeliveryGridPage(discountDelivery: homeData?.discountDelivery ?? [])));
                       },
                     ),
                   ),
@@ -423,8 +378,9 @@ class _HomeState extends State<Home>
                 loading
                     ? _shimmerBox(height: 130.h)
                     : state.maybeWhen(
-                        loaded: (data) => DiscountDeliveryHome(
-                          discountDelivery: data.discountDelivery,
+                        loaded: (data) => Padding(
+                          padding: EdgeInsetsDirectional.only(start: 10.w),
+                          child: DiscountDeliveryHome(discountDelivery: data.discountDelivery),
                         ),
                         orElse: () => const SizedBox.shrink(),
                       ),
@@ -451,23 +407,16 @@ class _HomeState extends State<Home>
                         all: "common.all".tr(),
                         icon: Icons.arrow_forward_ios_outlined,
                         ontap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => SweetsRestaurantsGridPage(
-                                restaurants: sweetsList,
-                              ),
-                            ),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => SweetsRestaurantsGridPage(restaurants: sweetsList)));
                         },
                       ),
                     ),
                   SizedBox(height: 10.h),
                   loading
                       ? _shimmerBox(height: 178.h)
-                      : SweetsRestaurantsSection(
-                          restaurants: sweetsList,
-                          onTap: _openRestaurant,
+                      : Padding(
+                          padding: EdgeInsetsDirectional.only(start: 10.w),
+                          child: SweetsRestaurantsSection(restaurants: sweetsList, onTap: _openRestaurant),
                         ),
                 ],
               ),
@@ -492,19 +441,15 @@ class _HomeState extends State<Home>
                         all: "common.all".tr(),
                         icon: Icons.arrow_forward_ios_outlined,
                         ontap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => BreakfastRestaurantsGridPage(
-                                restaurants: breakfastList,
-                              ),
-                            ),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => BreakfastRestaurantsGridPage(restaurants: breakfastList)));
                         },
                       ),
                     ),
                   SizedBox(height: 10.h),
-                  BreakfastRestaurantsSection(restaurants: breakfastList),
+                  Padding(
+                    padding: EdgeInsetsDirectional.only(start: 10.w),
+                    child: BreakfastRestaurantsSection(restaurants: breakfastList),
+                  ),
                 ],
               ),
             ),
@@ -525,23 +470,15 @@ class _HomeState extends State<Home>
                       all: "common.all".tr(),
                       icon: Icons.arrow_forward_ios_outlined,
                       ontap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SupermarketsGridPage(
-                              supermarkets: homeData?.supermarkets ?? [],
-                            ),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SupermarketsGridPage(supermarkets: homeData?.supermarkets ?? [])));
                       },
                     ),
                   ),
                 SizedBox(height: 10.h),
                 state.maybeWhen(
-                  loaded: (data) => Supermarketslider(
-                    restaurants: data.supermarkets,
-                    onTap: _openMarket,
-                    onRateSuccess: () => cubit.load(),
+                  loaded: (data) => Padding(
+                    padding: EdgeInsetsDirectional.only(start: 0.w),
+                    child: Supermarketslider(restaurants: data.supermarkets, onTap: _openMarket, onRateSuccess: () => cubit.load()),
                   ),
                   orElse: () => const SizedBox.shrink(),
                 ),
@@ -567,10 +504,7 @@ class _HomeState extends State<Home>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AllResturant(
-                              restaurants: homeData?.allRestaurants ?? [],
-                              onTap: _openRestaurant,
-                            ),
+                            builder: (_) => AllResturant(restaurants: homeData?.allRestaurants ?? [], onTap: _openRestaurant),
                           ),
                         );
                       },
@@ -580,10 +514,7 @@ class _HomeState extends State<Home>
                 loading
                     ? _shimmerBox(height: 320.h)
                     : state.maybeWhen(
-                        loaded: (data) => AllResturant(
-                          restaurants: data.allRestaurants,
-                          onTap: _openRestaurant,
-                        ),
+                        loaded: (data) => AllResturant(restaurants: data.allRestaurants, onTap: _openRestaurant),
                         orElse: () => const SizedBox.shrink(),
                       ),
               ],
@@ -594,10 +525,7 @@ class _HomeState extends State<Home>
 
         final tabTitles = sections.map((s) => s.title).toList();
 
-        final safeActive = homeScroll.activeIndex.value.clamp(
-          0,
-          (tabTitles.isEmpty ? 0 : tabTitles.length - 1),
-        );
+        final safeActive = homeScroll.activeIndex.value.clamp(0, (tabTitles.isEmpty ? 0 : tabTitles.length - 1));
 
         if (safeActive != homeScroll.activeIndex.value) {
           homeScroll.activeIndex.value = safeActive;
@@ -606,8 +534,7 @@ class _HomeState extends State<Home>
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
-        final fabBottomPadding =
-            (showBottom ? 90.h : 24.h) + MediaQuery.of(context).padding.bottom;
+        final fabBottomPadding = (showBottom ? 90.h : 24.h) + MediaQuery.of(context).padding.bottom;
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -631,15 +558,11 @@ class _HomeState extends State<Home>
                         width: 30.w,
                         height: 8.h,
                         decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.14),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.14),
                           borderRadius: BorderRadius.circular(999),
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
                               blurRadius: 10,
                               spreadRadius: 0,
                               offset: const Offset(0, 4),
@@ -651,17 +574,9 @@ class _HomeState extends State<Home>
                     AnimatedBuilder(
                       animation: _robotBob,
                       builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(0, _robotBob.value),
-                          child: child,
-                        );
+                        return Transform.translate(offset: Offset(0, _robotBob.value), child: child);
                       },
-                      child: Image.asset(
-                        'assets/icons/pnj ROBOT.png',
-                        width: 56.w,
-                        height: 56.w,
-                        fit: BoxFit.contain,
-                      ),
+                      child: Image.asset('assets/icons/pnj ROBOT.png', width: 56.w, height: 56.w, fit: BoxFit.contain),
                     ),
                   ],
                 ),
@@ -695,18 +610,11 @@ class _HomeState extends State<Home>
                           child: SizedBox.expand(
                             child: Container(
                               key: homeScroll.tabsKey,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 5.w,
-                                vertical: 7,
-                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 7),
                               child: ValueListenableBuilder<int>(
                                 valueListenable: homeScroll.activeIndex,
                                 builder: (_, active, __) {
-                                  return HomeTabsBar(
-                                    titles: tabTitles,
-                                    activeIndex: active,
-                                    onTap: (i) => homeScroll.scrollToSection(i),
-                                  );
+                                  return HomeTabsBar(titles: tabTitles, activeIndex: active, onTap: (i) => homeScroll.scrollToSection(i));
                                 },
                               ),
                             ),
@@ -722,10 +630,7 @@ class _HomeState extends State<Home>
                             ...List.generate(sections.length, (i) {
                               return Column(
                                 children: [
-                                  SizedBox(
-                                    key: homeScroll.sectionKeys[i],
-                                    height: 0,
-                                  ), // ✅ فقط هون
+                                  SizedBox(key: homeScroll.sectionKeys[i], height: 0), // ✅ فقط هون
                                   sections[i].builder(),
                                   SizedBox(height: 14.h),
                                 ],
@@ -735,9 +640,7 @@ class _HomeState extends State<Home>
                         ),
                       ),
 
-                      SliverToBoxAdapter(
-                        child: SizedBox(height: showBottom ? 90.h : 24.h),
-                      ),
+                      SliverToBoxAdapter(child: SizedBox(height: showBottom ? 90.h : 24.h)),
                     ],
                   ),
                 ),
@@ -753,16 +656,10 @@ class _HomeState extends State<Home>
                     child: BlocBuilder<HomeCubit, HomeState>(
                       bloc: cubit,
                       builder: (context, st) {
-                        final haveOrder = st.maybeWhen(
-                          loaded: (d) => d.haveOrder,
-                          orElse: () => null,
-                        );
+                        final haveOrder = st.maybeWhen(loaded: (d) => d.haveOrder, orElse: () => null);
 
                         // ✅ مرر haveOrder (قد يكون null) وخلي الويدجت تقرر شو تعرض
-                        return _HomeBottomAction(
-                          homeCubit: cubit,
-                          haveOrder: haveOrder,
-                        );
+                        return _HomeBottomAction(homeCubit: cubit, haveOrder: haveOrder);
                       },
                     ),
                   ),
@@ -785,17 +682,13 @@ class _HomeBottomAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, st) {
-        final cart = st.maybeWhen(
-          cartLoaded: (cart, updatingIds, toast, isRefreshing) => cart,
-          orElse: () => null,
-        );
+        final cart = st.maybeWhen(cartLoaded: (cart, updatingIds, toast, isRefreshing) => cart, orElse: () => null);
 
         // 1) ✅ إذا في سلة وفيها عناصر -> View Cart
         if (cart != null) {
           final summary = CartSummary.from(cart);
           if (summary.hasCart) {
-            final title =
-                "${'cart.view_cart'.tr()} • ${summary.count} • ${context.money(summary.total, decimals: 0)}";
+            final title = "${'cart.view_cart'.tr()} • ${summary.count} • ${context.money(summary.total, decimals: 0)}";
 
             return CustomButton(
               title: title,
@@ -856,11 +749,7 @@ class _StickyTabsHeader extends SliverPersistentHeaderDelegate {
   double get maxExtent => height;
 
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(
       child: Container(
         color: Theme.of(context).colorScheme.surface,
@@ -880,9 +769,5 @@ class _HomeSectionDef {
   final String title; // للـ tabs
   final Widget Function() builder;
 
-  _HomeSectionDef({
-    required this.id,
-    required this.title,
-    required this.builder,
-  });
+  _HomeSectionDef({required this.id, required this.title, required this.builder});
 }

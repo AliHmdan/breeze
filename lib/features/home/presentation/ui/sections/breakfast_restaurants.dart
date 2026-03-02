@@ -3,6 +3,7 @@ import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -34,8 +35,7 @@ class BreakfastRestaurantCard extends StatefulWidget {
   });
 
   @override
-  State<BreakfastRestaurantCard> createState() =>
-      _BreakfastRestaurantCardState();
+  State<BreakfastRestaurantCard> createState() => _BreakfastRestaurantCardState();
 }
 
 class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
@@ -49,9 +49,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
 
   @override
   Widget build(BuildContext context) {
-    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0)
-        ? context.syp(widget.deliveryFee, decimals: 0)
-        : "common.dash".tr();
+    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0) ? context.syp(widget.deliveryFee, decimals: 0) : "common.dash".tr();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -68,12 +66,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                   width: double.infinity,
                   fit: BoxFit.cover,
 
-                  fallback: Image.asset(
-                    "assets/images/meal_breeze.jpeg",
-                    height: 100.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  fallback: Image.asset("assets/images/meal_breeze.jpeg", height: 100.h, width: double.infinity, fit: BoxFit.cover),
                 ),
               ),
               // ✅ Open/Closed badge
@@ -88,13 +81,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.2), // لو حابب خلفية خفيفة
                     borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4, offset: Offset(0, 2))],
                   ),
                   child: Row(
                     children: [
@@ -102,11 +89,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -115,35 +98,22 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            padding: EdgeInsets.symmetric(horizontal: 0.w),
             child: Text(
               widget.name,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w600),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 1.h),
 
           Row(
             children: [
-              Image.asset(
-                "assets/icons/new_del.png",
-                width: 16.w,
-                height: 16.h,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: AppColor.white,
-                fontsize: 12.sp,
-              ),
+              CustomSubTitle(subtitle: feeText, color: AppColor.white, fontsize: 11.sp),
             ],
           ),
         ],
@@ -156,11 +126,7 @@ class BreakfastRestaurantsSection extends StatelessWidget {
   final List<HomeRestaurantModel> restaurants;
   final bool hideWhenEmpty;
 
-  const BreakfastRestaurantsSection({
-    super.key,
-    required this.restaurants,
-    this.hideWhenEmpty = true,
-  });
+  const BreakfastRestaurantsSection({super.key, required this.restaurants, this.hideWhenEmpty = true});
 
   @override
   Widget build(BuildContext context) {
@@ -172,15 +138,8 @@ class BreakfastRestaurantsSection extends StatelessWidget {
         child: Container(
           height: 100.h,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColor.black,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: CustomSubTitle(
-            subtitle: "home.empty_breakfast".tr(),
-            color: AppColor.white,
-            fontsize: 14.sp,
-          ),
+          decoration: BoxDecoration(color: AppColor.black, borderRadius: BorderRadius.circular(12.r)),
+          child: CustomSubTitle(subtitle: "home.empty_breakfast".tr(), color: AppColor.white, fontsize: 14.sp),
         ),
       );
     }
@@ -189,7 +148,7 @@ class BreakfastRestaurantsSection extends StatelessWidget {
     final cardWidth = MediaQuery.of(context).size.width / 2.3;
 
     return SizedBox(
-      height: 160.h,
+      height: 150.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -199,14 +158,12 @@ class BreakfastRestaurantsSection extends StatelessWidget {
 
           return Container(
             width: cardWidth,
-            margin: EdgeInsets.only(
-              left: index == 0 ? 9.w : 0,
-              right: index == restaurants.length - 1 ? 10.w : gap,
-            ),
+            margin: EdgeInsets.only(left: index == 0 ? 9.w : 0, right: index == restaurants.length - 1 ? 10.w : gap),
             child: BreakfastRestaurantCard(
               image: restaurantImage(r),
               isOpen: r.isOpen, // ✅ هون
-              name: r.name,
+              // name: r.name,
+              name: extractLocalizedText(r.name, context.locale),
               rating: r.ratingAvg <= 0 ? 4.0 : r.ratingAvg,
               deliveryFee: r.deliveryFinalFee?.toDouble(),
               onTap: () async {
