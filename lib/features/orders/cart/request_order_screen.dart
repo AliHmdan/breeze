@@ -1371,7 +1371,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   },
                                 ),
                                 SizedBox(height: 10.h),
-                                Divider(),
+                                // Divider(),
                               ],
 
                               // VIP Section
