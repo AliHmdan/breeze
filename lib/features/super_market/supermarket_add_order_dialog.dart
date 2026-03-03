@@ -1,10 +1,12 @@
 import 'package:breezefood/core/component/color.dart';
+import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/money.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
+import 'package:breezefood/features/orders/add_order_sheet/notes_field.dart';
 import 'package:breezefood/features/orders/request_order/counter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/material.dart';
 
 Future<SupermarketAddToCartResult?> showSupermarketAddOrderDialog(
   BuildContext context, {
@@ -70,6 +72,7 @@ class _SupermarketAddOrderBodyState extends State<SupermarketAddOrderBody> {
     super.dispose();
   }
 
+  final TextEditingController _noteCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final num pricePerItem = widget.price;
@@ -155,7 +158,7 @@ class _SupermarketAddOrderBodyState extends State<SupermarketAddOrderBody> {
 
                           if (widget.oldPrice != null) ...[
                             Text(
-                              context.money(widget.oldPrice!, decimals: 0),
+                              context.syp(widget.oldPrice!, decimals: 0),
                               style: TextStyle(
                                 color: Colors.redAccent,
                                 fontSize: 12.sp,
@@ -200,22 +203,40 @@ class _SupermarketAddOrderBodyState extends State<SupermarketAddOrderBody> {
                         fontsize: 14.sp,
                       ),
                       SizedBox(height: 6.h),
-
+                      // NotesField(controller: notesController),
                       TextField(
                         controller: notesController,
                         maxLines: 2,
-                        style: const TextStyle(color: Colors.white),
+                        showCursor: true,
+                        cursorColor: AppColor.white,
+                        cursorWidth: 2,
+                        cursorRadius: const Radius.circular(2),
+                        style: TextStyle(
+                          color: AppColor.white,
+                          fontSize: 14.sp,
+                        ),
+                        textAlignVertical: TextAlignVertical.bottom,
                         decoration: InputDecoration(
                           hintText: "supermarket.notes_hint".tr(),
                           hintStyle: TextStyle(
-                            color: AppColor.gry,
-                            fontSize: 10.sp,
+                            color: AppColor.LightActive,
+                            fontSize: 12.sp,
                           ),
-                          filled: true,
-                          fillColor: AppColor.black,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide.none,
+
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF373737),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF373737),
+                              width: 1,
+                            ),
                           ),
                         ),
                       ),

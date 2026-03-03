@@ -246,10 +246,7 @@ class MarketCategoriesScreen extends StatelessWidget {
 
           bottomNavigationBar: SafeArea(
             top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: SupermarketBottomButton(),
-            ),
+            child: SupermarketBottomButton(),
           ),
         ),
       ),
