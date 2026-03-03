@@ -2,6 +2,7 @@ import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/services/del_price_helper.dart';
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/open_status_badge.dart';
@@ -14,12 +15,7 @@ class Supermarketslider extends StatelessWidget {
   final void Function(dynamic r)? onTap;
   final VoidCallback? onRateSuccess;
 
-  const Supermarketslider({
-    super.key,
-    required this.restaurants,
-    this.onTap,
-    this.onRateSuccess,
-  });
+  const Supermarketslider({super.key, required this.restaurants, this.onTap, this.onRateSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +37,7 @@ class Supermarketslider extends StatelessWidget {
           return Container(
             width: cardWidth,
             margin: EdgeInsetsDirectional.only(end: gap),
-            child: _SupermarketCard(
-              model: r,
-              onTap: onTap == null ? null : () => onTap!(r),
-            ),
+            child: _SupermarketCard(model: r, onTap: onTap == null ? null : () => onTap!(r)),
           );
         },
       ),
@@ -73,9 +66,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl =
-        UrlHelper.toFullUrl(widget.model.coverImage) ??
-        UrlHelper.toFullUrl(widget.model.logo);
+    final imageUrl = UrlHelper.toFullUrl(widget.model.coverImage) ?? UrlHelper.toFullUrl(widget.model.logo);
 
     final feeText = deliveryFeeText(widget.model);
 
@@ -104,22 +95,12 @@ class _SupermarketCardState extends State<_SupermarketCard> {
               if (!widget.model.isOpen)
                 Positioned.fill(
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.45),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
+                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.45), borderRadius: BorderRadius.circular(12.r)),
                     child: Center(
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
 
-                        child: CustomSubTitle(
-                          subtitle: "restaurant.closed".tr(),
-                          color: AppColor.white,
-                          fontsize: 13.sp,
-                        ),
+                        child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: AppColor.white, fontsize: 13.sp),
                       ),
                     ),
                   ),
@@ -133,13 +114,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4, offset: const Offset(0, 1))],
                   ),
                   child: Row(
                     children: [
@@ -147,11 +122,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -164,33 +135,21 @@ class _SupermarketCardState extends State<_SupermarketCard> {
 
           /// الاسم
           Text(
-            widget.model.name,
+            // widget.model.name,
+            extractLocalizedText(widget.model.name, context.locale),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w600),
           ),
 
-          SizedBox(height: 6.h),
+          SizedBox(height: 1.h),
 
           /// التوصيل
           Row(
             children: [
-              Image.asset(
-                "assets/icons/new_del.png",
-                width: 16.w,
-                height: 16.h,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 4.w),
-              CustomSubTitle(
-                subtitle: feeText,
-                color: Theme.of(context).colorScheme.onSurface,
-                fontsize: 12.sp,
-              ),
+              CustomSubTitle(subtitle: feeText, color: Theme.of(context).colorScheme.onSurface, fontsize: 11.sp),
             ],
           ),
         ],
