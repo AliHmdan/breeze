@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeTabsBar extends StatefulWidget {
-  const HomeTabsBar({
-    super.key,
-    required this.titles,
-    required this.activeIndex,
-    required this.onTap,
-  });
+  const HomeTabsBar({super.key, required this.titles, required this.activeIndex, required this.onTap});
 
   final List<String> titles;
   final int activeIndex;
@@ -37,21 +32,13 @@ class _HomeTabsBarState extends State<HomeTabsBar> {
       key: const ValueKey<String>("home_tabs_controller"),
       length: widget.titles.length,
       initialIndex: safe,
-      child: _HomeTabsBarInner(
-        titles: widget.titles,
-        activeIndex: safe,
-        onTap: widget.onTap,
-      ),
+      child: _HomeTabsBarInner(titles: widget.titles, activeIndex: safe, onTap: widget.onTap),
     );
   }
 }
 
 class _HomeTabsBarInner extends StatefulWidget {
-  const _HomeTabsBarInner({
-    required this.titles,
-    required this.activeIndex,
-    required this.onTap,
-  });
+  const _HomeTabsBarInner({required this.titles, required this.activeIndex, required this.onTap});
 
   final List<String> titles;
   final int activeIndex;
@@ -74,11 +61,7 @@ class _HomeTabsBarInnerState extends State<_HomeTabsBarInner> {
       final ctl = DefaultTabController.of(context);
 
       if (ctl.index != widget.activeIndex && !ctl.indexIsChanging) {
-        ctl.animateTo(
-          widget.activeIndex,
-          duration: _anim,
-          curve: Curves.easeOut,
-        );
+        ctl.animateTo(widget.activeIndex, duration: _anim, curve: Curves.easeOut);
       }
     });
   }
@@ -98,10 +81,7 @@ class _HomeTabsBarInnerState extends State<_HomeTabsBarInner> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(
-              height: 3.h,
-              color: colorScheme.outline.withOpacity(0.25),
-            ),
+            child: Container(height: 3.h, color: colorScheme.outline.withOpacity(0.25)),
           ),
 
           /// Tabs
@@ -118,29 +98,16 @@ class _HomeTabsBarInnerState extends State<_HomeTabsBarInner> {
 
             labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w800),
 
-            unselectedLabelStyle: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-            ),
+            unselectedLabelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
 
             indicatorSize: TabBarIndicatorSize.tab,
 
             indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(width: 2.h, color: colorScheme.primary),
+              borderSide: BorderSide(width: 2.h, color: colorScheme.onSurface),
               insets: EdgeInsets.symmetric(horizontal: 12.w),
             ),
 
-            tabs: widget.titles
-                .map(
-                  (t) => Tab(
-                    child: Text(
-                      t,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
-                .toList(),
+            tabs: widget.titles.map((t) => Tab(child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
           ),
         ],
       ),

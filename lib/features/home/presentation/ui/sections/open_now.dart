@@ -2,8 +2,8 @@ import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/prices_helper.dart';
-import 'package:breezefood/core/services/del_price_helper.dart'
-    show deliveryFeeText;
+import 'package:breezefood/core/services/del_price_helper.dart' show deliveryFeeText;
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,8 +33,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
   @override
   void didUpdateWidget(covariant RestaurantCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.restaurant.id != widget.restaurant.id ||
-        oldWidget.restaurant.ratingAvg != widget.restaurant.ratingAvg) {
+    if (oldWidget.restaurant.id != widget.restaurant.id || oldWidget.restaurant.ratingAvg != widget.restaurant.ratingAvg) {
       _rating = (widget.restaurant.ratingAvg).toDouble();
     }
   }
@@ -72,10 +71,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                         height: 100.h, // نفس ارتفاع الصورة
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        fallback: Image.asset(
-                          "assets/images/meal_breeze.jpeg",
-                          fit: BoxFit.cover,
-                        ),
+                        fallback: Image.asset("assets/images/meal_breeze.jpeg", fit: BoxFit.cover),
                       ),
                     ),
                   ),
@@ -85,14 +81,8 @@ class _RestaurantCardState extends State<RestaurantCard> {
                     top: 6,
                     end: 6,
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.inverseSurface.withOpacity(0.30),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                      decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.30), borderRadius: BorderRadius.circular(20.r)),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -100,11 +90,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           SizedBox(width: 3.w),
                           Text(
                             _rating.toStringAsFixed(1),
-                            style: TextStyle(
-                              color: colorScheme.onInverseSurface,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -115,18 +101,11 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   if (!r.isOpen)
                     Positioned.fill(
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.inverseSurface.withOpacity(0.45),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
+                        decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.45), borderRadius: BorderRadius.circular(12.r)),
                         child: Center(
                           child: Text(
                             "restaurant.closed".tr(),
-                            style: TextStyle(
-                              color: colorScheme.onInverseSurface,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 13.sp, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
@@ -137,42 +116,30 @@ class _RestaurantCardState extends State<RestaurantCard> {
               SizedBox(height: 6.h), // نفس gapH الطبيعي
               // 🏷️ Name (center مثل Discount)
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                padding: EdgeInsets.symmetric(horizontal: 0.w),
                 child: Text(
-                  r.name.trim(),
+                  // r.name.trim(),
+                  extractLocalizedText(r.name, context.locale),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
                 ),
               ),
 
-              SizedBox(height: 4.h),
+              SizedBox(height: 1.h),
 
               // 🚚 Delivery row بنفس padding الداخلي
               Padding(
-                padding: EdgeInsetsDirectional.only(start: 8.w),
+                padding: EdgeInsetsDirectional.only(start: 0.w),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset(
-                      "assets/icons/new_del.png",
-                      width: 16.w,
-                      height: 16.h,
-                      color: colorScheme.onSurface,
-                    ),
+                    Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: colorScheme.onSurface),
                     SizedBox(width: 4.w),
                     Text(
                       context.syp(feeText, decimals: 0),
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: colorScheme.onSurface, fontSize: 11.sp, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -200,10 +167,7 @@ class OpenNow extends StatelessWidget {
         child: Center(
           child: Text(
             "No restaurants available",
-            style: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.7),
-              fontSize: 12.sp,
-            ),
+            style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7), fontSize: 12.sp),
           ),
         ),
       );
@@ -227,10 +191,7 @@ class OpenNow extends StatelessWidget {
                 return Container(
                   width: itemWidth,
                   margin: EdgeInsetsDirectional.only(end: 10.w),
-                  child: RestaurantCard(
-                    restaurant: r,
-                    onTap: onTap == null ? null : () => onTap!(r),
-                  ),
+                  child: RestaurantCard(restaurant: r, onTap: onTap == null ? null : () => onTap!(r)),
                 );
               },
             );

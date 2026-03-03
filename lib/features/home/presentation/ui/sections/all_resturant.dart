@@ -1,7 +1,7 @@
 import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/url_helper.dart';
-import 'package:breezefood/core/services/del_price_helper.dart'
-    show deliveryFeeText;
+import 'package:breezefood/core/services/del_price_helper.dart' show deliveryFeeText;
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +31,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
   @override
   void didUpdateWidget(covariant RestaurantCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.restaurant.id != widget.restaurant.id ||
-        oldWidget.restaurant.ratingAvg != widget.restaurant.ratingAvg) {
+    if (oldWidget.restaurant.id != widget.restaurant.id || oldWidget.restaurant.ratingAvg != widget.restaurant.ratingAvg) {
       _rating = (widget.restaurant.ratingAvg).toDouble();
     }
   }
@@ -80,22 +79,12 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   if (!r.isOpen)
                     Positioned.fill(
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.inverseSurface.withOpacity(0.45),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
+                        decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.45), borderRadius: BorderRadius.circular(12.r)),
                         child: Center(
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12.w,
-                              vertical: 6.h,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
 
-                            child: CustomSubTitle(
-                              subtitle: "restaurant.closed".tr(),
-                              color: colorScheme.onInverseSurface,
-                              fontsize: 13.sp,
-                            ),
+                            child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: colorScheme.onInverseSurface, fontsize: 13.sp),
                           ),
                         ),
                       ),
@@ -105,14 +94,8 @@ class _RestaurantCardState extends State<RestaurantCard> {
                     top: 6,
                     end: 6,
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.inverseSurface.withOpacity(0.30),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                      decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.30), borderRadius: BorderRadius.circular(20.r)),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -120,11 +103,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           SizedBox(width: 3.w),
                           Text(
                             _rating.toStringAsFixed(1),
-                            style: TextStyle(
-                              color: colorScheme.onInverseSurface,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -135,7 +114,8 @@ class _RestaurantCardState extends State<RestaurantCard> {
             ),
             SizedBox(height: 8.h),
             CustomSubTitle(
-              subtitle: (r.name).trim(),
+              // subtitle: '(r.name).trim()',
+              subtitle: extractLocalizedText(r.name, context.locale),
               color: colorScheme.onSurface,
               fontsize: 16.sp,
             ),
@@ -145,18 +125,9 @@ class _RestaurantCardState extends State<RestaurantCard> {
 
               child: Row(
                 children: [
-                  Image.asset(
-                    "assets/icons/new_del.png",
-                    width: 16.w,
-                    height: 16.h,
-                    color: colorScheme.onSurface,
-                  ),
+                  Image.asset("assets/icons/new_del.png", width: 16.w, height: 16.h, color: colorScheme.onSurface),
                   SizedBox(width: 8.w),
-                  CustomSubTitle(
-                    subtitle: feeText,
-                    color: colorScheme.onSurface,
-                    fontsize: 12,
-                  ),
+                  CustomSubTitle(subtitle: feeText, color: colorScheme.onSurface, fontsize: 12),
                 ],
               ),
             ),
@@ -183,10 +154,7 @@ class AllResturant extends StatelessWidget {
         child: Center(
           child: Text(
             "No restaurants available",
-            style: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.7),
-              fontSize: 12.sp,
-            ),
+            style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7), fontSize: 12.sp),
           ),
         ),
       );
@@ -199,10 +167,7 @@ class AllResturant extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final r = restaurants[index];
-        return RestaurantCard(
-          restaurant: r,
-          onTap: onTap == null ? null : () => onTap!(r),
-        );
+        return RestaurantCard(restaurant: r, onTap: onTap == null ? null : () => onTap!(r));
       },
     );
   }

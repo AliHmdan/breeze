@@ -8,11 +8,7 @@ class BottomNavBreeze extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onChanged;
 
-  const BottomNavBreeze({
-    super.key,
-    required this.currentIndex,
-    required this.onChanged,
-  });
+  const BottomNavBreeze({super.key, required this.currentIndex, required this.onChanged});
 
   static const List<String> _iconsOutline = [
     'assets/icons/home-linear.svg',
@@ -28,28 +24,17 @@ class BottomNavBreeze extends StatelessWidget {
     'assets/icons/profile-filled.svg',
   ];
 
-  static const List<String> _labelKeys = [
-    "nav.home",
-    "nav.favorites",
-    "nav.orders",
-    "nav.Profile",
-  ];
+  static const List<String> _labelKeys = ["nav.home", "nav.favorites", "nav.orders", "nav.Profile"];
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Container(
-        height: 60.h,
+        height: context.locale == "en" ? 60.h : 70.h,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -71,16 +56,12 @@ class BottomNavBreeze extends StatelessWidget {
                         switchInCurve: Curves.easeInOut,
                         switchOutCurve: Curves.easeInOut,
                         child: SvgPicture.asset(
-                          isSelected
-                              ? _iconsFilled[index]
-                              : _iconsOutline[index],
+                          isSelected ? _iconsFilled[index] : _iconsOutline[index],
                           key: ValueKey('${isSelected}_$index'),
                           width: 24.sp,
                           height: 24.sp,
                           colorFilter: ColorFilter.mode(
-                            isSelected
-                                ?  Theme.of(context).colorScheme.onSurface
-                                : AppColor.gry.withOpacity(0.7),
+                            isSelected ? Theme.of(context).colorScheme.onSurface : AppColor.gry.withOpacity(0.7),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -94,17 +75,9 @@ class BottomNavBreeze extends StatelessWidget {
                         curve: Curves.easeInOut,
                         style: TextStyle(
                           fontSize: isSelected ? 12.sp : 11.sp,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: isSelected
-                              ?  Theme.of(context).colorScheme.onSurface
-                              : AppColor.gry.withOpacity(0.7),
-                          fontFamily:
-                              Localizations.localeOf(context).languageCode ==
-                                  'ar'
-                              ? 'Cairo'
-                              : 'Inter',
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected ? Theme.of(context).colorScheme.onSurface : AppColor.gry.withOpacity(0.7),
+                          fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
                         ),
                         child: Text(_labelKeys[index].tr()),
                       ),
