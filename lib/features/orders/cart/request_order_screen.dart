@@ -25,6 +25,8 @@ import 'package:breezefood/features/orders/request_order/meal_card.dart';
 import 'package:breezefood/features/ratings/presentation/cubit/rating_submit_cubit.dart';
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
+import 'package:breezefood/features/profile/data/model/address_model.dart';
+import 'package:breezefood/features/profile/data/repo/profile_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'address_section.dart';
@@ -119,6 +121,307 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     _tempDetailsFocus.dispose();
     _orderNotesCtrl.dispose();
     super.dispose();
+  }
+
+  List<AddressModel> _parseAddresses(dynamic raw) {
+    List? listRaw;
+
+    if (raw is List) {
+      listRaw = raw;
+    } else if (raw is Map) {
+      final root = raw.cast<String, dynamic>();
+      final d = root["data"];
+      final a = root["addresses"];
+
+      if (a is List) listRaw = a;
+      if (listRaw == null && d is List) listRaw = d;
+
+      if (listRaw == null && d is Map) {
+        final dd = d.cast<String, dynamic>();
+        final dda = dd["addresses"];
+        if (dda is List) listRaw = dda;
+      }
+    }
+
+    final list = <AddressModel>[];
+    if (listRaw != null) {
+      for (final e in listRaw) {
+        if (e is Map) {
+          list.add(AddressModel.fromJson(e.cast<String, dynamic>()));
+        }
+      }
+    }
+
+    return list;
+  }
+
+  Future<void> _applyCartAddress({
+    required String text,
+    required double lat,
+    required double lon,
+  }) async {
+    setState(() {
+      _tempOrderAddress = OrderAddress(
+        text: text,
+        latitude: lat,
+        longitude: lon,
+      );
+      _tempDetailsCtrl.text = text;
+    });
+
+    await AuthStorageHelper.saveCartLocation(text: text, lat: lat, lon: lon);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _tempDetailsFocus.requestFocus();
+    });
+  }
+
+  Future<void> _onChangeAddressTap({required bool isRTL}) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final res = await showModalBottomSheet<Map<String, dynamic>?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final sheetColorScheme = Theme.of(ctx).colorScheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: sheetColorScheme.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: SafeArea(
+            top: false,
+            child: FutureBuilder(
+              future: getIt<ProfileRepository>().getAddresses(),
+              builder: (context, snap) {
+                final data = snap.data;
+
+                final addresses = (data != null && data.ok)
+                    ? _parseAddresses(data.data)
+                    : const <AddressModel>[];
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 8.h),
+                    Container(
+                      width: 44.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: sheetColorScheme.onSurface.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14.w,
+                        vertical: 6.h,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              isRTL ? "اختر عنوان" : "Choose address",
+                              style: TextStyle(
+                                color: sheetColorScheme.onSurface,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            icon: Icon(
+                              Icons.close,
+                              color: sheetColorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: sheetColorScheme.outlineVariant.withOpacity(0.6),
+                    ),
+                    ListTile(
+                      onTap: () => Navigator.pop(ctx, {"kind": "map"}),
+                      leading: Icon(
+                        Icons.map_outlined,
+                        color: sheetColorScheme.primary,
+                      ),
+                      title: Text(
+                        isRTL ? "اختيار من الخريطة" : "Pick on map",
+                        style: TextStyle(
+                          color: sheetColorScheme.onSurface,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: sheetColorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                    if (snap.connectionState == ConnectionState.waiting)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 12.h,
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 18.w,
+                              height: 18.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: sheetColorScheme.primary,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              isRTL
+                                  ? "جارٍ تحميل العناوين..."
+                                  : "Loading addresses...",
+                              style: TextStyle(
+                                color: sheetColorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (addresses.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 12.h,
+                        ),
+                        child: Text(
+                          isRTL
+                              ? "لا يوجد عناوين محفوظة"
+                              : "No saved addresses",
+                          style: TextStyle(
+                            color: sheetColorScheme.onSurface.withOpacity(0.7),
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.only(
+                            left: 6.w,
+                            right: 6.w,
+                            bottom: 10.h,
+                          ),
+                          itemCount: addresses.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: sheetColorScheme.outlineVariant.withOpacity(
+                              0.35,
+                            ),
+                          ),
+                          itemBuilder: (context, i) {
+                            final a = addresses[i];
+                            return ListTile(
+                              onTap: () => Navigator.pop(ctx, {
+                                "kind": "saved",
+                                "text": a.address,
+                                "lat": a.latitude,
+                                "lon": a.longitude,
+                              }),
+                              leading: Icon(
+                                Icons.location_on,
+                                color: sheetColorScheme.primary,
+                              ),
+                              title: Text(
+                                a.address,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: sheetColorScheme.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              trailing: a.isDefault
+                                  ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            sheetColorScheme.primaryContainer,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        isRTL ? "افتراضي" : "Default",
+                                        style: TextStyle(
+                                          color: sheetColorScheme
+                                              .onPrimaryContainer,
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.chevron_right,
+                                      color: sheetColorScheme.onSurface
+                                          .withOpacity(0.6),
+                                    ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || res == null) return;
+
+    final kind = (res["kind"] ?? "").toString();
+    if (kind == "map") {
+      await _changeLocation(isRTL: isRTL);
+      return;
+    }
+
+    if (kind == "saved") {
+      final text = (res["text"] ?? "").toString().trim();
+      final lat = (res["lat"] as num?)?.toDouble() ?? 0.0;
+      final lon = (res["lon"] as num?)?.toDouble() ?? 0.0;
+
+      if (text.isEmpty || lat == 0 || lon == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isRTL ? "تعذر اختيار العنوان" : "Couldn't select address",
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: colorScheme.error,
+          ),
+        );
+        return;
+      }
+
+      await _applyCartAddress(text: text, lat: lat, lon: lon);
+    }
   }
 
   Future<void> _loadAppetizers(int restaurantId) async {
@@ -870,7 +1173,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),
         child: Padding(
@@ -1053,7 +1356,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   isRTL: isRTL,
                                   address: _tempOrderAddress,
                                   onChangeTap: () =>
-                                      _changeLocation(isRTL: isRTL),
+                                      _onChangeAddressTap(isRTL: isRTL),
                                   detailsCtrl: _tempDetailsCtrl,
                                   detailsFocus: _tempDetailsFocus,
                                   onDetailsChanged: (v) {
@@ -1265,36 +1568,44 @@ class _CartItemsSection extends StatelessWidget {
 
     if (cart.items.isNotEmpty) {
       children.add(
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            // color: colorScheme.surface,
-            // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-          ),
-          child: InkWell(
-            onTap: onAddMore,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.add_circle,
-                    color: colorScheme.primary,
-                    size: 24.sp,
+        Column(
+          children: [
+            Divider(),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                // color: colorScheme.surface,
+                // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+              ),
+              child: InkWell(
+                onTap: onAddMore,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 14.h,
                   ),
-                  SizedBox(width: 10.w),
-                  Text(
-                    isRTL ? "أضف المزيد" : "Add more",
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.add_circle,
+                        color: colorScheme.primary,
+                        size: 24.sp,
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        isRTL ? "أضف المزيد" : "Add more",
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       );
     }
