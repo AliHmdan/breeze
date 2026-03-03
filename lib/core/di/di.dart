@@ -1,3 +1,5 @@
+import 'package:breezefood/features/profile/data/repo/addresses_repo.dart';
+import 'package:breezefood/features/profile/presentation/cubit/addresses_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,7 +18,7 @@ import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart';
 
 // ========== PROFILE ==========
 import 'package:breezefood/features/profile/data/api/profile_api_service.dart';
-import 'package:breezefood/features/profile/data/api/address_api_service.dart';
+import 'package:breezefood/features/profile/data/api/addresses_api_service.dart';
 import 'package:breezefood/features/profile/data/repo/profile_repository.dart'
     show ProfileRepository;
 import 'package:breezefood/features/profile/presentation/cubit/profile_cubit.dart';
@@ -244,17 +246,23 @@ Future<void> setupDi() async {
   // =========================
   // PROFILE
   // =========================
+
   getIt.registerLazySingleton<ProfileApiService>(
     () => ProfileApiService(getIt<Dio>()),
   );
-  getIt.registerLazySingleton<AddressApiService>(
-    () => AddressApiService(getIt<Dio>()),
+  getIt.registerLazySingleton<AddressesApiService>(
+    () => AddressesApiService(getIt<Dio>()), // ✅ بدون baseUrl
+  );
+
+  getIt.registerLazySingleton<AddressesRepository>(
+    () => AddressesRepository(getIt<AddressesApiService>()),
   );
   getIt.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepository(
-      getIt<ProfileApiService>(),
-      getIt<AddressApiService>(),
-    ),
+    () => ProfileRepository(getIt<ProfileApiService>()),
+  );
+
+  getIt.registerFactory<AddressesCubit>(
+    () => AddressesCubit(getIt<AddressesRepository>()),
   );
 
   /// ✅ مهم جداً للـ Splash preload

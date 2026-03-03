@@ -18,10 +18,9 @@ abstract class OrdersApiService {
   @POST("/ordersHistory")
   Future<HttpResponse<dynamic>> ordersHistory();
 
-  // ✅ NEW: fetch single order details (includes order_customer_code)
   @POST("/my-order-details")
   Future<HttpResponse<dynamic>> myOrderDetails(
-    @Body() Map<String, dynamic> body, // {"id": 147}
+    @Body() Map<String, dynamic> body,  
   );
   @POST("/orders/{id}/driver-location")
 Future<HttpResponse<dynamic>> driverLocation(

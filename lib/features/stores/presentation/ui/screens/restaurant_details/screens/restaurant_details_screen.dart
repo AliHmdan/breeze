@@ -8,6 +8,7 @@ import 'package:breezefood/core/services/pick_by_langu.dart';
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_cubit.dart';
+import 'package:breezefood/features/profile/presentation/cubit/addresses_cubit.dart';
 import 'package:breezefood/features/ratings/presentation/cubit/rating_submit_cubit.dart';
 import 'package:breezefood/features/ratings/presentation/ui/rate_dialog.dart';
 import 'package:breezefood/features/search/presentation/ui/search_screen.dart';
@@ -634,6 +635,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
                       providers: [
                         BlocProvider.value(value: context.read<CartCubit>()),
                         BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                        BlocProvider(create: (_) => getIt<AddressesCubit>()),
                       ],
                       child: const RequestOrderScreen(),
                     ),

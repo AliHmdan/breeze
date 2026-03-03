@@ -10,6 +10,7 @@ import 'package:breezefood/features/orders/model/active_orders_response.dart';
 import 'package:breezefood/features/orders/model/add_to_cart_request.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_cubit.dart';
+import 'package:breezefood/features/profile/presentation/cubit/addresses_cubit.dart';
 import 'package:breezefood/features/stores/data/repo/super_market_repo.dart';
 import 'package:breezefood/features/stores/presentation/cubit/market_details_cubit.dart';
 import 'package:breezefood/features/super_market/supermarket_add_order_dialog.dart';
@@ -150,7 +151,7 @@ class MarketPagePrice extends StatelessWidget {
               backgroundcolor: Colors.transparent,
             ),
           ),
-     
+
           body: Stack(
             children: [
               Padding(
@@ -345,6 +346,10 @@ class MarketPagePrice extends StatelessWidget {
                                         BlocProvider(
                                           create: (_) =>
                                               getIt<OrderFlowCubit>(),
+                                        ),
+                                        BlocProvider(
+                                          create: (_) =>
+                                              getIt<AddressesCubit>(),
                                         ),
                                       ],
                                       child: const RequestOrderScreen(),

@@ -15,6 +15,7 @@ import 'package:breezefood/features/home/presentation/ui/sections/dicounts/disco
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_meals/discount_home.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/sweets_restaurants.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/home_tabs_bar.dart';
+import 'package:breezefood/features/profile/presentation/cubit/addresses_cubit.dart';
 import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart';
 import 'package:breezefood/features/assistant/presentation/ui/assistant_chat_sheet.dart';
 
@@ -804,6 +805,8 @@ class _HomeBottomAction extends StatelessWidget {
                       providers: [
                         BlocProvider.value(value: context.read<CartCubit>()),
                         BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                        BlocProvider(create: (_) => getIt<AddressesCubit>()),
+                        
                       ],
                       child: const RequestOrderScreen(),
                     ),

@@ -1,6 +1,7 @@
 import 'package:breezefood/core/component/bottom_cart_action.dart';
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/model/active_orders_response.dart';
+import 'package:breezefood/features/profile/presentation/cubit/addresses_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
@@ -46,8 +47,9 @@ class SupermarketBottomButton extends StatelessWidget {
           MaterialPageRoute(
             builder: (_) => MultiBlocProvider(
               providers: [
-                BlocProvider.value(value: context.read<CartCubit>()),
-                BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                   BlocProvider.value(value: context.read<CartCubit>()),
+                        BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                        BlocProvider(create: (_) => getIt<AddressesCubit>()),
               ],
               child: const RequestOrderScreen(),
             ),

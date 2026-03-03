@@ -40,8 +40,9 @@ class ProfileCubit extends Cubit<ProfileState> {
       final root = raw.cast<String, dynamic>();
 
       final dynamic inner = root["data"];
-      final Map<String, dynamic> data =
-          (inner is Map) ? inner.cast<String, dynamic>() : root;
+      final Map<String, dynamic> data = (inner is Map)
+          ? inner.cast<String, dynamic>()
+          : root;
 
       final user = UserModel.fromJson(data);
 
@@ -105,10 +106,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   // =========================
   // Save Profile (JSON: first_name + last_name + profile_image(path))
   // =========================
-  Future<void> saveProfile({
-    String? firstName,
-    String? lastName,
-  }) async {
+  Future<void> saveProfile({String? firstName, String? lastName}) async {
     final current = state;
     if (current is! _Loaded) return;
 
@@ -149,106 +147,5 @@ class ProfileCubit extends Cubit<ProfileState> {
     if (after is _Loaded) {
       emit(after.copyWith(isSaving: false, message: "Saved"));
     }
-  }
-
-  // =========================
-  // Addresses
-  // =========================
-  Future<void> refreshAddresses() async {
-    final current = state;
-    if (current is! _Loaded) return;
-
-    final res = await repo.getAddresses();
-    if (!res.ok) {
-      emit(ProfileState.error(res.message ?? "فشل تحميل العناوين"));
-      emit(current);
-      return;
-    }
-
-    try {
-      final raw = res.data;
-      List? listRaw;
-
-      if (raw is List) {
-        listRaw = raw;
-      } else if (raw is Map) {
-        final root = raw.cast<String, dynamic>();
-        final d = root["data"];
-        final a = root["addresses"];
-
-        if (a is List) listRaw = a;
-        if (listRaw == null && d is List) listRaw = d;
-
-        if (listRaw == null && d is Map) {
-          final dd = d.cast<String, dynamic>();
-          final dda = dd["addresses"];
-          if (dda is List) listRaw = dda;
-        }
-      }
-
-      final list = <AddressModel>[];
-      if (listRaw != null) {
-        for (final e in listRaw) {
-          if (e is Map) {
-            list.add(AddressModel.fromJson(e.cast<String, dynamic>()));
-          }
-        }
-      }
-
-      emit(current.copyWith(addresses: list));
-    } catch (_) {}
-  }
-
-  Future<void> addAddress({
-    required String address,
-    required double latitude,
-    required double longitude,
-    required bool isDefault,
-  }) async {
-    final current = state;
-    if (current is! _Loaded) return;
-
-    emit(current.copyWith(isSaving: true, message: null));
-
-    final res = await repo.addAddress(
-      address: address,
-      latitude: latitude,
-      longitude: longitude,
-      isDefault: isDefault,
-    );
-
-    if (!res.ok) {
-      emit(
-        current.copyWith(
-          isSaving: false,
-          message: res.message ?? "فشل إضافة العنوان",
-        ),
-      );
-      return;
-    }
-
-    emit(current.copyWith(isSaving: false, message: "Address added"));
-    await refreshAddresses();
-  }
-
-  Future<void> deleteAddress(int id) async {
-    final current = state;
-    if (current is! _Loaded) return;
-
-    emit(current.copyWith(isSaving: true, message: null));
-
-    final res = await repo.deleteAddress(id);
-    if (!res.ok) {
-      emit(
-        current.copyWith(
-          isSaving: false,
-          message: res.message ?? "فشل حذف العنوان",
-        ),
-      );
-      return;
-    }
-
-    emit(current.copyWith(isSaving: false, message: "Deleted"));
-    await refreshAddresses();
   }
 }

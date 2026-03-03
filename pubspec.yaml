@@ -53,7 +53,6 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   like_button: ^2.1.0
   scrollable_positioned_list: ^0.3.8
-  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:

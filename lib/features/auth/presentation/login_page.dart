@@ -106,17 +106,11 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
   }
 
   Future<void> _openTermsAndMaybeAccept() async {
-    final ok = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => const TermsDialog(),
     );
-
-    if (!mounted) return;
-
-    if (ok == true) {
-      setState(() => _acceptedTerms = true);
-    }
   }
 
   void _handleLogin() {
@@ -389,7 +383,7 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
 
                                   SizedBox(height: 14.h),
 
-                                  // Terms checkbox + tap
+                                  // Terms checkbox + tap to view
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -397,19 +391,16 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
                                       Checkbox(
                                         value: _acceptedTerms,
                                         activeColor: colorScheme.primary,
-                                        onChanged: (v) async {
-                                          if (v == true) {
-                                            await _openTermsAndMaybeAccept();
-                                          } else {
-                                            setState(
-                                              () => _acceptedTerms = false,
-                                            );
-                                          }
+                                        onChanged: (v) {
+                                          setState(
+                                            () => _acceptedTerms = v ?? false,
+                                          ); // ✅ قبول مباشر بدون فتح الديالوج
                                         },
                                       ),
                                       Expanded(
                                         child: GestureDetector(
-                                          onTap: _openTermsAndMaybeAccept,
+                                          onTap:
+                                              _openTermsAndMaybeAccept, // ✅ هون بس فتح الديالوج للعرض
                                           child: Padding(
                                             padding: EdgeInsets.only(top: 12.h),
                                             child: Text(
