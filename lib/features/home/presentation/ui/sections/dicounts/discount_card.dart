@@ -10,7 +10,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 class Discount extends StatelessWidget {
   final String imagePath;
   final String subtitle;
-  final dynamic price; // main price (meal price OR delivery final fee حسب استخدامك)
+  final dynamic
+  price; // main price (meal price OR delivery final fee حسب استخدامك)
   final String discount;
   final bool? isOpen; // null => ما نعرض شي
 
@@ -106,7 +107,9 @@ class Discount extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final ratingText = (rating <= 0) ? "0.0" : rating.toStringAsFixed(1);
-    final openText = (isOpen == true) ? "restaurant.open".tr() : "restaurant.closed".tr();
+    final openText = (isOpen == true)
+        ? "restaurant.open".tr()
+        : "restaurant.closed".tr();
 
     final openColor = (isOpen == true) ? Colors.green : Colors.red;
 
@@ -140,7 +143,10 @@ class Discount extends StatelessWidget {
                         height: imageH,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        fallback: Image.asset("assets/images/meal_breeze.jpeg", fit: BoxFit.cover),
+                        fallback: Image.asset(
+                          "assets/images/meal_breeze.jpeg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -150,8 +156,14 @@ class Discount extends StatelessWidget {
                     top: 6,
                     end: 6,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                      decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.30), borderRadius: BorderRadius.circular(20.r)),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.inverseSurface.withOpacity(0.30),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -159,7 +171,11 @@ class Discount extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             ratingText,
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                              color: colorScheme.onInverseSurface,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ],
                       ),
@@ -170,8 +186,14 @@ class Discount extends StatelessWidget {
                     top: 6,
                     end: 6,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                      decoration: BoxDecoration(color: colorScheme.inverseSurface.withOpacity(0.30), borderRadius: BorderRadius.circular(20.r)),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.inverseSurface.withOpacity(0.30),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -179,7 +201,11 @@ class Discount extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             ratingText,
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                              color: colorScheme.onInverseSurface,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ],
                       ),
@@ -190,7 +216,10 @@ class Discount extends StatelessWidget {
                       bottom: 0,
                       start: 0,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 2.h,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColor.red,
                           borderRadius: BorderRadiusDirectional.only(
@@ -205,7 +234,11 @@ class Discount extends StatelessWidget {
                           children: [
                             Text(
                               discount,
-                              style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w800),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                             SizedBox(width: 4.w),
                             // SvgPicture.asset(
@@ -227,7 +260,11 @@ class Discount extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               SizedBox(height: 1.h),
@@ -242,11 +279,18 @@ class Discount extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: colorScheme.onSurface),
+                            Image.asset(
+                              "assets/icons/new_del.png",
+                              width: 15.w,
+                              height: 15.h,
+                              color: colorScheme.onSurface,
+                            ),
                             SizedBox(width: 4.w),
 
                             // ✅ إذا يوجد خصم توصيل (سعرين)
-                            if (deliveryOldPrice != null && deliveryNewPrice != null && deliveryOldPrice != deliveryNewPrice) ...[
+                            if (deliveryOldPrice != null &&
+                                deliveryNewPrice != null &&
+                                deliveryOldPrice != deliveryNewPrice) ...[
                               Text(
                                 context.syp(deliveryOldPrice, decimals: 0),
                                 style: TextStyle(

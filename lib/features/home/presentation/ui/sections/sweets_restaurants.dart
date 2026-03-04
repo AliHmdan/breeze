@@ -2,7 +2,8 @@ import 'package:breezefood/core/component/app_image.dart';
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
-import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
+import 'package:breezefood/core/services/detect_language.dart'
+    show extractLocalizedText;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -21,6 +22,8 @@ class SweetsRestaurantCard extends StatefulWidget {
   final double rating;
   final double? deliveryFee;
   final bool isOpen; // ✅
+  final bool hasFoodDiscount; // ✅ NEW
+  final String discount; // ✅ NEW
   final VoidCallback? onTap;
 
   const SweetsRestaurantCard({
@@ -29,7 +32,9 @@ class SweetsRestaurantCard extends StatefulWidget {
     required this.name,
     required this.rating,
     required this.deliveryFee,
-    required this.isOpen,
+    required this.isOpen, // ✅
+    this.hasFoodDiscount = false, // ✅ NEW
+    this.discount = '', // ✅ NEW
     this.onTap,
   });
 
@@ -48,7 +53,9 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
   @override
   Widget build(BuildContext context) {
-    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0) ? context.syp(widget.deliveryFee, decimals: 0) : "common.dash".tr();
+    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0)
+        ? context.syp(widget.deliveryFee, decimals: 0)
+        : "common.dash".tr();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -64,12 +71,59 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                   height: 100.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  fallback: Image.asset("assets/images/meal_breeze.jpeg", height: 100.h, width: double.infinity, fit: BoxFit.cover),
+                  fallback: Image.asset(
+                    "assets/images/meal_breeze.jpeg",
+                    height: 100.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 
               // ✅ Closed overlay (نفس الفطور)
               if (!widget.isOpen) const ClosedOverlay(),
+
+              // ✅ Discount badge
+              if (widget.hasFoodDiscount && widget.discount.trim().isNotEmpty)
+                PositionedDirectional(
+                  bottom: 0,
+                  start: 0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.red,
+                      borderRadius: BorderRadiusDirectional.only(
+                        // topStart:  Radius.circular(12.r),
+                        bottomStart: Radius.circular(12.r),
+                        topEnd: Radius.circular(20.r),
+                        bottomEnd: Radius.circular(20.r),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.discount,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        // SvgPicture.asset(
+                        //   "assets/icons/nspah.svg",
+                        //   width: 18.w,
+                        //   height: 18.h,
+                        //   color: Colors.white,
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
 
               // Rating ()
               PositionedDirectional(
@@ -78,7 +132,9 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.30),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.inverseSurface.withOpacity(0.30),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
@@ -92,7 +148,11 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                           color: Theme.of(context).colorScheme.onInverseSurface,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w700,
-                          fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
+                          fontFamily:
+                              Localizations.localeOf(context).languageCode ==
+                                  'ar'
+                              ? 'Cairo'
+                              : 'Inter',
                         ),
                       ),
                     ],
@@ -114,7 +174,9 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w700,
-                fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
+                fontFamily: Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'Cairo'
+                    : 'Inter',
               ),
             ),
           ),
@@ -122,7 +184,12 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
           Row(
             children: [
-              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
+              Image.asset(
+                "assets/icons/new_del.png",
+                width: 15.w,
+                height: 15.h,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               SizedBox(width: 4.w),
               Text(
                 context.syp(feeText, decimals: 0),
@@ -133,7 +200,10 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
-                  fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
+                  fontFamily:
+                      Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'Cairo'
+                      : 'Inter',
                 ),
               ),
 
@@ -152,10 +222,44 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
 class SweetsRestaurantsSection extends StatelessWidget {
   final List<HomeRestaurantModel> restaurants;
+  final List<RestaurantDiscountModel> discounts; // ✅ NEW
   final bool hideWhenEmpty;
   final ValueChanged<HomeRestaurantModel>? onTap;
 
-  const SweetsRestaurantsSection({super.key, required this.restaurants, this.hideWhenEmpty = true, this.onTap});
+  const SweetsRestaurantsSection({
+    super.key,
+    required this.restaurants,
+    this.discounts = const [], // ✅ NEW
+    this.hideWhenEmpty = true,
+    this.onTap,
+  });
+
+  // ✅ NEW: Helper method to get discount text for a restaurant
+  String _getDiscountText(HomeRestaurantModel restaurant) {
+    final discount = discounts.firstWhere(
+      (d) => d.restaurantId == restaurant.id,
+      orElse: () => RestaurantDiscountModel(
+        restaurantId: restaurant.id,
+        restaurantName: restaurant.name,
+        logo: null, // ✅ Fixed: Added required logo parameter
+        isOpen: restaurant.isOpen,
+        ratingAvg: restaurant.ratingAvg,
+        ratingCount: 0,
+        foodDiscount: null,
+        deliveryDiscount: null,
+      ),
+    );
+
+    if (discount.foodDiscount != null) {
+      final type = discount.foodDiscount!.discountType.toLowerCase();
+      final value = discount.foodDiscount!.discountValue;
+      if (value <= 0) return "";
+      if (type.contains('percent')) return "${value.toStringAsFixed(0)}%";
+      return value.toStringAsFixed(0);
+    }
+
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +271,10 @@ class SweetsRestaurantsSection extends StatelessWidget {
         child: Container(
           height: 100.h,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: AppColor.black, borderRadius: BorderRadius.circular(12.r)),
+          decoration: BoxDecoration(
+            color: AppColor.black,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
           child: CustomSubTitle(
             subtitle: "home.empty_sweets".tr(), // ✅ رسالة السويتس
             color: AppColor.white,
@@ -191,13 +298,18 @@ class SweetsRestaurantsSection extends StatelessWidget {
 
           return Container(
             width: cardWidth,
-            margin: EdgeInsets.only(left: index == 0 ? 9.w : 0, right: index == restaurants.length - 1 ? 10.w : gap),
+            margin: EdgeInsets.only(
+              left: index == 0 ? 9.w : 0,
+              right: index == restaurants.length - 1 ? 10.w : gap,
+            ),
             child: SweetsRestaurantCard(
               image: restaurantImage(r),
               isOpen: r.isOpen,
               name: r.name,
               rating: r.ratingAvg <= 0 ? 4.0 : r.ratingAvg,
               deliveryFee: r.deliveryFinalFee?.toDouble(),
+              hasFoodDiscount: _getDiscountText(r).isNotEmpty, // ✅ NEW
+              discount: _getDiscountText(r), // ✅ NEW
               onTap: () async {
                 // ✅ إذا مررت onTap من الهوم، استخدمه
                 if (onTap != null) {

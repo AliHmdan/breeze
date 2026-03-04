@@ -3,7 +3,8 @@ import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
-import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
+import 'package:breezefood/core/services/detect_language.dart'
+    show extractLocalizedText;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -22,6 +23,8 @@ class BreakfastRestaurantCard extends StatefulWidget {
   final double rating;
   final double? deliveryFee;
   final bool isOpen; // ✅ NEW
+  final bool hasFoodDiscount; // ✅ NEW
+  final String discount; // ✅ NEW
   final VoidCallback? onTap;
 
   const BreakfastRestaurantCard({
@@ -31,11 +34,14 @@ class BreakfastRestaurantCard extends StatefulWidget {
     required this.rating,
     required this.deliveryFee,
     required this.isOpen, // ✅
+    this.hasFoodDiscount = false, // ✅
+    this.discount = '', // ✅
     this.onTap,
   });
 
   @override
-  State<BreakfastRestaurantCard> createState() => _BreakfastRestaurantCardState();
+  State<BreakfastRestaurantCard> createState() =>
+      _BreakfastRestaurantCardState();
 }
 
 class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
@@ -49,7 +55,9 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
 
   @override
   Widget build(BuildContext context) {
-    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0) ? context.syp(widget.deliveryFee, decimals: 0) : "common.dash".tr();
+    final feeText = (widget.deliveryFee != null && widget.deliveryFee! > 0)
+        ? context.syp(widget.deliveryFee, decimals: 0)
+        : "common.dash".tr();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -67,12 +75,57 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                     height: 100.h, // نفس ارتفاع الصورة
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    fallback: Image.asset("assets/images/meal_breeze.jpeg", fit: BoxFit.cover),
+                    fallback: Image.asset(
+                      "assets/images/meal_breeze.jpeg",
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
               // ✅ Open/Closed badge
               if (!widget.isOpen) const ClosedOverlay(),
+
+              // ✅ Discount badge
+              if (widget.hasFoodDiscount && widget.discount.trim().isNotEmpty)
+                PositionedDirectional(
+                  bottom: 0,
+                  start: 0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.red,
+                      borderRadius: BorderRadiusDirectional.only(
+                        // topStart:  Radius.circular(12.r),
+                        bottomStart: Radius.circular(12.r),
+                        topEnd: Radius.circular(20.r),
+                        bottomEnd: Radius.circular(20.r),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.discount,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        // SvgPicture.asset(
+                        //   "assets/icons/nspah.svg",
+                        //   width: 18.w,
+                        //   height: 18.h,
+                        //   color: Colors.white,
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
 
               // Rating
               PositionedDirectional(
@@ -81,7 +134,9 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.30),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.inverseSurface.withOpacity(0.30),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
@@ -91,7 +146,11 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
-                        style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -106,7 +165,11 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
 
@@ -118,7 +181,12 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
+                Image.asset(
+                  "assets/icons/new_del.png",
+                  width: 15.w,
+                  height: 15.h,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 SizedBox(width: 4.w),
                 Text(
                   context.syp(feeText, decimals: 0),
@@ -142,9 +210,42 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
 
 class BreakfastRestaurantsSection extends StatelessWidget {
   final List<HomeRestaurantModel> restaurants;
+  final List<RestaurantDiscountModel> discounts; // ✅ NEW
   final bool hideWhenEmpty;
 
-  const BreakfastRestaurantsSection({super.key, required this.restaurants, this.hideWhenEmpty = true});
+  const BreakfastRestaurantsSection({
+    super.key,
+    required this.restaurants,
+    this.discounts = const [], // ✅ NEW
+    this.hideWhenEmpty = true,
+  });
+
+  // ✅ NEW: Helper method to get discount text for a restaurant
+  String _getDiscountText(HomeRestaurantModel restaurant) {
+    final discount = discounts.firstWhere(
+      (d) => d.restaurantId == restaurant.id,
+      orElse: () => RestaurantDiscountModel(
+        restaurantId: restaurant.id,
+        restaurantName: restaurant.name,
+        logo: null, // Fixed: Added required logo parameter
+        isOpen: restaurant.isOpen,
+        ratingAvg: restaurant.ratingAvg,
+        ratingCount: 0,
+        foodDiscount: null,
+        deliveryDiscount: null,
+      ),
+    );
+
+    if (discount.foodDiscount != null) {
+      final type = discount.foodDiscount!.discountType.toLowerCase();
+      final value = discount.foodDiscount!.discountValue;
+      if (value <= 0) return "";
+      if (type.contains('percent')) return "${value.toStringAsFixed(0)}%";
+      return value.toStringAsFixed(0);
+    }
+
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +257,15 @@ class BreakfastRestaurantsSection extends StatelessWidget {
         child: Container(
           height: 100.h,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: AppColor.black, borderRadius: BorderRadius.circular(12.r)),
-          child: CustomSubTitle(subtitle: "home.empty_breakfast".tr(), color: Theme.of(context).colorScheme.onSurface, fontsize: 14.sp),
+          decoration: BoxDecoration(
+            color: AppColor.black,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: CustomSubTitle(
+            subtitle: "home.empty_breakfast".tr(),
+            color: Theme.of(context).colorScheme.onSurface,
+            fontsize: 14.sp,
+          ),
         ),
       );
     }
@@ -176,7 +284,10 @@ class BreakfastRestaurantsSection extends StatelessWidget {
 
           return Container(
             width: cardWidth,
-            margin: EdgeInsets.only(left: index == 0 ? 9.w : 0, right: index == restaurants.length - 1 ? 10.w : gap),
+            margin: EdgeInsets.only(
+              left: index == 0 ? 9.w : 0,
+              right: index == restaurants.length - 1 ? 10.w : gap,
+            ),
             child: BreakfastRestaurantCard(
               image: restaurantImage(r),
               isOpen: r.isOpen, // ✅ هون
@@ -184,6 +295,8 @@ class BreakfastRestaurantsSection extends StatelessWidget {
               name: extractLocalizedText(r.name, context.locale),
               rating: r.ratingAvg <= 0 ? 4.0 : r.ratingAvg,
               deliveryFee: r.deliveryFinalFee?.toDouble(),
+              hasFoodDiscount: _getDiscountText(r).isNotEmpty, // ✅ NEW
+              discount: _getDiscountText(r), // ✅ NEW
               onTap: () async {
                 await Navigator.push(
                   context,

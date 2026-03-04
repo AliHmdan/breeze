@@ -12,6 +12,7 @@ import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_cubit.dart';
 import 'package:breezefood/features/stores/data/repo/super_market_repo.dart';
 import 'package:breezefood/features/stores/presentation/cubit/market_details_cubit.dart';
+import 'package:breezefood/features/stores/presentation/ui/widget/cart_action_button.dart';
 import 'package:breezefood/features/super_market/supermarket_add_order_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -328,7 +329,7 @@ class MarketPagePrice extends StatelessWidget {
                         child: SafeArea(
                           top: false,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            padding: EdgeInsets.symmetric(horizontal: 0.w),
                             child: BottomCartAction(
                               haveOrder: haveOrder,
                               usePrimaryButton:
@@ -382,6 +383,10 @@ class MarketPagePrice extends StatelessWidget {
               ),
             ],
           ),
+          // bottomNavigationBar: SafeArea(
+          //   top: false,
+          //   child: SupermarketBottomButton(),
+          // ),
         ),
       ),
     );

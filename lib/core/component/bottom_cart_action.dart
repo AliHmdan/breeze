@@ -37,7 +37,7 @@ class BottomCartAction extends StatelessWidget {
 
         st.maybeWhen(
           loading: () => loading = true,
-          cartLoaded:(cart, updatingIds, toast, isRefreshing) {
+          cartLoaded: (cart, updatingIds, toast, isRefreshing) {
             summary = CartSummary.from(cart);
           },
           orElse: () {},
@@ -55,7 +55,13 @@ class BottomCartAction extends StatelessWidget {
           return SafeArea(
             top: false,
             child: Container(
-              padding: EdgeInsets.fromLTRB(14.w, 10.h, 14.w, 12.h),
+             
+              padding: EdgeInsets.fromLTRB(
+                14.w, // ✅ Removed horizontal padding for full width
+                10.h,
+                14.w, // ✅ Removed horizontal padding for full width
+                12.h,
+              ),
               decoration: BoxDecoration(
                 color: AppColor.Dark.withOpacity(0.92),
                 boxShadow: [
@@ -84,7 +90,12 @@ class BottomCartAction extends StatelessWidget {
           return SafeArea(
             top: false,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(14.w, 10.h, 14.w, 12.h),
+              padding: EdgeInsets.fromLTRB(
+                0.w,
+                10.h,
+                0.w,
+                12.h,
+              ), // ✅ Removed horizontal padding for full width
               child: CustomButtonOrder(
                 title: "home.your_order".tr(),
                 onPressed: () => openHaveOrderTracking(context, haveOrder!.id),

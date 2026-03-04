@@ -17,6 +17,7 @@ class CustomButtonOrder extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicWidth(
       child: SizedBox(
+        width: double.infinity,
         height: 44.h,
         child: ElevatedButton(
           onPressed: onPressed,
@@ -41,7 +42,7 @@ class CustomButtonOrder extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color:Colors.white,
+                  color: Colors.white,
                   fontFamily: "Manrope",
                   fontWeight: FontWeight.w400,
                 ),
