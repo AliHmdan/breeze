@@ -31,11 +31,11 @@ class AddressSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-      ),
+      // decoration: BoxDecoration(
+      //   color: colorScheme.surface,
+      //   borderRadius: BorderRadius.circular(12.r),
+      //   border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+      // ),
       child: InkWell(
         onTap: onChangeTap,
         borderRadius: BorderRadius.circular(14.r),
@@ -66,31 +66,34 @@ class AddressSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          isRTL ? "تغيير" : "Change",
-                          style: TextStyle(
-                            color: colorScheme.onSurface.withOpacity(0.8),
-                            fontSize: 11.sp,
-                            fontWeight: FontWeight.w700,
+                  InkWell(
+                    onTap: onChangeTap,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            isRTL ? "تغيير" : "Change",
+                            style: TextStyle(
+                              color: colorScheme.onSurface.withOpacity(0.8),
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 6.w),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: colorScheme.onSurface.withOpacity(0.8),
-                        ),
-                      ],
+                          SizedBox(width: 6.w),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: colorScheme.onSurface.withOpacity(0.8),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -23,6 +23,11 @@ import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_
 
 import 'package:breezefood/features/orders/request_order/counter_request.dart';
 import 'package:breezefood/features/orders/request_order/meal_card.dart';
+import 'package:breezefood/features/ratings/presentation/cubit/rating_submit_cubit.dart';
+import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
+import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
+import 'package:breezefood/features/profile/data/model/address_model.dart';
+import 'package:breezefood/features/profile/data/repo/profile_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'address_section.dart';
@@ -85,12 +90,339 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     });
   }
 
+  Future<void> _openRestaurantFromCart(int restaurantId) async {
+    if (restaurantId <= 0) return;
+
+    final changed = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: context.read<CartCubit>()),
+            BlocProvider(create: (_) => getIt<RatingSubmitCubit>()),
+            BlocProvider(create: (_) => getIt<FavoritesCubit>()),
+          ],
+          child: ResturantDetails(restaurant_id: restaurantId),
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (changed == true) {
+      await context.read<CartCubit>().loadCart(silent: false);
+    } else {
+      context.read<CartCubit>().loadCart(silent: true);
+    }
+  }
+
   @override
   void dispose() {
     _tempDetailsCtrl.dispose();
     _tempDetailsFocus.dispose();
     _orderNotesCtrl.dispose();
     super.dispose();
+  }
+
+  List<AddressModel> _parseAddresses(dynamic raw) {
+    List? listRaw;
+
+    if (raw is List) {
+      listRaw = raw;
+    } else if (raw is Map) {
+      final root = raw.cast<String, dynamic>();
+      final d = root["data"];
+      final a = root["addresses"];
+
+      if (a is List) listRaw = a;
+      if (listRaw == null && d is List) listRaw = d;
+
+      if (listRaw == null && d is Map) {
+        final dd = d.cast<String, dynamic>();
+        final dda = dd["addresses"];
+        if (dda is List) listRaw = dda;
+      }
+    }
+
+    final list = <AddressModel>[];
+    if (listRaw != null) {
+      for (final e in listRaw) {
+        if (e is Map) {
+          list.add(AddressModel.fromJson(e.cast<String, dynamic>()));
+        }
+      }
+    }
+
+    return list;
+  }
+
+  Future<void> _applyCartAddress({
+    required String text,
+    required double lat,
+    required double lon,
+  }) async {
+    setState(() {
+      _tempOrderAddress = OrderAddress(
+        text: text,
+        latitude: lat,
+        longitude: lon,
+      );
+      _tempDetailsCtrl.text = text;
+    });
+
+    await AuthStorageHelper.saveCartLocation(text: text, lat: lat, lon: lon);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _tempDetailsFocus.requestFocus();
+    });
+  }
+
+  Future<void> _onChangeAddressTap({required bool isRTL}) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final res = await showModalBottomSheet<Map<String, dynamic>?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final sheetColorScheme = Theme.of(ctx).colorScheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: sheetColorScheme.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: SafeArea(
+            top: false,
+            child: FutureBuilder(
+              future: getIt<ProfileRepository>().getAddresses(),
+              builder: (context, snap) {
+                final data = snap.data;
+
+                final addresses = (data != null && data.ok)
+                    ? _parseAddresses(data.data)
+                    : const <AddressModel>[];
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 8.h),
+                    Container(
+                      width: 44.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: sheetColorScheme.onSurface.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14.w,
+                        vertical: 6.h,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              isRTL ? "اختر عنوان" : "Choose address",
+                              style: TextStyle(
+                                color: sheetColorScheme.onSurface,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            icon: Icon(
+                              Icons.close,
+                              color: sheetColorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: sheetColorScheme.outlineVariant.withOpacity(0.6),
+                    ),
+                    ListTile(
+                      onTap: () => Navigator.pop(ctx, {"kind": "map"}),
+                      leading: Icon(
+                        Icons.map_outlined,
+                        color: sheetColorScheme.primary,
+                      ),
+                      title: Text(
+                        isRTL ? "اختيار من الخريطة" : "Pick on map",
+                        style: TextStyle(
+                          color: sheetColorScheme.onSurface,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: sheetColorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                    if (snap.connectionState == ConnectionState.waiting)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 12.h,
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 18.w,
+                              height: 18.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: sheetColorScheme.primary,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              isRTL
+                                  ? "جارٍ تحميل العناوين..."
+                                  : "Loading addresses...",
+                              style: TextStyle(
+                                color: sheetColorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (addresses.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 12.h,
+                        ),
+                        child: Text(
+                          isRTL
+                              ? "لا يوجد عناوين محفوظة"
+                              : "No saved addresses",
+                          style: TextStyle(
+                            color: sheetColorScheme.onSurface.withOpacity(0.7),
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.only(
+                            left: 6.w,
+                            right: 6.w,
+                            bottom: 10.h,
+                          ),
+                          itemCount: addresses.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: sheetColorScheme.outlineVariant.withOpacity(
+                              0.35,
+                            ),
+                          ),
+                          itemBuilder: (context, i) {
+                            final a = addresses[i];
+                            return ListTile(
+                              onTap: () => Navigator.pop(ctx, {
+                                "kind": "saved",
+                                "text": a.address,
+                                "lat": a.latitude,
+                                "lon": a.longitude,
+                              }),
+                              leading: Icon(
+                                Icons.location_on,
+                                color: sheetColorScheme.primary,
+                              ),
+                              title: Text(
+                                a.address,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: sheetColorScheme.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              trailing: a.isDefault
+                                  ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            sheetColorScheme.primaryContainer,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        isRTL ? "افتراضي" : "Default",
+                                        style: TextStyle(
+                                          color: sheetColorScheme
+                                              .onPrimaryContainer,
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.chevron_right,
+                                      color: sheetColorScheme.onSurface
+                                          .withOpacity(0.6),
+                                    ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || res == null) return;
+
+    final kind = (res["kind"] ?? "").toString();
+    if (kind == "map") {
+      await _changeLocation(isRTL: isRTL);
+      return;
+    }
+
+    if (kind == "saved") {
+      final text = (res["text"] ?? "").toString().trim();
+      final lat = (res["lat"] as num?)?.toDouble() ?? 0.0;
+      final lon = (res["lon"] as num?)?.toDouble() ?? 0.0;
+
+      if (text.isEmpty || lat == 0 || lon == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isRTL ? "تعذر اختيار العنوان" : "Couldn't select address",
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: colorScheme.error,
+          ),
+        );
+        return;
+      }
+
+      await _applyCartAddress(text: text, lat: lat, lon: lon);
+    }
   }
 
   Future<void> _loadAppetizers(int restaurantId) async {
@@ -218,11 +550,11 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
+      // decoration: BoxDecoration(
+      //   color: colorScheme.surface,
+      //   border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+      //   borderRadius: BorderRadius.circular(14.r),
+      // ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -236,7 +568,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
           ),
           SizedBox(height: 10.h),
           SizedBox(
-            height: 230.h,
+            height: 220.h,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -253,44 +585,249 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                     : (a.nameEn.trim().isNotEmpty ? a.nameEn : a.nameAr);
 
                 return SizedBox(
-                  width: 170.w,
+                  width: 145.w,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.18),
-                      ),
+                      // color: colorScheme.surface,
+                      // borderRadius: BorderRadius.circular(14.r),
+                      // border: Border.all(
+                      //   color: colorScheme.outline.withOpacity(0.18),
+                      // ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(14.r),
-                            topRight: Radius.circular(14.r),
-                          ),
+                          borderRadius: BorderRadius.circular(14.r),
                           child: Stack(
                             children: [
-                              (a.image == null || a.image!.isEmpty)
-                                  ? Image.asset(
-                                      "assets/images/003.jpg",
-                                      width: double.infinity,
-                                      height: 120.h,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.network(
-                                      a.image!,
-                                      width: double.infinity,
-                                      height: 120.h,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Image.asset(
-                                        "assets/images/003.jpg",
-                                        width: double.infinity,
-                                        height: 120.h,
-                                        fit: BoxFit.cover,
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: SizedBox(
+                                  width: 145.w,
+                                  height: 145.w,
+                                  child: Stack(
+                                    children: [
+                                      (a.image == null || a.image!.isEmpty)
+                                          ? Image.asset(
+                                              "assets/images/003.jpg",
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.network(
+                                              a.image!,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Image.asset(
+                                                    "assets/images/003.jpg",
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                            ),
+                                      Positioned(
+                                        bottom: 5,
+                                        right: 5,
+                                        child: Row(
+                                          children: [
+                                            if (qty <= 0)
+                                              InkWell(
+                                                onTap: disabled
+                                                    ? null
+                                                    : () {
+                                                        setState(() {
+                                                          _appetizerQty[a.id] =
+                                                              1;
+                                                        });
+                                                        _syncAppetizer(
+                                                          appetizerId: a.id,
+                                                          quantity: 1,
+                                                        );
+                                                      },
+                                                child: Container(
+                                                  width: 38.w,
+                                                  height: 38.w,
+                                                  decoration: BoxDecoration(
+                                                    color: disabled
+                                                        ? colorScheme
+                                                              .surfaceContainerHighest
+                                                        : colorScheme.surface,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12.r,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: colorScheme.outline
+                                                          .withOpacity(0.22),
+                                                    ),
+                                                  ),
+                                                  child: syncing
+                                                      ? Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                10.w,
+                                                              ),
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                color:
+                                                                    colorScheme
+                                                                        .primary,
+                                                              ),
+                                                        )
+                                                      : Icon(
+                                                          Icons.add,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                ),
+                                              )
+                                            else
+                                              Container(
+                                                height: 38.w,
+                                                decoration: BoxDecoration(
+                                                  color: colorScheme.surface,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                  border: Border.all(
+                                                    color: colorScheme.outline
+                                                        .withOpacity(0.22),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: disabled
+                                                          ? null
+                                                          : () {
+                                                              final next =
+                                                                  (qty - 1)
+                                                                      .clamp(
+                                                                        0,
+                                                                        99,
+                                                                      );
+                                                              setState(() {
+                                                                if (next == 0) {
+                                                                  _appetizerQty
+                                                                      .remove(
+                                                                        a.id,
+                                                                      );
+                                                                } else {
+                                                                  _appetizerQty[a
+                                                                          .id] =
+                                                                      next;
+                                                                }
+                                                              });
+                                                              _syncAppetizer(
+                                                                appetizerId:
+                                                                    a.id,
+                                                                quantity: next,
+                                                              );
+                                                            },
+                                                      child: SizedBox(
+                                                        width: 38.w,
+                                                        height: 38.w,
+                                                        child: Icon(
+                                                          Icons.remove,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 28.w,
+                                                      child: Center(
+                                                        child: syncing
+                                                            ? SizedBox(
+                                                                width: 14.w,
+                                                                height: 14.w,
+                                                                child: CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      2,
+                                                                  color: colorScheme
+                                                                      .primary,
+                                                                ),
+                                                              )
+                                                            : Text(
+                                                                qty.toString(),
+                                                                style: TextStyle(
+                                                                  color: colorScheme
+                                                                      .onSurface,
+                                                                  fontSize:
+                                                                      13.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                ),
+                                                              ),
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: disabled
+                                                          ? null
+                                                          : () {
+                                                              final next =
+                                                                  (qty + 1)
+                                                                      .clamp(
+                                                                        0,
+                                                                        99,
+                                                                      );
+                                                              setState(() {
+                                                                _appetizerQty[a
+                                                                        .id] =
+                                                                    next;
+                                                              });
+                                                              _syncAppetizer(
+                                                                appetizerId:
+                                                                    a.id,
+                                                                quantity: next,
+                                                              );
+                                                            },
+                                                      child: SizedBox(
+                                                        width: 38.w,
+                                                        height: 38.w,
+                                                        child: Icon(
+                                                          Icons.add,
+                                                          color: disabled
+                                                              ? colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.35,
+                                                                    )
+                                                              : colorScheme
+                                                                    .primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               Positioned(
                                 top: 8.h,
                                 left: 8.w,
@@ -327,8 +864,8 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: colorScheme.onSurface,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                               SizedBox(height: 8.h),
@@ -341,163 +878,6 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 ),
                               ),
                               SizedBox(height: 5.h),
-                              Row(
-                                children: [
-                                  if (qty <= 0)
-                                    InkWell(
-                                      onTap: disabled
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                _appetizerQty[a.id] = 1;
-                                              });
-                                              _syncAppetizer(
-                                                appetizerId: a.id,
-                                                quantity: 1,
-                                              );
-                                            },
-                                      child: Container(
-                                        width: 38.w,
-                                        height: 38.w,
-                                        decoration: BoxDecoration(
-                                          color: disabled
-                                              ? colorScheme
-                                                    .surfaceContainerHighest
-                                              : colorScheme.surface,
-                                          borderRadius: BorderRadius.circular(
-                                            12.r,
-                                          ),
-                                          border: Border.all(
-                                            color: colorScheme.outline
-                                                .withOpacity(0.22),
-                                          ),
-                                        ),
-                                        child: syncing
-                                            ? Padding(
-                                                padding: EdgeInsets.all(10.w),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color:
-                                                          colorScheme.primary,
-                                                    ),
-                                              )
-                                            : Icon(
-                                                Icons.add,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                      ),
-                                    )
-                                  else
-                                    Container(
-                                      height: 38.w,
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.surface,
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                        border: Border.all(
-                                          color: colorScheme.outline
-                                              .withOpacity(0.22),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          InkWell(
-                                            onTap: disabled
-                                                ? null
-                                                : () {
-                                                    final next = (qty - 1)
-                                                        .clamp(0, 99);
-                                                    setState(() {
-                                                      if (next == 0) {
-                                                        _appetizerQty.remove(
-                                                          a.id,
-                                                        );
-                                                      } else {
-                                                        _appetizerQty[a.id] =
-                                                            next;
-                                                      }
-                                                    });
-                                                    _syncAppetizer(
-                                                      appetizerId: a.id,
-                                                      quantity: next,
-                                                    );
-                                                  },
-                                            child: SizedBox(
-                                              width: 38.w,
-                                              height: 38.w,
-                                              child: Icon(
-                                                Icons.remove,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 28.w,
-                                            child: Center(
-                                              child: syncing
-                                                  ? SizedBox(
-                                                      width: 14.w,
-                                                      height: 14.w,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                            color: colorScheme
-                                                                .primary,
-                                                          ),
-                                                    )
-                                                  : Text(
-                                                      qty.toString(),
-                                                      style: TextStyle(
-                                                        color: colorScheme
-                                                            .onSurface,
-                                                        fontSize: 13.sp,
-                                                        fontWeight:
-                                                            FontWeight.w900,
-                                                      ),
-                                                    ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: disabled
-                                                ? null
-                                                : () {
-                                                    final next = (qty + 1)
-                                                        .clamp(0, 99);
-                                                    setState(() {
-                                                      _appetizerQty[a.id] =
-                                                          next;
-                                                    });
-                                                    _syncAppetizer(
-                                                      appetizerId: a.id,
-                                                      quantity: next,
-                                                    );
-                                                  },
-                                            child: SizedBox(
-                                              width: 38.w,
-                                              height: 38.w,
-                                              child: Icon(
-                                                Icons.add,
-                                                color: disabled
-                                                    ? colorScheme.onSurface
-                                                          .withOpacity(0.35)
-                                                    : colorScheme.primary,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
                             ],
                           ),
                         ),
@@ -794,7 +1174,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),
         child: Padding(
@@ -821,15 +1201,15 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              "assets/images/background_auth.png",
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: colorScheme.surface.withOpacity(0.85)),
-          ),
+          // Positioned.fill(
+          //   child: Image.asset(
+          //     "assets/images/background_auth.png",
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
+          // Positioned.fill(
+          //   child: Container(color: colorScheme.surface.withOpacity(0.85)),
+          // ),
           SafeArea(
             child: BlocListener<OrderFlowCubit, OrderFlowState>(
               listener: (context, state) async {
@@ -937,6 +1317,9 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   isRTL: isRTL,
                                   updatingIds: updatingIds,
                                   itemNotes: _itemNotes,
+                                  onAddMore: () => _openRestaurantFromCart(
+                                    cart.restaurantId,
+                                  ),
                                   onEditNote: (it) =>
                                       _editItemNote(isRTL: isRTL, item: it),
                                   onDelete: (it) async {
@@ -958,21 +1341,23 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                 ),
 
                               SizedBox(height: 10.h),
-
+                              Divider(),
                               _recommendedAppetizersSection(
                                 isRTL: isRTL,
                                 cart: cart,
                               ),
 
-                              if (_appetizers.isNotEmpty)
-                                SizedBox(height: 10.h),
+                              if (_appetizers.isNotEmpty) ...[
+                                // SizedBox(height: 10.h),
+                                Divider(),
+                              ],
 
                               if (_deliveryType == "delivery") ...[
                                 AddressSection(
                                   isRTL: isRTL,
                                   address: _tempOrderAddress,
                                   onChangeTap: () =>
-                                      _changeLocation(isRTL: isRTL),
+                                      _onChangeAddressTap(isRTL: isRTL),
                                   detailsCtrl: _tempDetailsCtrl,
                                   detailsFocus: _tempDetailsFocus,
                                   onDetailsChanged: (v) {
@@ -987,6 +1372,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   },
                                 ),
                                 SizedBox(height: 10.h),
+                                // Divider(),
                               ],
 
                               // VIP Section
@@ -1104,6 +1490,8 @@ class _CartItemsSection extends StatelessWidget {
   final Set<int> updatingIds;
   final Map<int, String> itemNotes;
 
+  final VoidCallback onAddMore;
+
   final void Function(CartItem it) onEditNote;
   final void Function(CartItem it) onDelete;
   final void Function(CartItem it, int newQty) onQtyChange;
@@ -1113,6 +1501,7 @@ class _CartItemsSection extends StatelessWidget {
     required this.isRTL,
     required this.updatingIds,
     required this.itemNotes,
+    required this.onAddMore,
     required this.onEditNote,
     required this.onDelete,
     required this.onQtyChange,
@@ -1121,17 +1510,19 @@ class _CartItemsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      children: cart.items.map((it) {
-        final isUpdating = updatingIds.contains(it.id);
+    final children = <Widget>[];
 
-        final title = isRTL
-            ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn)
-            : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
+    for (final it in cart.items) {
+      final isUpdating = updatingIds.contains(it.id);
 
-        final note = (it.specialNotes ?? "").trim();
+      final title = isRTL
+          ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn)
+          : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
 
-        return Padding(
+      final note = (it.specialNotes ?? "").trim();
+
+      children.add(
+        Padding(
           padding: EdgeInsets.only(bottom: 8.h),
           child: Slidable(
             key: ValueKey("cart_item_${it.id}"),
@@ -1150,10 +1541,10 @@ class _CartItemsSection extends StatelessWidget {
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border.all(
-                  color: colorScheme.outline.withOpacity(0.25),
-                ),
+                // color: colorScheme.surface,
+                // border: Border.all(
+                //   color: colorScheme.outline.withOpacity(0.25),
+                // ),
               ),
               child: Column(
                 children: [
@@ -1168,70 +1559,59 @@ class _CartItemsSection extends StatelessWidget {
                       onChanged: (newQty) => onQtyChange(it, newQty),
                     ),
                   ),
-                  // Padding(
-                  //   padding: EdgeInsets.symmetric(
-                  //     horizontal: 12.w,
-                  //     vertical: 8.h,
-                  //   ),
-                  //   child: Row(
-                  //     children: [
-                  //       InkWell(
-                  //         onTap: () => onEditNote(it),
-                  //         borderRadius: BorderRadius.circular(10.r),
-                  //         child: Container(
-                  //           padding: EdgeInsets.symmetric(
-                  //             horizontal: 10.w,
-                  //             vertical: 6.h,
-                  //           ),
-                  //           decoration: BoxDecoration(
-                  //             color: Colors.white10,
-                  //             borderRadius: BorderRadius.circular(10.r),
-                  //             border: Border.all(color: Colors.white12),
-                  //           ),
-                  //           child: Row(
-                  //             children: [
-                  //               const Icon(
-                  //                 Icons.edit_note,
-                  //                 color: Colors.white70,
-                  //                 size: 18,
-                  //               ),
-                  //               SizedBox(width: 6.w),
-                  //               Text(
-                  //                 isRTL ? "ملاحظة" : "Note",
-                  //                 style: TextStyle(
-                  //                   color: Colors.white70,
-                  //                   fontSize: 12.sp,
-                  //                   fontWeight: FontWeight.w700,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       SizedBox(width: 10.w),
-                  //       Expanded(
-                  //         child: Text(
-                  //           note.isEmpty
-                  //               ? (isRTL ? "لا توجد ملاحظة" : "No note")
-                  //               : note,
-                  //           maxLines: 2,
-                  //           overflow: TextOverflow.ellipsis,
-                  //           style: TextStyle(
-                  //             color: Colors.white54,
-                  //             fontSize: 12.sp,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                 ],
               ),
             ),
           ),
-        );
-      }).toList(),
-    );
+        ),
+      );
+    }
+
+    if (cart.items.isNotEmpty) {
+      children.add(
+        Column(
+          children: [
+            Divider(),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                // color: colorScheme.surface,
+                // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+              ),
+              child: InkWell(
+                onTap: onAddMore,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 14.h,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.add_circle,
+                        color: colorScheme.primary,
+                        size: 24.sp,
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        isRTL ? "أضف المزيد" : "Add more",
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(children: children);
   }
 }
 
@@ -1254,9 +1634,9 @@ class _TotalsSection extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(11.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+        // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
       ),
       child: Column(
         children: [
@@ -1328,9 +1708,9 @@ class _OrderNotesSection extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
+        // border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
       ),
       child: TextField(
         controller: ctrl,
@@ -1380,9 +1760,9 @@ class _VipSection extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: isVipEnabled
-            ? colorScheme.primary.withOpacity(0.1)
-            : colorScheme.surface,
+        // color: isVipEnabled
+        //     ? colorScheme.primary.withOpacity(0.1)
+        //     : colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isVipEnabled

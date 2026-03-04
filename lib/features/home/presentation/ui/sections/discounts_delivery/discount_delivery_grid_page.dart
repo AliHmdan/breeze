@@ -2,8 +2,7 @@ import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discount_card.dart';
 import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
-import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart'
-    show ResturantDetails;
+import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart' show ResturantDetails;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,8 +11,7 @@ class DiscountDeliveryGridPage extends StatelessWidget {
 
   const DiscountDeliveryGridPage({super.key, required this.discountDelivery});
 
-  String _logoUrl(RestaurantDiscountModel d) =>
-      UrlHelper.toFullUrl(d.logo) ?? "";
+  String _logoUrl(RestaurantDiscountModel d) => UrlHelper.toFullUrl(d.logo) ?? "";
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +22,7 @@ class DiscountDeliveryGridPage extends StatelessWidget {
         preferredSize: Size.fromHeight(50.h),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: CustomAppbarProfile(
-            title: "Delivery Discounts",
-            icon: Icons.arrow_back_ios,
-            ontap: () => Navigator.of(context).pop(),
-          ),
+          child: CustomAppbarProfile(title: "Delivery Discounts", icon: Icons.arrow_back_ios, ontap: () => Navigator.of(context).pop()),
         ),
       ),
       body: Padding(
@@ -36,9 +30,7 @@ class DiscountDeliveryGridPage extends StatelessWidget {
         child: GridView.builder(
           physics: const BouncingScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _getCrossAxisCount(
-              MediaQuery.of(context).size.width,
-            ),
+            crossAxisCount: _getCrossAxisCount(MediaQuery.of(context).size.width),
             mainAxisSpacing: 8.h,
             crossAxisSpacing: 10.w,
             childAspectRatio: 0.55, // More compact
@@ -51,8 +43,7 @@ class DiscountDeliveryGridPage extends StatelessWidget {
             final fin = d.deliveryFinalFee;
 
             // يوجد خصم توصيل فقط إذا deliveryDiscount موجود
-            final hasDeliveryDiscount =
-                d.deliveryDiscount != null && base != null && fin != null;
+            final hasDeliveryDiscount = d.deliveryDiscount != null && base != null && fin != null;
 
             return Discount(
               isOpen: d.isOpen,
@@ -61,12 +52,8 @@ class DiscountDeliveryGridPage extends StatelessWidget {
               subtitle: d.restaurantName,
               price: 0,
               discount: _discountText(d),
-              rating: d.ratingAvg > 0
-                  ? d.ratingAvg
-                  : 4.5, // Default rating if 0
-              ratingCount: d.ratingCount > 0
-                  ? d.ratingCount
-                  : 100, // Default count if 0
+              rating: d.ratingAvg > 0 ? d.ratingAvg : 4.5, // Default rating if 0
+              ratingCount: d.ratingCount > 0 ? d.ratingCount : 100, // Default count if 0
               hasFoodDiscount: false, // Only delivery discount
               hasDeliveryDiscount: d.deliveryDiscount != null,
               showDeliveryPrices: true,
@@ -101,10 +88,5 @@ class DiscountDeliveryGridPage extends StatelessWidget {
 
 Future<void> openRestaurantById(BuildContext context, int restaurantId) async {
   if (restaurantId == 0) return;
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ResturantDetails(restaurant_id: restaurantId),
-    ),
-  );
+  await Navigator.push(context, MaterialPageRoute(builder: (_) => ResturantDetails(restaurant_id: restaurantId)));
 }

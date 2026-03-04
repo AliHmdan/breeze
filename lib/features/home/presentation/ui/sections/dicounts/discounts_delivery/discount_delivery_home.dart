@@ -1,3 +1,4 @@
+import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discount_card.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_delivery/discount_delivery_grid_page.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,16 +7,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/features/home/model/home_response.dart';
-import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart'
-    show CustomTitleSection;
+import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart' show CustomTitleSection;
 
 class DiscountDeliveryHome extends StatelessWidget {
   final List<RestaurantDiscountModel> discountDelivery;
 
   const DiscountDeliveryHome({super.key, required this.discountDelivery});
 
-  String _logoUrl(RestaurantDiscountModel d) =>
-      UrlHelper.toFullUrl(d.logoSafe) ?? "";
+  String _logoUrl(RestaurantDiscountModel d) => UrlHelper.toFullUrl(d.logoSafe) ?? "";
 
   String _discountText(RestaurantDiscountModel d) {
     // ✅ prefer FOOD discount in the red badge
@@ -70,10 +69,10 @@ class DiscountDeliveryHome extends StatelessWidget {
                       margin: EdgeInsetsDirectional.only(end: 10.w),
                       child: Discount(
                         isOpen: d.isOpen,
-                        onTap: () =>
-                            openRestaurantById(context, d.restaurantId),
+                        onTap: () => openRestaurantById(context, d.restaurantId),
                         imagePath: _logoUrl(d),
-                        subtitle: d.restaurantName,
+                        // subtitle: d.restaurantName,
+                        subtitle: extractLocalizedText(d.restaurantName, context.locale),
                         price: fin ?? 0,
                         discount: _discountText(d),
                         rating: d.ratingAvg,
