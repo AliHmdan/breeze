@@ -19,8 +19,7 @@ class UpdateAddressScreen extends StatefulWidget {
   State<UpdateAddressScreen> createState() => _UpdateAddressScreenState();
 }
 
-class _UpdateAddressScreenState extends State<UpdateAddressScreen>
-    with WidgetsBindingObserver {
+class _UpdateAddressScreenState extends State<UpdateAddressScreen> with WidgetsBindingObserver {
   late final AuthFlowCubit cubit;
 
   String _status = 'auth.updating_location'.tr();
@@ -57,8 +56,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
     if (_isBusy) return;
 
     final now = DateTime.now();
-    if (_lastAutoRetryAt != null &&
-        now.difference(_lastAutoRetryAt!) < const Duration(seconds: 1)) {
+    if (_lastAutoRetryAt != null && now.difference(_lastAutoRetryAt!) < const Duration(seconds: 1)) {
       return;
     }
     _lastAutoRetryAt = now;
@@ -111,26 +109,20 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
       }
 
       setState(() => _status = 'auth.getting_location'.tr());
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
       setState(() => _status = 'auth.resolving_address'.tr());
 
       String addressText = "common.unknown_address".tr();
       try {
-        final placemarks = await placemarkFromCoordinates(
-          pos.latitude,
-          pos.longitude,
-        );
+        final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
           final parts = <String>[
             if ((p.street ?? '').trim().isNotEmpty) p.street!,
             if ((p.subLocality ?? '').trim().isNotEmpty) p.subLocality!,
             if ((p.locality ?? '').trim().isNotEmpty) p.locality!,
-            if ((p.administrativeArea ?? '').trim().isNotEmpty)
-              p.administrativeArea!,
+            if ((p.administrativeArea ?? '').trim().isNotEmpty) p.administrativeArea!,
             if ((p.country ?? '').trim().isNotEmpty) p.country!,
           ];
           addressText = parts.join(', ');
@@ -140,11 +132,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
       }
 
       setState(() => _status = 'auth.updating_address'.tr());
-      cubit.addAddress(
-        address: addressText,
-        lat: pos.latitude,
-        lon: pos.longitude,
-      );
+      cubit.addAddress(address: addressText, lat: pos.latitude, lon: pos.longitude);
     } catch (e, st) {
       log('Error in _start: $e\n$st');
       if (!mounted) return;
@@ -168,9 +156,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
   }
 
   void _navigateToHome() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)),
-    );
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)));
   }
 
   @override
@@ -193,9 +179,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
           addressAdded: (data) {
             if (!mounted) return;
 
-            final msg = (data is Map)
-                ? (data["message"] ?? "auth.address_added".tr())
-                : null;
+            final msg = (data is Map) ? (data["message"] ?? "auth.address_added".tr()) : null;
 
             setState(() {
               _isBusy = false;
@@ -215,17 +199,10 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 84.w,
-                    color: colorScheme.primary,
-                  ),
+                  Icon(Icons.location_on, size: 84.w, color: colorScheme.primary),
                   const SizedBox(height: 16),
 
-                  if (_isBusy) ...[
-                    CircularProgressIndicator(color: colorScheme.primary),
-                    const SizedBox(height: 12),
-                  ],
+                  if (_isBusy) ...[CircularProgressIndicator(color: colorScheme.primary), const SizedBox(height: 12)],
 
                   Text(
                     _status,
@@ -241,15 +218,8 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
                       child: ElevatedButton.icon(
                         onPressed: _openFix,
                         icon: const Icon(Icons.settings),
-                        label: Text(
-                          _gate == _LocationGate.serviceOff
-                              ? "auth.open_location_settings".tr()
-                              : "auth.open_app_settings".tr(),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                        ),
+                        label: Text(_gate == _LocationGate.serviceOff ? "auth.open_location_settings".tr() : "auth.open_app_settings".tr()),
+                        style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary, foregroundColor: colorScheme.onPrimary),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -262,9 +232,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen>
                         label: Text("common.retry".tr()),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: colorScheme.onSurface,
-                          side: BorderSide(
-                            color: colorScheme.outline.withOpacity(0.35),
-                          ),
+                          side: BorderSide(color: colorScheme.outline.withOpacity(0.35)),
                         ),
                       ),
                     ),

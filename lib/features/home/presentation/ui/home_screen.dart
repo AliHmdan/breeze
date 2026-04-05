@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:async';
 
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/have_order.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/services/money.dart';
 import 'package:breezefood/core/prices_helper.dart';
+import 'package:breezefood/features/app/bloc/app_cubit.dart' show AppCubit;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart';
 import 'package:breezefood/features/home/presentation/ui/home_scroll_controller.dart';
@@ -16,6 +18,8 @@ import 'package:breezefood/features/home/presentation/ui/sections/dicounts/disco
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discounts_meals/discount_home.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/sweets_restaurants.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/home_tabs_bar.dart';
+import 'package:breezefood/features/orders/model/cart_response.dart' show CartResponse;
+import 'package:breezefood/features/profile/presentation/cubit/profile_cubit.dart' show ProfileCubit;
 import 'package:breezefood/features/stores/presentation/ui/screens/most_popular.dart';
 import 'package:breezefood/features/assistant/presentation/ui/assistant_chat_sheet.dart';
 
@@ -35,6 +39,7 @@ import 'package:breezefood/features/super_market/market_page_price.dart';
 import 'package:breezefood/main.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
@@ -67,9 +72,25 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
 
   late final HomeCubit cubit;
 
+  Future<void> _bootstrap() async {
+    final home = getIt<HomeCubit>();
+    final profile = getIt<ProfileCubit>();
+    final cart = getIt<CartCubit>();
+
+    // // لو فشل GPS ما بدنا نوقف كل شيء
+    // try {
+    //   await home.sendMyLocationOnce();
+    // } catch (_) {}
+    print("ali mostafa for coding");
+
+    // load كلاتهم سوا
+    await Future.wait([home.load(), profile.load(), cart.loadCart()]);
+  }
+
   @override
   void initState() {
     super.initState();
+    _bootstrap();
 
     _robotBobController = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
 
@@ -151,6 +172,17 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
     return 0;
   }
 
+  String _extractImage(dynamic x) {
+    if (x == null) return "";
+    if (x is Map) return (x["cover_image"] ?? x["cover_image"] ?? "").toString();
+
+    try {
+      return ((x as dynamic).name ?? "").toString();
+    } catch (_) {}
+
+    return "";
+  }
+
   String _extractTitle(dynamic x) {
     if (x == null) return "";
     if (x is Map) return (x["name"] ?? x["title"] ?? "").toString();
@@ -186,6 +218,10 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
 
   Future<void> _openRestaurant(dynamic r) async {
     final id = _extractId(r);
+    final image = _extractImage(r);
+    print('heloo ${r}');
+    print('heloo ${image}');
+    // String image=r.
     if (id == 0) return;
 
     final changed = await Navigator.push(
@@ -238,14 +274,14 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
     return Padding(
       padding: padding,
       child: Shimmer.fromColors(
-        baseColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        highlightColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+        baseColor: AppColor.search,
+        highlightColor: AppColor.primaryColor.withOpacity(0.3),
         child: Container(
           height: height,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: AppColor.search,
             borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.35)),
+            border: Border.all(color: AppColor.primaryColor.withOpacity(0.35)),
           ),
         ),
       ),
@@ -294,21 +330,34 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10.h),
                 if (homeData?.nearbyRestaurants.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.open_now".tr(),
-                      all: "common.all".tr(),
-                      icon: Icons.arrow_forward_ios_outlined,
-                      ontap: () {
+                    child: InkWell(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AllResturant(restaurants: homeData?.nearbyRestaurants ?? [], onTap: _openRestaurant),
+                            // builder: (_) => AllResturant(restaurants: homeData?.nearbyRestaurants ?? [], onTap: _openRestaurant),
+                            builder: (_) => SweetsRestaurantsGridPage(restaurants: homeData!.nearbyRestaurants, screenTitle: "home.open_now".tr()),
                           ),
                         );
                       },
+                      child: CustomTitleSection(
+                        title: "home.open_now".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              // builder: (_) => AllResturant(restaurants: homeData?.nearbyRestaurants ?? [], onTap: _openRestaurant),
+                              builder: (_) => SweetsRestaurantsGridPage(restaurants: homeData!.nearbyRestaurants, screenTitle: "home.open_now".tr()),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 SizedBox(height: 0.h),
@@ -329,18 +378,26 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10.h),
                 if (homeData?.discounts.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.filters.discounts".tr(),
-                      all: "common.all".tr(),
-                      icon: Icons.arrow_forward_ios_outlined,
-                      ontap: () {
+                    child: InkWell(
+                      onTap: () {
                         Navigator.of(
                           context,
                         ).push(MaterialPageRoute(builder: (_) => DiscountRestaurantsGridPage(discounts: homeData?.discounts ?? [])));
                       },
+                      child: CustomTitleSection(
+                        title: "home.filters.discounts".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.of(
+                            context,
+                          ).push(MaterialPageRoute(builder: (_) => DiscountRestaurantsGridPage(discounts: homeData?.discounts ?? [])));
+                        },
+                      ),
                     ),
                   ),
                 SizedBox(height: 0.h),
@@ -361,18 +418,26 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
             builder: () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10.h),
                 if (homeData?.discountDelivery.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.filters.delivery".tr(),
-                      all: "common.all".tr(),
-                      icon: Icons.arrow_forward_ios_outlined,
-                      ontap: () {
+                    child: InkWell(
+                      onTap: () {
                         Navigator.of(
                           context,
                         ).push(MaterialPageRoute(builder: (_) => DiscountDeliveryGridPage(discountDelivery: homeData?.discountDelivery ?? [])));
                       },
+                      child: CustomTitleSection(
+                        title: "home.filters.delivery".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.of(
+                            context,
+                          ).push(MaterialPageRoute(builder: (_) => DiscountDeliveryGridPage(discountDelivery: homeData?.discountDelivery ?? [])));
+                        },
+                      ),
                     ),
                   ),
                 SizedBox(height: 0.h),
@@ -380,7 +445,7 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                     ? _shimmerBox(height: 130.h)
                     : state.maybeWhen(
                         loaded: (data) => Padding(
-                          padding: EdgeInsetsDirectional.only(start: 10.w),
+                          padding: EdgeInsetsDirectional.only(start: 0.w),
                           child: DiscountDeliveryHome(discountDelivery: data.discountDelivery),
                         ),
                         orElse: () => const SizedBox.shrink(),
@@ -400,23 +465,29 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
               builder: () => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 10.h),
                   if (homeData?.sweets.isNotEmpty == true)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: CustomTitleSection(
-                        title: "home.sweets".tr(),
-                        all: "common.all".tr(),
-                        icon: Icons.arrow_forward_ios_outlined,
-                        ontap: () {
+                      child: InkWell(
+                        onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => SweetsRestaurantsGridPage(restaurants: sweetsList)));
                         },
+                        child: CustomTitleSection(
+                          title: "home.sweets".tr(),
+                          all: "common.all".tr(),
+                          icon: Icons.arrow_forward_ios_outlined,
+                          ontap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => SweetsRestaurantsGridPage(restaurants: sweetsList)));
+                          },
+                        ),
                       ),
                     ),
                   SizedBox(height: 10.h),
                   loading
                       ? _shimmerBox(height: 178.h)
                       : Padding(
-                          padding: EdgeInsetsDirectional.only(start: 10.w),
+                          padding: EdgeInsetsDirectional.only(start: 0.w),
                           child: SweetsRestaurantsSection(restaurants: sweetsList, onTap: _openRestaurant),
                         ),
                 ],
@@ -434,21 +505,27 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
               builder: () => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 5.h),
                   if (homeData?.breakfastRestaurants.isNotEmpty == true)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: CustomTitleSection(
-                        title: "home.breakfast_restaurants".tr(),
-                        all: "common.all".tr(),
-                        icon: Icons.arrow_forward_ios_outlined,
-                        ontap: () {
+                      child: InkWell(
+                        onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => BreakfastRestaurantsGridPage(restaurants: breakfastList)));
                         },
+                        child: CustomTitleSection(
+                          title: "home.breakfast_restaurants".tr(),
+                          all: "common.all".tr(),
+                          icon: Icons.arrow_forward_ios_outlined,
+                          ontap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => BreakfastRestaurantsGridPage(restaurants: breakfastList)));
+                          },
+                        ),
                       ),
                     ),
                   SizedBox(height: 10.h),
                   Padding(
-                    padding: EdgeInsetsDirectional.only(start: 10.w),
+                    padding: EdgeInsetsDirectional.only(start: 0.w),
                     child: BreakfastRestaurantsSection(restaurants: breakfastList),
                   ),
                 ],
@@ -466,13 +543,21 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                 if (homeData?.supermarkets.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.super_market".tr(),
-                      all: "common.all".tr(),
-                      icon: Icons.arrow_forward_ios_outlined,
-                      ontap: () {
+                    child: InkWell(
+                      onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => SupermarketsGridPage(supermarkets: homeData?.supermarkets ?? [])));
                       },
+                      child: CustomTitleSection(
+                        title: "home.super_market".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => SupermarketsGridPage(supermarkets: homeData?.supermarkets ?? [])),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 SizedBox(height: 10.h),
@@ -494,11 +579,8 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                 if (homeData?.allRestaurants.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CustomTitleSection(
-                      title: "home.all_resturant".tr(),
-                      all: "common.all".tr(),
-                      icon: Icons.arrow_forward_ios_outlined,
-                      ontap: () {
+                    child: InkWell(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -506,6 +588,19 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                           ),
                         );
                       },
+                      child: CustomTitleSection(
+                        title: "home.all_resturant".tr(),
+                        all: "common.all".tr(),
+                        icon: Icons.arrow_forward_ios_outlined,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AllResturant(restaurants: homeData?.allRestaurants ?? [], onTap: _openRestaurant),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 SizedBox(height: 10.h),
@@ -533,60 +628,73 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
         }
 
         final fabBottomPadding = (showBottom ? 90.h : 24.h) + MediaQuery.of(context).padding.bottom;
+        final isDark = AppCubit.get(context).isThemDark();
 
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          floatingActionButton: Padding(
-            padding: EdgeInsets.only(bottom: fabBottomPadding),
-            child: FloatingActionButton(
-              heroTag: 'assistant_robot_fab',
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              highlightElevation: 0,
-              onPressed: () => showAssistantChatSheet(context),
-              child: SizedBox(
-                width: 56.w,
-                height: 56.w,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        width: 30.w,
-                        height: 8.h,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.14),
-                          borderRadius: BorderRadius.circular(999),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                              blurRadius: 10,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: isDark ? Color(0xff363535) : Color(0xffd9d6d6),
+
+            statusBarIconBrightness: Brightness.light, // icons color
+          ),
+          child: Scaffold(
+            // backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: AppColor.Dark,
+            floatingActionButton: Padding(
+              padding: EdgeInsets.only(bottom: fabBottomPadding),
+              child: FloatingActionButton(
+                heroTag: 'assistant_robot_fab',
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                highlightElevation: 0,
+                onPressed: () => showAssistantChatSheet(context),
+                child: SizedBox(
+                  width: 56.w,
+                  height: 56.w,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          width: 30.w,
+                          height: 8.h,
+                          decoration: BoxDecoration(
+                            // color: Theme.of(context).colorScheme.primary.withOpacity(0.14),
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                                blurRadius: 10,
+                                spreadRadius: 0,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    AnimatedBuilder(
-                      animation: _robotBob,
-                      builder: (context, child) {
-                        return Transform.translate(offset: Offset(0, _robotBob.value), child: child);
-                      },
-                      child: Image.asset('assets/icons/pnj ROBOT.png', width: 56.w, height: 56.w, fit: BoxFit.contain),
-                    ),
-                  ],
+                      AnimatedBuilder(
+                        animation: _robotBob,
+
+                        builder: (context, child) {
+                          return Transform.translate(offset: Offset(0, _robotBob.value), child: child);
+                        },
+                        child: Image.asset('assets/icons/pnj ROBOT.png', width: 56.w, height: 56.w, fit: BoxFit.contain),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          body: Stack(
-            children: [
-              SafeArea(
-                child: RefreshIndicator(
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            body: Stack(
+              children: [
+                RefreshIndicator(
                   onRefresh: _refreshHomeAndCart,
+                  color: AppColor.primaryColor,
+                  backgroundColor: AppColor.Dark,
+                  elevation: 0,
+
                   child: CustomScrollView(
                     controller: homeScroll.controller,
                     physics: const BouncingScrollPhysics(),
@@ -595,7 +703,7 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                         child: Column(
                           children: [
                             AppbarHome(home: homeData, homeCubit: cubit),
-                            SizedBox(height: 14.h),
+                            // SizedBox(height: 14.h),
                           ],
                         ),
                       ),
@@ -607,7 +715,8 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                           child: SizedBox.expand(
                             child: Container(
                               key: homeScroll.tabsKey,
-                              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 7),
+                              color: AppColor.search,
+                              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 0),
                               child: ValueListenableBuilder<int>(
                                 valueListenable: homeScroll.activeIndex,
                                 builder: (_, active, __) {
@@ -641,27 +750,27 @@ class _HomeState extends State<Home> with RouteAware, SingleTickerProviderStateM
                     ],
                   ),
                 ),
-              ),
-              // ===== Bottom action (Cart / Order) =====
-              if (showBottom)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 16 + MediaQuery.of(context).padding.bottom,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: BlocBuilder<HomeCubit, HomeState>(
-                      bloc: cubit,
-                      builder: (context, st) {
-                        final haveOrder = st.maybeWhen(loaded: (d) => d.haveOrder, orElse: () => null);
+                // ===== Bottom action (Cart / Order) =====
+                if (showBottom)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 16 + MediaQuery.of(context).padding.bottom,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: BlocBuilder<HomeCubit, HomeState>(
+                        bloc: cubit,
+                        builder: (context, st) {
+                          final haveOrder = st.maybeWhen(loaded: (d) => d.haveOrder, orElse: () => null);
 
-                        // ✅ مرر haveOrder (قد يكون null) وخلي الويدجت تقرر شو تعرض
-                        return _HomeBottomAction(homeCubit: cubit, haveOrder: haveOrder);
-                      },
+                          // ✅ مرر haveOrder (قد يكون null) وخلي الويدجت تقرر شو تعرض
+                          return _HomeBottomAction(homeCubit: cubit, haveOrder: haveOrder);
+                        },
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -675,6 +784,14 @@ class _HomeBottomAction extends StatelessWidget {
 
   const _HomeBottomAction({required this.homeCubit, required this.haveOrder});
 
+  double totalPriceForItems(CartResponse? cart) {
+    double sum = 0.0;
+    for (int i = 0; i < cart!.items.length; i++) {
+      sum = sum + cart!.items[i].totalPrice;
+    }
+    return sum;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CartCubit, CartState>(
@@ -685,7 +802,11 @@ class _HomeBottomAction extends StatelessWidget {
         if (cart != null) {
           final summary = CartSummary.from(cart);
           if (summary.hasCart) {
-            final title = "${'cart.view_cart'.tr()} • ${summary.count} • ${context.syp(summary.total, decimals: 0)}";
+            final title =
+                "${'cart.view_cart'.tr()}      "
+                // "• ${summary.count} • "
+                // "${context.syp(summary.total, decimals: 0)}";
+                "${context.syp(totalPriceForItems(cart), decimals: 0)}";
 
             return CustomButton(
               title: title,
@@ -698,7 +819,9 @@ class _HomeBottomAction extends StatelessWidget {
                         BlocProvider.value(value: context.read<CartCubit>()),
                         BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
                       ],
-                      child: const RequestOrderScreen(),
+                      child: RequestOrderScreen(
+                        // addressTitle: context.read<HomeCubit>().homeData!.provinceDetected ?? ''
+                      ),
                     ),
                   ),
                 );

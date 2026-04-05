@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/bottom_cart_action.dart';
+import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart' show HomeCubit;
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/model/active_orders_response.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,7 @@ class CartActionButton extends StatelessWidget {
   final VoidCallback onViewCart;
   final OrderInfo? haveOrder;
 
-  const CartActionButton({
-    super.key,
-    required this.onViewCart,
-    required this.haveOrder,
-  });
+  const CartActionButton({super.key, required this.onViewCart, required this.haveOrder});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +46,9 @@ class SupermarketBottomButton extends StatelessWidget {
                 BlocProvider.value(value: context.read<CartCubit>()),
                 BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
               ],
-              child: const RequestOrderScreen(),
+              child: RequestOrderScreen(
+                // addressTitle: context.read<HomeCubit>().homeData!.provinceDetected ?? ''
+              ),
             ),
           ),
         );

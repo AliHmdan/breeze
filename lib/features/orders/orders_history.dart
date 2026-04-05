@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:breezefood/features/orders/model/active_orders_response.dart'; // OrderBundle
@@ -25,6 +26,13 @@ class _OrdersHistoryState extends State<OrdersHistory> {
     await context.read<OrdersCubit>().loadHistory();
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    // _refresh();
+    super.initState();
+  }
+
   String _fullUrl(String path) {
     final p = (path).trim();
     if (p.isEmpty) return "";
@@ -32,9 +40,7 @@ class _OrdersHistoryState extends State<OrdersHistory> {
 
     // السيرفر يرجّع أحياناً بدون "/" أو مع "//"
     final fixed = p.startsWith("/") ? p.substring(1) : p;
-    return "https://breezefood.cloud/$fixed"
-        .replaceAll("//", "/")
-        .replaceFirst("https:/", "https://");
+    return "https://breezefood.cloud/$fixed".replaceAll("//", "/").replaceFirst("https:/", "https://");
   }
 
   Color _statusColor(String status) {
@@ -54,12 +60,7 @@ class _OrdersHistoryState extends State<OrdersHistory> {
     if (!mounted) return;
 
     // 2️⃣ انتقل لصفحة تفاصيل المطعم
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ResturantDetails(restaurant_id: bundle.restaurant.id),
-      ),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => ResturantDetails(restaurant_id: bundle.restaurant.id)));
   }
 
   Widget _buildOrderCard(OrderBundle bundle) {
@@ -86,12 +87,7 @@ class _OrdersHistoryState extends State<OrdersHistory> {
                   width: 60.w,
                   height: 60.h,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    "assets/images/003.jpg",
-                    width: 60.w,
-                    height: 60.h,
-                    fit: BoxFit.cover,
-                  ),
+                  errorBuilder: (_, __, ___) => Image.asset("assets/images/003.jpg", width: 60.w, height: 60.h, fit: BoxFit.cover),
                 ),
               ),
 
@@ -107,39 +103,21 @@ class _OrdersHistoryState extends State<OrdersHistory> {
                         Expanded(
                           child: Text(
                             restaurant.name,
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurface,
-                            ),
+                            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600, color: AppColor.white),
                           ),
                         ),
                         if (item.isVip)
                           Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 4.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                            decoration: BoxDecoration(color: AppColor.white, borderRadius: BorderRadius.circular(999)),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  Icons.emoji_events,
-                                  size: 14.sp,
-                                  color: colorScheme.onPrimary,
-                                ),
+                                Icon(Icons.emoji_events, size: 14.sp, color: AppColor.Dark),
                                 SizedBox(width: 4.w),
                                 Text(
                                   "orders.vip_badge".tr(),
-                                  style: TextStyle(
-                                    color: colorScheme.onPrimary,
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: TextStyle(color: AppColor.Dark, fontSize: 11.sp, fontWeight: FontWeight.w800),
                                 ),
                               ],
                             ),
@@ -152,11 +130,7 @@ class _OrdersHistoryState extends State<OrdersHistory> {
                     /// السعر
                     Text(
                       "${item.totalPrice.toStringAsFixed(2)} ${"common.currency".tr()}",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: colorScheme.onSurface,
-                      ),
+                      style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: AppColor.white),
                     ),
 
                     const SizedBox(height: 6),
@@ -168,15 +142,8 @@ class _OrdersHistoryState extends State<OrdersHistory> {
               Container(
                 width: 42,
                 height: 42,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.refresh_rounded),
-                  color: colorScheme.onSurface,
-                  onPressed: () => _onReorderPressed(bundle),
-                ),
+                decoration: BoxDecoration(color: AppColor.search, shape: BoxShape.circle),
+                child: IconButton(icon: const Icon(Icons.refresh_rounded), color: AppColor.white, onPressed: () => _onReorderPressed(bundle)),
               ),
             ],
           ),
@@ -186,18 +153,12 @@ class _OrdersHistoryState extends State<OrdersHistory> {
           ///
           RichText(
             text: TextSpan(
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: colorScheme.onSurface.withOpacity(0.7),
-              ),
+              style: TextStyle(fontSize: 12.sp, color: AppColor.white.withOpacity(0.7)),
               children: [
                 TextSpan(text: "$date • "),
                 TextSpan(
                   text: "Delivered",
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: AppColor.white, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -212,11 +173,7 @@ class _OrdersHistoryState extends State<OrdersHistory> {
           const SizedBox(height: 14),
 
           /// Divider خفيف جداً
-          Divider(
-            color: colorScheme.outline.withOpacity(0.25),
-            thickness: 1,
-            height: 1,
-          ),
+          Divider(color: AppColor.search.withOpacity(0.25), thickness: 1, height: 1),
         ],
       ),
     );
@@ -228,53 +185,35 @@ class _OrdersHistoryState extends State<OrdersHistory> {
 
     return BlocBuilder<OrdersCubit, OrdersState>(
       builder: (context, state) {
-        final orders = state.maybeWhen(
-          historyLoaded: (o) => o,
-          orElse: () => cubit.historyCache,
-        );
+        final orders = state.maybeWhen(historyLoaded: (o) => o, orElse: () => cubit.historyCache);
 
-        final isLoading = state.maybeWhen(
-          loadingHistory: () => true,
-          orElse: () => false,
-        );
+        final isLoading = state.maybeWhen(loadingHistory: () => true, orElse: () => false);
 
-        final errorMsg = state.maybeWhen(
-          errorHistory: (m) => m,
-          orElse: () => null,
-        );
+        final errorMsg = state.maybeWhen(errorHistory: (m) => m, orElse: () => null);
 
         if (isLoading && orders.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColor.primaryColor));
         }
 
         if (errorMsg != null && orders.isEmpty) {
           return Center(
-            child: Text(
-              errorMsg,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            child: Text(errorMsg, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           );
         }
 
         if (orders.isEmpty) {
           return Center(
-            child: Text(
-              "orders.empty_history".tr(),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
+            child: Text("orders.empty_history".tr(), style: TextStyle(color: AppColor.white.withOpacity(0.7))),
           );
         }
 
         return RefreshIndicator(
           onRefresh: _refresh,
+          color: AppColor.primaryColor,
+          elevation: 0,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              for (final order in orders) _buildOrderCard(order),
-              const SizedBox(height: 40),
-            ],
+            children: [for (final order in orders) _buildOrderCard(order), const SizedBox(height: 40)],
           ),
         );
       },

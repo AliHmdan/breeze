@@ -5,23 +5,18 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RateDialogResult {
-  final double? rating;  
-  final bool delete;  
+  final double? rating;
+  final bool delete;
   const RateDialogResult.submit(this.rating) : delete = false;
   const RateDialogResult.delete() : rating = null, delete = true;
 }
 
 class RateDialog extends StatefulWidget {
-  final double currentRating; 
-  final int? reviewId;  
-  final bool allowEditWhenReviewed;  
+  final double currentRating;
+  final int? reviewId;
+  final bool allowEditWhenReviewed;
 
-  const RateDialog({
-    super.key,
-    required this.currentRating,
-    required this.reviewId,
-    this.allowEditWhenReviewed = false,
-  });
+  const RateDialog({super.key, required this.currentRating, required this.reviewId, this.allowEditWhenReviewed = false});
 
   bool get hasReview => reviewId != null && (reviewId ?? 0) > 0;
 
@@ -46,7 +41,8 @@ class _RateDialogState extends State<RateDialog> {
     final readOnly = hasReview && widget.allowEditWhenReviewed == false;
 
     return Dialog(
-      backgroundColor: Colors.black87,
+      // backgroundColor: Colors.black87,
+      backgroundColor: AppColor.Dark,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       child: Padding(
         padding: EdgeInsets.all(20.w),
@@ -57,7 +53,7 @@ class _RateDialogState extends State<RateDialog> {
               alignment: AlignmentDirectional.topStart,
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close, color: Colors.white),
+                child: Icon(Icons.close, color: AppColor.white),
               ),
             ),
             SizedBox(height: 10.h),
@@ -67,11 +63,7 @@ class _RateDialogState extends State<RateDialog> {
                   ? "reviews.your_rate_title"
                         .tr() // ضيفها بالترجمة
                   : "reviews.rate_title".tr(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: AppColor.white, fontSize: 20.sp, fontWeight: FontWeight.w600),
             ),
 
             SizedBox(height: 15.h),
@@ -88,10 +80,8 @@ class _RateDialogState extends State<RateDialog> {
                   itemSize: 35,
                   unratedColor: Colors.white30,
                   itemPadding: EdgeInsets.symmetric(horizontal: 4.w),
-                  itemBuilder: (context, _) =>
-                      const Icon(Icons.star, color: Colors.amber),
-                  onRatingUpdate: (rating) =>
-                      setState(() => selectedRate = rating),
+                  itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
+                  onRatingUpdate: (rating) => setState(() => selectedRate = rating),
                 ),
               ),
             ),
@@ -100,18 +90,15 @@ class _RateDialogState extends State<RateDialog> {
 
             Text(
               selectedRate.toStringAsFixed(1),
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              style: TextStyle(color: AppColor.white, fontSize: 14.sp),
             ),
 
             SizedBox(height: 10.h),
 
             Text(
-              hasReview
-                  ? "reviews.already_rated_hint"
-                        .tr()  
-                  : "reviews.rate_hint".tr(),
+              hasReview ? "reviews.already_rated_hint".tr() : "reviews.rate_hint".tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+              style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp),
             ),
 
             SizedBox(height: 20.h),
@@ -122,16 +109,11 @@ class _RateDialogState extends State<RateDialog> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                   ),
                   onPressed: () {
-                    Navigator.pop(
-                      context,
-                      RateDialogResult.submit(selectedRate),
-                    );
+                    Navigator.pop(context, RateDialogResult.submit(selectedRate));
                   },
                   child: Text(
                     "reviews.submit".tr(),
@@ -153,11 +135,7 @@ class _RateDialogState extends State<RateDialog> {
                   },
                   child: Text(
                     "reviews.delete".tr(),
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(color: AppColor.red, fontSize: 13.sp, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -173,25 +151,13 @@ class _RateDialogState extends State<RateDialog> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF222222),
-        title: Text(
-          "reviews.delete_confirm_title".tr(),
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          "reviews.delete_confirm_body".tr(),
-          style: const TextStyle(color: Colors.white70),
-        ),
+        title: Text("reviews.delete_confirm_title".tr(), style: const TextStyle(color: Colors.white)),
+        content: Text("reviews.delete_confirm_body".tr(), style: const TextStyle(color: Colors.white70)),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text("reviews.delete_confirm_no".tr()),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("reviews.delete_confirm_no".tr())),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              "reviews.delete_confirm_yes".tr(),
-              style: const TextStyle(color: Colors.redAccent),
-            ),
+            child: Text("reviews.delete_confirm_yes".tr(), style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -199,11 +165,7 @@ class _RateDialogState extends State<RateDialog> {
   }
 }
 
-Future<RateDialogResult?> showRateDialog(
-  BuildContext context, {
-  required double currentRating,
-  required int? reviewId,
-}) {
+Future<RateDialogResult?> showRateDialog(BuildContext context, {required double currentRating, required int? reviewId}) {
   return showDialog<RateDialogResult>(
     context: context,
     barrierDismissible: true,

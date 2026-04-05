@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,16 +13,7 @@ class CustomSearch extends StatelessWidget {
   final double height;
   final double borderRadius;
 
-  const CustomSearch({
-    super.key,
-    this.hint,
-    this.icon,
-    this.boxicon,
-    this.onTap,
-    this.readOnly = true,
-    this.height = 40,
-    this.borderRadius = 30,
-  });
+  const CustomSearch({super.key, this.hint, this.icon, this.boxicon, this.onTap, this.readOnly = true, this.height = 40, this.borderRadius = 30});
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +25,11 @@ class CustomSearch extends StatelessWidget {
           Container(
             width: 40.w,
             height: 40.w,
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(50.r),
-            ),
+            decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(50.r)),
             child: IconButton(
               icon: Icon(
                 icon,
-                color: colorScheme.onSurface,
+                color: AppColor.white,
                 size: 18.sp, // ✅ متجاوب
               ),
               onPressed: () => Navigator.pop(context),
@@ -56,25 +45,27 @@ class CustomSearch extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.sp,
                 height: 1.2, // ✅ توازن النص داخل الحقل
+                color: AppColor.white,
               ),
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurface.withOpacity(0.65),
+                  // color: AppColor.white.withOpacity(0.65),
+                  // color: AppColor.white,
+                  color: AppColor.white.withOpacity(0.55),
                   fontSize: 14.sp,
-                  fontFamily:
-                      Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'Cairo'
-                      : 'Inter',
+                  fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
                 ),
 
                 prefixIcon: Padding(
-                  padding: EdgeInsets.all(10.w), //تحكم بحجم الأيقونة
+                  padding: EdgeInsetsDirectional.only(top: 10.w, bottom: 10.w, start: 140.w), //تحكم بحجم الأيقونة
                   child: SvgPicture.asset(
                     'assets/icons/search.svg',
-                    color: colorScheme.onSurface.withOpacity(0.65),
-                    width: 8.w,
-                    height: 8.w,
+                    // color: colorScheme.onSurface.withOpacity(0.65),
+                    // color: AppColor.white,
+                    color: AppColor.white.withOpacity(0.55),
+                    width: 20.w,
+                    height: 20.w,
                   ),
                 ),
                 // ✅ هذه أهم نقطة لضبط الارتفاع
@@ -83,23 +74,21 @@ class CustomSearch extends StatelessWidget {
                   horizontal: 12.w,
                 ),
                 filled: true,
-                fillColor: colorScheme.surface,
+                fillColor: AppColor.Dark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(borderRadius.r),
                   borderSide: BorderSide(
-                    color: colorScheme.primary, // أخضر عند الفوكس
+                    color: Colors.transparent, // أخضر عند الفوكس
                     width: 1.2,
                   ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(borderRadius.r),
-                  borderSide: BorderSide.none,
-                ),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(borderRadius.r), borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(borderRadius.r),
 
                   borderSide: BorderSide(
-                    color: colorScheme.primary, // أخضر عند الفوكس
+                    // color: colorScheme.primary, // أخضر عند الفوكس
+                    color: Colors.transparent,
                     width: 1.2,
                   ),
                 ),

@@ -30,41 +30,33 @@ class _LanguageState extends State<Language> {
     await context.setLocale(Locale(code));
 
     // ✅ Restart ناعم حتى يتطبق كلشي (RTL/LTR + خطوط + UI)
-    RestartWidget.restartApp(context);
+    // RestartWidget.restartApp(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.Dark,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.h),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: CustomAppbarProfile(
-            title: "language".tr(),
-            icon: Icons.arrow_back_ios,
-            ontap: () => Navigator.pop(context),
-          ),
-        ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            children: [
-              _LangButton(
-                label: "english".tr(),
-                active: selected == "en",
-                onTap: () => _setLang("en"),
-              ),
-              SizedBox(height: 12.h),
-              _LangButton(
-                label: "arabic".tr(),
-                active: selected == "ar",
-                onTap: () => _setLang("ar"),
-              ),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColor.Dark,
+        // appBar: PreferredSize(
+        //   preferredSize: Size.fromHeight(60.h),
+        //   child: Padding(
+        //     padding: EdgeInsets.symmetric(horizontal: 16.w),
+        //     child: CustomAppbarProfile(title: "language".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
+        //   ),
+        // ),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                CustomAppbarProfile(title: "profile.language".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
+                SizedBox(height: 15.h),
+                _LangButton(label: "profile.english".tr(), active: selected == "en", onTap: () => _setLang("en")),
+                SizedBox(height: 12.h),
+                _LangButton(label: "profile.arabic".tr(), active: selected == "ar", onTap: () => _setLang("ar")),
+              ],
+            ),
           ),
         ),
       ),
@@ -77,11 +69,7 @@ class _LangButton extends StatelessWidget {
   final bool active;
   final VoidCallback onTap;
 
-  const _LangButton({
-    required this.label,
-    required this.active,
-    required this.onTap,
-  });
+  const _LangButton({required this.label, required this.active, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -91,18 +79,11 @@ class _LangButton extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
-        decoration: BoxDecoration(
-          color: active ? AppColor.primaryColor : Colors.grey[800],
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+        decoration: BoxDecoration(color: active ? AppColor.primaryColor : Colors.grey[800], borderRadius: BorderRadius.circular(12.r)),
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
     );

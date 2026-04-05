@@ -69,7 +69,7 @@ class _RDTabsBarInnerState extends State<_RDTabsBarInner> {
     final ctl = DefaultTabController.of(context);
 
     return SizedBox(
-      height: 38.h,
+      height: 33.h,
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
@@ -92,11 +92,14 @@ class _RDTabsBarInnerState extends State<_RDTabsBarInner> {
             unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(width: 3.h, color: AppColor.white),
-              insets: EdgeInsets.symmetric(horizontal: 10.w),
+              borderSide: BorderSide(width: 3.3.h, color: AppColor.white),
+              borderRadius: BorderRadius.all(Radius.circular(12.w)),
+              // insets: EdgeInsets.symmetric(horizontal: 10.w),
+              // borderSide: BorderSide(width: 3.h, color: AppColor.white),
+              // insets: EdgeInsets.symmetric(horizontal: 10.w),
             ),
             dividerColor: Color(0xFFF9FAFB),
-            dividerHeight: -1.h,
+            dividerHeight: -20.h,
             tabs: widget.categories.map((t) => Tab(child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
           ),
         ],

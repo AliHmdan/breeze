@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart' show AppColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -32,6 +33,7 @@ class _HomeTabsBarState extends State<HomeTabsBar> {
       key: const ValueKey<String>("home_tabs_controller"),
       length: widget.titles.length,
       initialIndex: safe,
+
       child: _HomeTabsBarInner(titles: widget.titles, activeIndex: safe, onTap: widget.onTap),
     );
   }
@@ -81,7 +83,7 @@ class _HomeTabsBarInnerState extends State<_HomeTabsBarInner> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(height: 3.h, color: colorScheme.outline.withOpacity(0.25)),
+            child: Container(height: 3.h, color: AppColor.search),
           ),
 
           /// Tabs
@@ -91,22 +93,25 @@ class _HomeTabsBarInnerState extends State<_HomeTabsBarInner> {
             tabAlignment: TabAlignment.center,
             padding: EdgeInsets.zero,
             onTap: widget.onTap,
-            labelPadding: EdgeInsets.symmetric(horizontal: 14.w),
 
-            labelColor: colorScheme.onSurface,
-            unselectedLabelColor: colorScheme.onSurface.withOpacity(0.55),
-
-            labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w800),
-
-            unselectedLabelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
-
+            labelPadding: EdgeInsets.symmetric(horizontal: 12.w),
+            labelColor: AppColor.white,
+            unselectedLabelColor: AppColor.white.withOpacity(0.55),
+            labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+            unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             indicatorSize: TabBarIndicatorSize.tab,
-
             indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(width: 2.h, color: colorScheme.onSurface),
-              insets: EdgeInsets.symmetric(horizontal: 12.w),
+              borderSide: BorderSide(width: 3.3.h, color: AppColor.white),
+              borderRadius: BorderRadius.all(Radius.circular(12.w)),
+              // insets: EdgeInsets.symmetric(horizontal: 10.w),
+              // borderSide: BorderSide(width: 3.h, color: AppColor.white),
+              // insets: EdgeInsets.symmetric(horizontal: 10.w),
             ),
 
+            // dividerColor: Color(0xFFF9FAFB),
+            // dividerHeight: -20.h,
+            dividerColor: AppColor.Dark,
+            // dividerHeight: 0.h,
             tabs: widget.titles.map((t) => Tab(child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
           ),
         ],

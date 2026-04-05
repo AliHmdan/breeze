@@ -1,5 +1,7 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
+import 'package:breezefood/features/app/bloc/app_cubit.dart' show AppCubit;
 import 'package:breezefood/features/home/model/home_response.dart';
 import 'package:breezefood/features/home/presentation/ui/sections/dicounts/discount_card.dart';
 import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
@@ -7,6 +9,7 @@ import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_de
 import 'package:breezefood/features/stores/presentation/ui/screens/resturant_details.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DiscountHome extends StatelessWidget {
@@ -45,16 +48,17 @@ class DiscountHome extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsetsDirectional.only(top: 10, start: 16, end: 0.2),
+          padding: EdgeInsetsDirectional.only(top: 10, start: 0, end: 0.2),
           child: SizedBox(
-            height: 146.h,
+            height: 148.h,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / 2.2;
+                final itemWidth = constraints.maxWidth / 2.3;
 
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: discounts.length,
+                  padding: EdgeInsetsDirectional.only(start: 11.w),
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
                     final d = discounts[index];
@@ -66,7 +70,8 @@ class DiscountHome extends StatelessWidget {
                     final hasDeliveryDiscount = d.deliveryDiscount != null && base != null && fin != null;
                     return Container(
                       width: itemWidth,
-                      margin: EdgeInsetsDirectional.only(end: 10.w),
+                      // margin: EdgeInsetsDirectional.only(end: 10.w),
+                      margin: EdgeInsetsDirectional.only(start: index == 0 ? 9.w : 0, end: 10.w),
                       child: Discount(
                         isOpen: d.isOpen, // ✅ هون
                         onTap: () => openRestaurantById(context, d.restaurantId),
@@ -137,57 +142,65 @@ class DiscountRestaurantsGridPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50.h),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: CustomAppbarProfile(title: "home.filters.discounts".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.of(context).pop()),
-        ),
+    final isDark = AppCubit.get(context).isThemDark();
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: AppColor.Dark,
+
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark, // icons color
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final crossAxisCount = _getCrossAxisCount(constraints.maxWidth);
+      child: Scaffold(
+        backgroundColor: AppColor.Dark,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(50.h),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: CustomAppbarProfile(title: "home.filters.discounts".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.of(context).pop()),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final crossAxisCount = _getCrossAxisCount(constraints.maxWidth);
 
-            return GridView.builder(
-              physics: const BouncingScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 8.h,
-                crossAxisSpacing: 10.w,
-                childAspectRatio: 0.55, // More compact
-                mainAxisExtent: 150.h, // More compact
-              ),
-              itemCount: discounts.length,
-              itemBuilder: (context, index) {
-                final d = discounts[index];
-                final base = d.deliveryBaseFee;
-                final fin = d.deliveryFinalFee;
+              return GridView.builder(
+                physics: const BouncingScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  mainAxisSpacing: 8.h,
+                  crossAxisSpacing: 10.w,
+                  childAspectRatio: 0.55, // More compact
+                  mainAxisExtent: 150.h, // More compact
+                ),
+                itemCount: discounts.length,
+                itemBuilder: (context, index) {
+                  final d = discounts[index];
+                  final base = d.deliveryBaseFee;
+                  final fin = d.deliveryFinalFee;
 
-                // يوجد خصم توصيل فقط إذا deliveryDiscount موجود
-                final hasDeliveryDiscount = d.deliveryDiscount != null && base != null && fin != null;
+                  // يوجد خصم توصيل فقط إذا deliveryDiscount موجود
+                  final hasDeliveryDiscount = d.deliveryDiscount != null && base != null && fin != null;
 
-                return Discount(
-                  isOpen: d.isOpen,
-                  onTap: () => openRestaurantById(context, d.restaurantId),
-                  imagePath: _logoUrl(d),
-                  subtitle: d.restaurantName,
-                  price: 0,
-                  discount: _discountText(d),
-                  rating: d.ratingAvg > 0 ? d.ratingAvg : 4.5, // Default rating if 0
-                  ratingCount: d.ratingCount > 0 ? d.ratingCount : 100, // Default count if 0
-                  hasFoodDiscount: d.foodDiscount != null,
-                  hasDeliveryDiscount: d.deliveryDiscount != null,
-                  showDeliveryPrices: true,
-                  deliveryOldPrice: hasDeliveryDiscount ? base : null,
-                  deliveryNewPrice: fin,
-                );
-              },
-            );
-          },
+                  return Discount(
+                    isOpen: d.isOpen,
+                    onTap: () => openRestaurantById(context, d.restaurantId),
+                    imagePath: _logoUrl(d),
+                    subtitle: d.restaurantName,
+                    price: 0,
+                    discount: _discountText(d),
+                    rating: d.ratingAvg > 0 ? d.ratingAvg : 4.5, // Default rating if 0
+                    ratingCount: d.ratingCount > 0 ? d.ratingCount : 100, // Default count if 0
+                    hasFoodDiscount: d.foodDiscount != null,
+                    hasDeliveryDiscount: d.deliveryDiscount != null,
+                    showDeliveryPrices: true,
+                    deliveryOldPrice: hasDeliveryDiscount ? base : null,
+                    deliveryNewPrice: fin,
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );

@@ -5,8 +5,10 @@ import 'package:breezefood/core/router/navigation_key.dart';
 import 'package:breezefood/core/services/app_notification_service.dart';
 import 'package:breezefood/core/services/launch_screen.dart';
 import 'package:breezefood/core/services/restart_widget.dart';
+import 'package:breezefood/core/services/shared_perfrences_key.dart' show AuthStorageHelper;
 import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_cubit.dart';
 import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart';
+import 'package:breezefood/features/main_shell.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,6 +21,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'features/app/bloc/app_cubit.dart';
 
+///
+/// NOTE FOR APP
+/// removeBack,saveBack,getBack used in hive to save the user action on home screen if he press the back button
+/// it wiil seve the statues and detect it in the main to launch the mainShall or launcher screen
+/// ///////////////////////////////
+
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 Future<void> main() async {
@@ -26,10 +34,6 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
 
   configEasyLoading();
-
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light, statusBarBrightness: Brightness.dark),
-  );
 
   await setupDi();
   await AppNotificationService.init();
@@ -40,7 +44,10 @@ Future<void> main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       saveLocale: true,
-      child: const RestartWidget(child: MyApp()),
+      child:
+          // const RestartWidget(child:
+          MyApp(),
+      // ),
     ),
   );
 
@@ -55,12 +62,91 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  String? userBack;
+
+  Future<void> getBackArrow() async {
+    userBack = await AuthStorageHelper.getBack();
+    print('userBack:$userBack');
+  }
+
   @override
   void initState() {
     super.initState();
 
     configEasyLoading();
+    WidgetsBinding.instance.addObserver(this);
+    getBackArrow();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    /// when back button and remove app with button  ////////////////////////////////////////////
+    if (state == AppLifecycleState.inactive) {
+      print('???????????????????????????????????????');
+      print('inactive');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
+    if (state == AppLifecycleState.hidden) {
+      print('???????????????????????????????????????');
+      print('hidden');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
+    if (state == AppLifecycleState.paused) {
+      print('???????????????????????????????????????');
+      print('paused');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
+
+    /// here just back button
+    if (state == AppLifecycleState.detached) {
+      print('???????????????????????????????????????');
+      print('detached');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
+
+    /// ////////////////////////////////////////////////////
+    if (state == AppLifecycleState.resumed) {
+      print('???????????????????????????????????????');
+      print('resumed');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
+    if (state == AppLifecycleState.values) {
+      print('???????????????????????????????????????');
+      print('${AppLifecycleState.values}');
+      print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      print('sssssssssssssssss');
+      print('ddddddddddd');
+      print('ffff');
+      print('qq');
+    }
   }
 
   @override
@@ -94,11 +180,11 @@ class _MyAppState extends State<MyApp> {
 
               SystemChrome.setSystemUIOverlayStyle(
                 SystemUiOverlayStyle(
-                  statusBarColor: Colors.transparent,
-                  statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-                  statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+                  statusBarColor: AppColor.Dark,
+                  // statusBarColor: AppColor.red,
                 ),
               );
+              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
               return MaterialApp(
                 navigatorObservers: [routeObserver],
@@ -106,7 +192,7 @@ class _MyAppState extends State<MyApp> {
                 debugShowCheckedModeBanner: false,
                 title: 'breeze food UI',
 
-                home: const LaunchScreen(),
+                home: userBack != null ? MainShell() : LaunchScreen(),
 
                 locale: context.locale,
                 supportedLocales: context.supportedLocales,
@@ -115,11 +201,23 @@ class _MyAppState extends State<MyApp> {
                 themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
                 theme: ThemeData(
                   useMaterial3: true,
+                  scaffoldBackgroundColor: AppColor.Dark,
                   colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange, brightness: Brightness.light),
+                  // appBarTheme: Color(0xffd9d6d6),
+                  // appBarTheme: AppBarThemeData(
+                  //   // backgroundColor: Color(0xffd9d6d6),
+                  //   systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Color(0xffd9d6d6)),
+                  // ),
                 ),
                 darkTheme: ThemeData(
                   useMaterial3: true,
+                  scaffoldBackgroundColor: AppColor.Dark,
                   colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange, brightness: Brightness.dark),
+                  // appBarTheme: Color(0xff363535),
+                  // appBarTheme: AppBarThemeData(
+                  //   // backgroundColor:Color(0xff363535),
+                  //   systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Color(0xff363535)),
+                  // ),
                 ),
 
                 builder: (context, widget) {

@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
@@ -17,13 +18,7 @@ class CachedAvatar extends StatelessWidget {
   final String fallbackAsset; // صورة افتراضية
   final VoidCallback? onTap;
 
-  const CachedAvatar({
-    super.key,
-    required this.url,
-    this.size = 40,
-    this.fallbackAsset = 'assets/images/01.jpg',
-    this.onTap,
-  });
+  const CachedAvatar({super.key, required this.url, this.size = 40, this.fallbackAsset = 'assets/images/01.jpg', this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +41,9 @@ class CachedAvatar extends StatelessWidget {
                   placeholder: (_, __) => Container(
                     color: colorScheme.surfaceContainerHighest,
                     alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 16.w,
-                      height: 16.w,
-                      child: const CircularProgressIndicator(strokeWidth: 2),
-                    ),
+                    child: SizedBox(width: 16.w, height: 16.w, child: const CircularProgressIndicator(strokeWidth: 2)),
                   ),
-                  errorWidget: (_, __, ___) =>
-                      Image.asset(fallbackAsset, fit: BoxFit.cover),
+                  errorWidget: (_, __, ___) => Image.asset(fallbackAsset, fit: BoxFit.cover),
                 ),
         ),
       ),
@@ -159,29 +149,24 @@ class CustomAppbarHome extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (image != null)
-                      SvgPicture.asset(
-                        image!,
-                        color: colorScheme.onSurface.withOpacity(0.7),
-                        width: 20,
-                        height: 20,
-                      ),
+                    // if (image != null)
+                    // SvgPicture.asset(
+                    //   image!,
+                    //   color: colorScheme.onSurface.withOpacity(0.7),
+                    //   width: 20,
+                    //   height: 20,
+                    // ),
                     SizedBox(width: image != null ? 6.w : 0),
                     Flexible(
                       child: Text(
                         title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: TextStyle(color: AppColor.white, fontSize: 13.sp, fontWeight: FontWeight.w800),
                       ),
                     ),
 
-                    if (icon != null)
-                      Icon(icon, color: colorScheme.onSurface.withOpacity(0.7), size: 22.sp),
+                    if (icon != null) Icon(icon, color: AppColor.white.withOpacity(0.7), size: 22.sp),
                   ],
                 ),
 
@@ -191,11 +176,7 @@ class CustomAppbarHome extends StatelessWidget {
                     subtitle!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 11.sp, fontWeight: FontWeight.w500),
                   ),
                 ],
               ],
@@ -208,10 +189,7 @@ class CustomAppbarHome extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => BlocProvider(
-                  create: (context) => getIt<NotificationCubit>(),
-                  child: NotificationPage(),
-                ),
+                builder: (context) => BlocProvider(create: (context) => getIt<NotificationCubit>(), child: NotificationPage()),
               ),
             );
           },
@@ -221,14 +199,9 @@ class CustomAppbarHome extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.outline, width: 2),
+              border: Border.all(color: AppColor.white.withOpacity(0.7), width: 2),
             ),
-            child: SvgPicture.asset(
-              'assets/icons/notification.svg',
-              color: colorScheme.onSurface,
-              width: 20,
-              height: 20,
-            ),
+            child: SvgPicture.asset('assets/icons/notification.svg', color: AppColor.white.withOpacity(0.7), width: 20, height: 20),
           ),
         ),
       ],
@@ -245,12 +218,7 @@ class _AvatarImage extends StatelessWidget {
     final full = UrlHelper.toFullUrl(url);
 
     if (full == null || full.isEmpty) {
-      return Image.asset(
-        'assets/images/01.jpg',
-        width: 40.w,
-        height: 40.h,
-        fit: BoxFit.cover,
-      );
+      return Image.asset('assets/images/01.jpg', width: 40.w, height: 40.h, fit: BoxFit.cover);
     }
 
     return Image.network(
@@ -258,12 +226,7 @@ class _AvatarImage extends StatelessWidget {
       width: 40.w,
       height: 40.h,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => Image.asset(
-        'assets/images/01.jpg',
-        width: 40.w,
-        height: 40.h,
-        fit: BoxFit.cover,
-      ),
+      errorBuilder: (_, __, ___) => Image.asset('assets/images/01.jpg', width: 40.w, height: 40.h, fit: BoxFit.cover),
     );
   }
 }

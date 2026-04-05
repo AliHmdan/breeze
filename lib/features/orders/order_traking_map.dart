@@ -244,6 +244,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsB
 
   @override
   Widget build(BuildContext context) {
+    double lat = _myLatLng?.latitude ?? 0;
+    double lon = _myLatLng?.longitude ?? 0;
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: MultiBlocListener(
@@ -261,103 +263,110 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsB
             },
           ),
         ],
-        child: Stack(
-          children: [
-            GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: const CameraPosition(target: LatLng(33.5138, 36.2765), zoom: 13),
-              onMapCreated: _onMapCreated,
-              markers: _markers,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              compassEnabled: false,
-            ),
+        child: lat != 0
+            ? Stack(
+                children: [
+                  GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(target: LatLng(lat, lon), zoom: 13),
+                    onMapCreated: _onMapCreated,
+                    markers: _markers,
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
+                    compassEnabled: false,
+                  ),
 
-            // زر رجوع
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 12.h,
-              left: 12.w,
-              child: Container(
-                decoration: BoxDecoration(color: AppColor.white, shape: BoxShape.circle),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: AppColor.black),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ),
-
-            // عنوان
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 12.h,
-              left: 70.w,
-              right: 14.w,
-              child: _TitleChip(text: "tracking.title".tr(namedArgs: {"id": widget.orderId.toString()})),
-            ),
-
-            // Status pill
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 62.h,
-              left: 16.w,
-              right: 16.w,
-              child: BlocBuilder<OrdersTrackingCubit, OrdersTrackingState>(
-                builder: (context, state) {
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: state.maybeWhen(
-                      loading: () =>
-                          _StatusPill(key: const ValueKey("l"), text: "tracking.loading".tr(), bg: Colors.white, fg: Colors.black, icon: Icons.sync),
-                      error: (mKey) => _StatusPill(
-                        key: const ValueKey("e"),
-                        text: mKey.tr(),
-                        bg: const Color(0xFFFFF1F1),
-                        fg: const Color(0xFFB00020),
-                        icon: Icons.error_outline,
+                  // زر رجوع
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 12.h,
+                    left: 12.w,
+                    child: Container(
+                      decoration: BoxDecoration(color: AppColor.white, shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios, color: AppColor.black),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                      tracking: (tracking, _, __) => _StatusPill(
-                        key: const ValueKey("t"),
-                        text: tracking ? "tracking.live".tr() : "tracking.not_available".tr(),
-                        bg: tracking ? const Color(0xFFEFFFF3) : const Color(0xFFFFF7E6),
-                        fg: tracking ? const Color(0xFF0A7A2F) : const Color(0xFF8A5A00),
-                        icon: tracking ? Icons.location_on : Icons.location_off,
-                      ),
-                      orElse: () => const SizedBox.shrink(),
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
 
-            // كارد السائق
-            Positioned(bottom: 20.h, left: 20.w, right: 20.w, child: const _DriverMiniCard()),
+                  // عنوان
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 12.h,
+                    left: 70.w,
+                    right: 14.w,
+                    child: _TitleChip(text: "tracking.title".tr(namedArgs: {"id": widget.orderId.toString()})),
+                  ),
 
-            // زر recenter
-            Positioned(
-              right: 16.w,
-              bottom: 120.h,
-              child: _RoundFab(icon: Icons.my_location, onTap: _recenter),
-            ),
+                  // Status pill
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 62.h,
+                    left: 16.w,
+                    right: 16.w,
+                    child: BlocBuilder<OrdersTrackingCubit, OrdersTrackingState>(
+                      builder: (context, state) {
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: state.maybeWhen(
+                            loading: () => _StatusPill(
+                              key: const ValueKey("l"),
+                              text: "tracking.loading".tr(),
+                              bg: Colors.white,
+                              fg: Colors.black,
+                              icon: Icons.sync,
+                            ),
+                            error: (mKey) => _StatusPill(
+                              key: const ValueKey("e"),
+                              text: mKey.tr(),
+                              bg: const Color(0xFFFFF1F1),
+                              fg: const Color(0xFFB00020),
+                              icon: Icons.error_outline,
+                            ),
+                            tracking: (tracking, _, __) => _StatusPill(
+                              key: const ValueKey("t"),
+                              text: tracking ? "tracking.live".tr() : "tracking.not_available".tr(),
+                              bg: tracking ? const Color(0xFFEFFFF3) : const Color(0xFFFFF7E6),
+                              fg: tracking ? const Color(0xFF0A7A2F) : const Color(0xFF8A5A00),
+                              icon: tracking ? Icons.location_on : Icons.location_off,
+                            ),
+                            orElse: () => const SizedBox.shrink(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
 
-            // الشيت فوق الخريطة
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: DraggableScrollableSheet(
-                  initialChildSize: 0.30,
-                  minChildSize: 0.16,
-                  maxChildSize: 0.92,
-                  snap: true,
-                  snapSizes: const [0.16, 0.30, 0.60, 0.92],
-                  builder: (context, scrollController) {
-                    return BlocProvider.value(
-                      value: context.read<OrdersDetailsCubit>(),
-                      child: TrackingSheet(orderId: widget.orderId, scrollController: scrollController),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+                  // كارد السائق
+                  Positioned(bottom: 20.h, left: 20.w, right: 20.w, child: const _DriverMiniCard()),
+
+                  // زر recenter
+                  Positioned(
+                    right: 16.w,
+                    bottom: 120.h,
+                    child: _RoundFab(icon: Icons.my_location, onTap: _recenter),
+                  ),
+
+                  // الشيت فوق الخريطة
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: DraggableScrollableSheet(
+                        initialChildSize: 0.30,
+                        minChildSize: 0.16,
+                        maxChildSize: 0.92,
+                        snap: true,
+                        snapSizes: const [0.16, 0.30, 0.60, 0.92],
+                        builder: (context, scrollController) {
+                          return BlocProvider.value(
+                            value: context.read<OrdersDetailsCubit>(),
+                            child: TrackingSheet(orderId: widget.orderId, scrollController: scrollController),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
       ),
     );
   }

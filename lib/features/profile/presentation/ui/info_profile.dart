@@ -84,6 +84,7 @@ class _InfoProfileState extends State<InfoProfile> {
       return CachedNetworkImageProvider(busted);
     }
 
+    // return const AssetImage('assets/images/person.jpg');
     return const AssetImage('assets/images/person.jpg');
   }
 
@@ -131,7 +132,7 @@ class _InfoProfileState extends State<InfoProfile> {
                   if (avatars.isEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 18.h),
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: const Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
                     )
                   else
                     GridView.builder(
@@ -216,116 +217,141 @@ class _InfoProfileState extends State<InfoProfile> {
       builder: (context, state) {
         final isSaving = state.maybeWhen(loaded: (_, __, ___, ____, isSaving, _____) => isSaving, orElse: () => false);
 
-        return Scaffold(
-          backgroundColor: AppColor.Dark,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.h),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: CustomAppbarProfile(title: "profile.title".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
-            ),
-          ),
-          body: state.maybeWhen(
-            initial: () => const Center(child: CircularProgressIndicator()),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (msg) => Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      msg,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 10.h),
-                    TextButton(
-                      onPressed: () => widget.profileCubit.load(),
-                      child: Text("common.retry".tr(), style: const TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            loaded: (_, __, ___, ____, _____, ______) {
-              return SafeArea(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        return SafeArea(
+          child: Scaffold(
+            backgroundColor: AppColor.Dark,
+            // appBar: PreferredSize(
+            //   preferredSize: Size.fromHeight(60.h),
+            //   child: Padding(
+            //     padding: EdgeInsets.symmetric(horizontal: 16.w),
+            //     child: CustomAppbarProfile(title: "profile.title".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
+            //   ),
+            // ),
+            body: state.maybeWhen(
+              initial: () => const Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
+              loading: () => const Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
+              error: (msg) => Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(radius: 70.r, backgroundImage: _avatarImageProvider(state)),
-                          GestureDetector(
-                            onTap: () => _openAvatarPicker(state),
-                            child: Container(
-                              padding: EdgeInsets.all(8.r),
-                              decoration: BoxDecoration(
-                                color: AppColor.Dark,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColor.LightActive, width: 1.w),
-                              ),
-                              child: SvgPicture.asset(
-                                "assets/icons/edit.svg",
-                                width: 18.w,
-                                height: 18.h,
-                                colorFilter: ColorFilter.mode(AppColor.white, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        msg,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 35.h),
-
-                      CustomTextfaildInfo(label: "First Name", hint: "First Name", controller: _firstCtrl, keyboardType: TextInputType.text),
-                      SizedBox(height: 15.h),
-
-                      CustomTextfaildInfo(label: "Last Name", hint: "Last Name", controller: _lastCtrl, keyboardType: TextInputType.text),
-                      SizedBox(height: 15.h),
-
-                      CustomTextfaildInfo(
-                        label: "Phone Number",
-                        hint: "0938204147",
-                        controller: _phoneCtrl,
-                        keyboardType: TextInputType.phone,
-                        // readOnly: true,
-                      ),
-                      SizedBox(height: 30.h),
-
-                      CustomButton(
-                        title: isSaving ? "common.saving".tr() : "common.save".tr(),
-                        onPressed: isSaving
-                            ? null
-                            : () async {
-                                await widget.profileCubit.saveProfile(firstName: _firstCtrl.text.trim(), lastName: _lastCtrl.text.trim());
-
-                                final st = widget.profileCubit.state;
-                                final serverPath = st.maybeWhen(loaded: (user, _, __, ___, ____, _____) => user.profileImage, orElse: () => null);
-
-                                final full = UrlHelper.toFullUrl(serverPath);
-                                if (full != null && full.isNotEmpty) {
-                                  await CachedNetworkImage.evictFromCache(full);
-                                }
-
-                                if (!mounted) return;
-
-                                // ✅ Restart app shell
-                                Navigator.of(
-                                  context,
-                                ).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)), (route) => false);
-                              },
+                      SizedBox(height: 10.h),
+                      TextButton(
+                        onPressed: () => widget.profileCubit.load(),
+                        child: Text("common.retry".tr(), style: const TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
                 ),
-              );
-            },
-            orElse: () => const SizedBox.shrink(),
+              ),
+              loaded: (_, __, ___, ____, _____, ______) {
+                return SafeArea(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                    child: Column(
+                      children: [
+                        CustomAppbarProfile(title: "profile.title".tr(), icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
+                        SizedBox(height: 12.h),
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            CircleAvatar(radius: 70.r, backgroundImage: _avatarImageProvider(state)),
+                            GestureDetector(
+                              onTap: () => _openAvatarPicker(state),
+                              child: Container(
+                                padding: EdgeInsets.all(8.r),
+                                decoration: BoxDecoration(
+                                  color: AppColor.Dark,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColor.LightActive, width: 1.w),
+                                ),
+                                child: SvgPicture.asset(
+                                  "assets/icons/edit.svg",
+                                  width: 18.w,
+                                  height: 18.h,
+                                  colorFilter: ColorFilter.mode(AppColor.white, BlendMode.srcIn),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 35.h),
+
+                        LabelWidget(text: "auth.first_name".tr()),
+                        SizedBox(height: 5.h),
+                        CustomTextfaildInfo(label: "First Name", hint: "First Name", controller: _firstCtrl, keyboardType: TextInputType.text),
+                        SizedBox(height: 15.h),
+                        LabelWidget(text: "auth.last_name".tr()),
+                        SizedBox(height: 5.h),
+                        CustomTextfaildInfo(label: "Last Name", hint: "Last Name", controller: _lastCtrl, keyboardType: TextInputType.text),
+                        SizedBox(height: 15.h),
+                        LabelWidget(text: "auth.phone_number".tr()),
+                        SizedBox(height: 5.h),
+                        CustomTextfaildInfo(
+                          label: "Phone Number",
+                          hint: "0938204147",
+                          controller: _phoneCtrl,
+                          keyboardType: TextInputType.phone,
+                          // readOnly: true,
+                        ),
+                        SizedBox(height: 30.h),
+
+                        CustomButton(
+                          title: isSaving ? "common.saving".tr() : "common.save".tr(),
+                          onPressed: isSaving
+                              ? null
+                              : () async {
+                                  await widget.profileCubit.saveProfile(firstName: _firstCtrl.text.trim(), lastName: _lastCtrl.text.trim());
+
+                                  final st = widget.profileCubit.state;
+                                  final serverPath = st.maybeWhen(loaded: (user, _, __, ___, ____, _____) => user.profileImage, orElse: () => null);
+
+                                  final full = UrlHelper.toFullUrl(serverPath);
+                                  if (full != null && full.isNotEmpty) {
+                                    await CachedNetworkImage.evictFromCache(full);
+                                  }
+
+                                  if (!mounted) return;
+
+                                  // ✅ Restart app shell
+                                  Navigator.of(
+                                    context,
+                                  ).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)), (route) => false);
+                                },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              orElse: () => const SizedBox.shrink(),
+            ),
           ),
         );
       },
+    );
+  }
+}
+
+class LabelWidget extends StatelessWidget {
+  final String text;
+  const LabelWidget({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: TextStyle(color: AppColor.white, fontSize: 14.w, fontWeight: FontWeight.w400),
+        ),
+      ],
     );
   }
 }

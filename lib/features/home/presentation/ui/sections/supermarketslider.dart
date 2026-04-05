@@ -28,10 +28,11 @@ class Supermarketslider extends StatelessWidget {
     return SizedBox(
       height: 160.h,
       child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        padding: EdgeInsetsDirectional.only(start: 16.w),
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: restaurants.length,
+
         itemBuilder: (context, index) {
           final r = restaurants[index];
 
@@ -101,7 +102,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
 
-                        child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: Colors.white, fontsize: 13.sp),
+                        child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: AppColor.red, fontsize: 13.sp),
                       ),
                     ),
                   ),
@@ -120,7 +121,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
-                        style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -129,7 +130,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
             ],
           ),
 
-          SizedBox(height: 6.h), // نفس gapH الطبيعي
+          SizedBox(height: 0.h), // نفس gapH الطبيعي
           // 🏷️ Name (center مثل Discount)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 0.w),
@@ -140,7 +141,7 @@ class _SupermarketCardState extends State<_SupermarketCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
 
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(color: AppColor.white, fontSize: 15.sp, fontWeight: FontWeight.w700),
             ),
           ),
 
@@ -152,12 +153,12 @@ class _SupermarketCardState extends State<_SupermarketCard> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
+                Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.7)),
                 SizedBox(width: 4.w),
                 Text(
                   context.syp(feeText, decimals: 0),
                   // feeText,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 11.sp, fontWeight: FontWeight.w600),
                 ),
               ],
             ),

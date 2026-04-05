@@ -36,55 +36,59 @@ class _TermsState extends State<Terms> {
     return BlocBuilder<TermsCubit, TermsState>(
       bloc: cubit,
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: AppColor.Dark,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.h),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: CustomAppbarProfile(icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
-            ),
-          ),
-          body: state.when(
-            initial: () => const SizedBox.shrink(),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (msg) => Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Text(
-                  msg,
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
+        return SafeArea(
+          child: Scaffold(
+            backgroundColor: AppColor.Dark,
+            // appBar: PreferredSize(
+            //   preferredSize: Size.fromHeight(60.h),
+            //   child: Padding(
+            //     padding: EdgeInsets.symmetric(horizontal: 16.w),
+            //     child: CustomAppbarProfile(icon: Icons.arrow_back_ios, ontap: () => Navigator.pop(context)),
+            //   ),
+            // ),
+            body: state.when(
+              initial: () => const SizedBox.shrink(),
+              loading: () => const Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
+              error: (msg) => Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Text(
+                    msg,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-            loaded: (data) {
-              final locale = context.locale.languageCode; // ar / en
-              final text = data.byLocale(locale).replaceAll('\r\n', '\n').trim();
+              loaded: (data) {
+                final locale = context.locale.languageCode; // ar / en
+                final text = data.byLocale(locale).replaceAll('\r\n', '\n').trim();
 
-              return Padding(
-                padding: EdgeInsets.all(0.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    HeaderForProfileWidget(text: "profile.terms".tr()),
-
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 40.w),
-                        decoration: BoxDecoration(color: AppColor.Dark, borderRadius: BorderRadius.circular(12.r)),
-                        child: SingleChildScrollView(
-                          child: Text(
-                            text.isEmpty ? "—" : text,
-                            style: TextStyle(color: AppColor.white, fontSize: 14.sp, height: 1.65),
+                return Padding(
+                  padding: EdgeInsets.all(0.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // SizedBox(height: 33.h),
+                      // HeaderForProfileWidget(text: "profile.terms".tr()),
+                      CustomAppbarProfile(title: "profile.terms".tr(), ontap: () => Navigator.pop(context), icon: Icons.arrow_back_ios),
+                      SizedBox(height: 20.h),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 40.w),
+                          decoration: BoxDecoration(color: AppColor.Dark, borderRadius: BorderRadius.circular(12.r)),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              text.isEmpty ? "—" : text,
+                              style: TextStyle(color: AppColor.white, fontSize: 14.sp, height: 1.65),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         );
       },

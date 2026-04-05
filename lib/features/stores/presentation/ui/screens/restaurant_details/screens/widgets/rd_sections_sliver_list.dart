@@ -37,10 +37,7 @@ class RDSectionsSliverList extends StatelessWidget {
 
   Future<void> _openItem(BuildContext context, MenuItem item) async {
     final title = context.pick(ar: item.nameAr, en: item.nameEn);
-    final desc = context.pick(
-      ar: item.descriptionAr ?? "",
-      en: item.descriptionEn ?? "",
-    );
+    final desc = context.pick(ar: item.descriptionAr ?? "", en: item.descriptionEn ?? "");
     final img = imageUrl(item.image);
 
     await showAddOrderDialog(
@@ -66,23 +63,15 @@ class RDSectionsSliverList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count = [
-      categories.length,
-      itemsByCategory.length,
-      categoryKeys.length,
-    ].reduce((a, b) => a < b ? a : b);
+    final count = [categories.length, itemsByCategory.length, categoryKeys.length].reduce((a, b) => a < b ? a : b);
 
-    bool _isOffersTitle(String t) =>
-        t.toLowerCase().contains("offer") || t.contains("العروض");
+    bool _isOffersTitle(String t) => t.toLowerCase().contains("offer") || t.contains("العروض");
 
-    bool _isMostPopularTitle(String t) =>
-        t.toLowerCase().contains("most popular") || t.contains("الأكثر طلباً");
+    bool _isMostPopularTitle(String t) => t.toLowerCase().contains("most popular") || t.contains("الأكثر طلباً");
 
     return CustomScrollView(
       slivers: [
-        SliverOverlapInjector(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
+        SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
 
         SliverToBoxAdapter(
           child: Column(
@@ -94,25 +83,14 @@ class RDSectionsSliverList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(key: categoryKeys[i], height: 1),
-
                   if (_isOffersTitle(title))
-                    RDDiscountSection(
-                      items: items,
-                      fullImageUrl: (raw) => imageUrl(raw),
-                      onTap: (it) => _openItem(context, it),
-                    )
+                    RDDiscountSection(items: items, fullImageUrl: (raw) => imageUrl(raw), onTap: (it) => _openItem(context, it))
                   else if (_isMostPopularTitle(title))
-                    RDMostPopularSection(
-                      restaurantId: restaurantId,
-                      items: items,
-                      isRestaurantOpen: isRestaurantOpen,
-                      imageUrl: imageUrl,
-                    )
+                    RDMostPopularSection(restaurantId: restaurantId, items: items, isRestaurantOpen: isRestaurantOpen, imageUrl: imageUrl)
                   else
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 6),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: CustomTitleSection(
@@ -134,36 +112,25 @@ class RDSectionsSliverList extends StatelessWidget {
                             },
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         SizedBox(
                           height: 200.h,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsetsDirectional.only(
-                              start: 20,
-                            ),
+                            padding: const EdgeInsetsDirectional.only(start: 20),
                             itemCount: items.length,
                             itemBuilder: (context, x) {
                               final it = items[x];
                               final img = imageUrl(it.image);
 
-                              final mapped =
-                                  RestaurantDetailsMapper.mapMenuItemToHomeModel(
-                                    it: it,
-                                    imageUrl: img,
-                                  );
+                              final mapped = RestaurantDetailsMapper.mapMenuItemToHomeModel(it: it, imageUrl: img);
 
                               return GestureDetector(
                                 onTap: () => _openItem(context, it),
                                 child: Container(
                                   width: 142.w,
-                                  margin: EdgeInsetsDirectional.only(
-                                    end: x == items.length - 1 ? 0 : 8.w,
-                                  ),
-                                  child: PopularItemCard(
-                                    item: mapped,
-                                    isRestaurantOpen: isRestaurantOpen,
-                                  ),
+                                  margin: EdgeInsetsDirectional.only(end: x == items.length - 1 ? 0 : 8.w),
+                                  child: PopularItemCard(item: mapped, isRestaurantOpen: isRestaurantOpen),
                                 ),
                               );
                             },

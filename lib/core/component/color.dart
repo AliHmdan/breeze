@@ -31,10 +31,16 @@ class AppColor {
   static Color get search {
     final ctx = NavigationKey.navigatorKey.currentContext;
 
-    if (ctx == null) return const Color(0xff1A1A1A);
+    if (ctx == null) return const Color(0xff363535);
 
     final isDark = AppCubit.get(ctx).isThemDark();
-    return isDark ? const Color(0xff1A1A1A) : const Color(0xffF2F2F2);
+    return isDark
+        // ? const Color(0xff1A1A1A)
+        ? const Color(0xff363535)
+        :
+          // const Color(0xffF2F4F7);
+          const Color(0xffd9d6d6);
+    // Color(0xffF2F2F2);
   }
 
   // static const Color Dark = Color(0xff000201);
@@ -44,7 +50,7 @@ class AppColor {
     if (ctx == null) return const Color(0xff000201);
 
     final isDark = AppCubit.get(ctx).isThemDark();
-    return isDark ? const Color(0xff000201) : const Color(0xFFF9FAFB);
+    return isDark ? const Color(0xff000201) : const Color(0xFFFFFFFF);
   }
 
   // static const Color gryLighter = Color(0xffd5d2d2);

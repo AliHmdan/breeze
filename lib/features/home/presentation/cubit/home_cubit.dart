@@ -11,6 +11,7 @@ part 'home_cubit.freezed.dart';
 class HomeCubit extends Cubit<HomeState> {
   final HomeRepository repo;
   final AuthRepository authRepo;
+  HomeResponse? homeData;
 
   HomeCubit(this.repo, this.authRepo) : super(const HomeState.initial());
 
@@ -29,15 +30,9 @@ class HomeCubit extends Cubit<HomeState> {
     if (!ok) return;
 
     try {
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-      await updateUserLocation(
-        address: "موقعي الحالي",
-        lat: pos.latitude,
-        lon: pos.longitude,
-      );
+      await updateUserLocation(address: "موقعي الحالي", lat: pos.latitude, lon: pos.longitude);
 
       _sentLocationOnce = true;
     } catch (_) {
@@ -54,53 +49,51 @@ class HomeCubit extends Cubit<HomeState> {
       perm = await Geolocator.requestPermission();
     }
 
-    if (perm == LocationPermission.denied ||
-        perm == LocationPermission.deniedForever) {
+    if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
       return false;
     }
 
     return true;
   }
 
-  Future<void> updateUserLocation({
-    required String address,
-    required double lat,
-    required double lon,
-  }) async {
-    final res = await authRepo.addAddress(
-      address: address,
-      latitude: lat,
-      longitude: lon,
-      isDefault: true,
-    );
+  String? userAddress;
+  double? latUserAddress;
+  double? lonUserAddress;
+
+  Future<void> updateUserLocation({required String address, required double lat, required double lon}) async {
+    final res = await authRepo.addAddress(address: address, latitude: lat, longitude: lon, isDefault: true);
 
     if (!res.ok) {
       return;
     }
-    await load();
+    userAddress = address;
+    latUserAddress = lat;
+    lonUserAddress = lon;
+    // await load();
   }
 
- Future<void> load({bool silent = false}) async {
-  final prev = state.maybeWhen(loaded: (d) => d, orElse: () => null);
+  Future<void> load({bool silent = false}) async {
+    final prev = state.maybeWhen(loaded: (d) => d, orElse: () => null);
 
-  if (!silent || prev == null) {
-    emit(const HomeState.loading());
-  }
+    if (!silent || prev == null) {
+      emit(const HomeState.loading());
+    }
 
-  final res = await repo.getHome();
-  if (!res.ok) {
-    // لو silent ومعك prev، لا تطيّر الصفحة
-    if (silent && prev != null) return;
-    emit(HomeState.error(res.message ?? "خطأ"));
-    return;
-  }
+    final res = await repo.getHome();
+    if (!res.ok) {
+      // لو silent ومعك prev، لا تطيّر الصفحة
+      if (silent && prev != null) return;
+      emit(HomeState.error(res.message ?? "خطأ"));
+      return;
+    }
 
-  try {
-    final parsed = HomeResponse.fromJson((res.data as Map).cast<String, dynamic>());
-    emit(HomeState.loaded(parsed));
-  } catch (_) {
-    if (silent && prev != null) return;
-    emit(const HomeState.error("فشل قراءة بيانات الصفحة الرئيسية"));
+    try {
+      final parsed = HomeResponse.fromJson((res.data as Map).cast<String, dynamic>());
+      homeData = parsed;
+      emit(HomeState.loaded(parsed));
+    } catch (_) {
+      if (silent && prev != null) return;
+      emit(const HomeState.error("فشل قراءة بيانات الصفحة الرئيسية"));
+    }
   }
-}
 }

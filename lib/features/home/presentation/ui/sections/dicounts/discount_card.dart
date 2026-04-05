@@ -179,7 +179,7 @@ class Discount extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             ratingText,
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -227,7 +227,7 @@ class Discount extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+                  style: TextStyle(color: AppColor.white, fontSize: 15.sp, fontWeight: FontWeight.w700),
                 ),
               ),
               SizedBox(height: 1.h),
@@ -242,7 +242,7 @@ class Discount extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: colorScheme.onSurface),
+                            Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.7)),
                             SizedBox(width: 4.w),
 
                             // ✅ إذا يوجد خصم توصيل (سعرين)
@@ -250,8 +250,9 @@ class Discount extends StatelessWidget {
                               Text(
                                 context.syp(deliveryOldPrice, decimals: 0),
                                 style: TextStyle(
-                                  color: colorScheme.onSurface.withOpacity(0.6),
+                                  color: AppColor.white.withOpacity(0.6),
                                   decoration: TextDecoration.lineThrough,
+                                  decorationColor: AppColor.white.withOpacity(0.6),
                                   fontSize: 11.sp,
                                   // fontWeight: FontWeight.w600,
                                 ),
@@ -262,7 +263,7 @@ class Discount extends StatelessWidget {
                               Text(
                                 context.syp(deliveryNewPrice, decimals: 0),
                                 style: TextStyle(
-                                  color: colorScheme.error,
+                                  color: AppColor.red,
                                   fontSize: 11.sp,
                                   // fontWeight: FontWeight.w600
                                 ),
@@ -273,7 +274,7 @@ class Discount extends StatelessWidget {
                               Text(
                                 context.syp(deliveryNewPrice, decimals: 0),
                                 style: TextStyle(
-                                  color: colorScheme.onSurface,
+                                  color: AppColor.white.withOpacity(0.6),
                                   fontSize: 11.sp,
                                   // fontWeight: FontWeight.w900
                                 ),

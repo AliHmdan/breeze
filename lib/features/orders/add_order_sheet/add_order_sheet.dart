@@ -22,6 +22,7 @@ Future<void> showAddOrderDialog(
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    // enableDrag: true,
     useSafeArea: false,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.6),
@@ -32,36 +33,46 @@ Future<void> showAddOrderDialog(
       // ✅ خذ CartCubit من سياق الصفحة (context) مو sheetCtx
       final cartCubit = context.read<CartCubit>();
 
-      return MediaQuery.removePadding(
-        context: sheetCtx,
-        removeTop: true,
-        child: AnimatedPadding(
-          duration: const Duration(milliseconds: 600),
-          padding: EdgeInsets.only(bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
-          child: Container(
-            height: height,
-            decoration: BoxDecoration(
-              color: AppColor.Dark,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: BlocProvider.value(
-              value: cartCubit,
-              child: AddOrderBody(
-                restaurantId: restaurantId,
-                menuItemId: menuItemId,
-                title: title,
-                price: price,
-                oldPrice: oldPrice,
-                imagePathOrUrl: imagePathOrUrl,
-                description: description,
-                extras: extraMeals,
-                extraGroups: extraGroups,
-                isRestaurantOpen: isRestaurantOpen,
+      return DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return MediaQuery.removePadding(
+            context: sheetCtx,
+            removeTop: true,
+            child: AnimatedPadding(
+              duration: const Duration(milliseconds: 600),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
+              child: Container(
+                height: height,
+                decoration: BoxDecoration(
+                  color: AppColor.Dark,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: BlocProvider.value(
+                  value: cartCubit,
+                  child: AddOrderBody(
+                    restaurantId: restaurantId,
+                    menuItemId: menuItemId,
+                    scrollController: scrollController,
+                    title: title,
+                    price: price,
+                    oldPrice: oldPrice,
+                    imagePathOrUrl: imagePathOrUrl,
+                    description: description,
+                    extras: extraMeals,
+                    extraGroups: extraGroups,
+                    isRestaurantOpen: isRestaurantOpen,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       );
+      ;
     },
   );
 }

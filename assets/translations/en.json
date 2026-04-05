@@ -59,6 +59,10 @@
     "title": "Profile",
     "personal_info": "Personal info",
     "addresses": "Addresses",
+    "english": "english",
+    "arabic": "arabic",
+    "dark_mode": "Dark mode",
+    "light_mode": "Light Mode",
     "language": "Language",
     "help_center": "Help center",
     "terms": "Terms & Conditions",
@@ -148,7 +152,9 @@
     "item_notes_hint": "e.g. No onion, mild spicy...",
     "recommended_to_you": "Recommended to you",
     "recommended_loading": "Loading recommendations...",
-    "people_also_added": "People also added",
+    "orders_history": "Orders history",
+    "people_also_added": "Extras",
+    "order_note": "Order Note",
     "popular": "Popular",
     "view_cart": "View Cart",
     "view_cart_loading": "View Cart ..."
@@ -169,6 +175,7 @@
   "tracking.error_missing_locations": "Unable to load tracking data",
   "orders": {
     "cancel_order": "Cancel order",
+    "Order": "Order",
     "empty_history": "Your history is empty",
     "cancel_confirm_title": "Cancel order?",
     "cancel_confirm_body": "This will cancel your order. Are you sure?",
@@ -235,7 +242,7 @@
     "view_cart_loading": "View Cart ...",
     "view_cart": "View Cart • Qty: {count} • {total}",
     "min": "min",
-    "search": "Search",
+    "search": "Search ",
     "AddToCart": "Add"
   },
   "notifications": {
@@ -250,6 +257,10 @@
     }
   },
   "reviews": {
+    "Success":"Success!",
+    "Your_Order_was_completed.": "Your Order was completed.",
+    "Your_order_was_complete_successfully": "Your order was complete successfully!",
+    "done": "Done",
     "your_rate_title": "Your rating",
     "already_rated_hint": "You already rated this restaurant. You can delete your rating if you want.",
     "delete": "Delete rating",

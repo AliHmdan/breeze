@@ -1,7 +1,9 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/shared_perfrences_key.dart';
+import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as mt;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +30,8 @@ import 'package:breezefood/features/favorite_page/presentation/cubit/favorites_c
 import 'package:breezefood/features/stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
 import 'package:breezefood/features/profile/data/model/address_model.dart';
 import 'package:breezefood/features/profile/data/repo/profile_repository.dart';
+import 'package:geocoding/geocoding.dart' show Placemark, placemarkFromCoordinates;
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'address_section.dart';
@@ -35,7 +39,12 @@ import 'location_helper.dart';
 import 'temp_address_map_picker.dart';
 
 class RequestOrderScreen extends StatefulWidget {
-  const RequestOrderScreen({super.key});
+  const RequestOrderScreen({
+    super.key,
+    // required this.addressTitle
+  });
+
+  // final String addressTitle;
 
   @override
   State<RequestOrderScreen> createState() => _RequestOrderScreenState();
@@ -72,22 +81,111 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
   int? _lastCartRestaurantId;
 
-  final methods = const [
-    PaymentMethod(
-      id: 'cash',
-      title: 'Cash',
-      imageAsset: 'assets/images/cash.png',
-      imageWidth: 36,
-      imageHeight: 24,
-    ),
-  ];
+  final methods = const [PaymentMethod(id: 'cash', title: 'Cash', imageAsset: 'assets/images/cash.png', imageWidth: 36, imageHeight: 24)];
+
+  ///
+  /// here to init the location from home
+  ///
+  Future<void> getAddressFromLatLon({required double lat, required double lon}) async {
+    List<Placemark> placeMarks = await placemarkFromCoordinates(lat, lon);
+
+    Placemark place = placeMarks[0];
+
+    print(place.street);
+    print(place.locality);
+    print(place.country);
+    _tempDetailsCtrl.text = '${place.country} ${place.locality} ${place.street}';
+  }
+
+  ///
+  /// here for get the current location
+  ///
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
+  void getLatLon() async {
+    try {
+      Position pos = await determinePosition();
+
+      double lat = pos.latitude;
+      double lon = pos.longitude;
+
+      getAddressFromLatLon(lat: lat, lon: lon);
+      Navigator.pop(context, {"kind": "saved", "text": _tempDetailsCtrl.text, "lat": lat, "lon": lon});
+      _tempOrderAddress = OrderAddress(text: _tempDetailsCtrl.text, latitude: lat, longitude: lon);
+      _prefillCurrentLocation();
+
+      print("Latitude: $lat");
+      print("Longitude: $lon");
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  ///
 
   @override
   void initState() {
     super.initState();
+    _tempOrderAddress = OrderAddress(
+      text: context.read<HomeCubit>().userAddress ?? '',
+      latitude: context.read<HomeCubit>().latUserAddress ?? 0,
+      longitude: context.read<HomeCubit>().lonUserAddress ?? 0,
+    );
+    print('???????????????????????????????');
+    print('???????????????????????????????');
+    print('${_tempOrderAddress!.latitude}');
+    print('${_tempOrderAddress!.longitude}');
+    print('???????????????????????????????');
+    print('???????????????????????????????');
+
+    // _tempDetailsCtrl.text = context.read<HomeCubit>().userAddress ?? '';
+
+    // print('?????????????????????????????????????');
+    // print('?????????????????????????????????????');
+    // print('${context.read<HomeCubit>().userAddress}');
+    // print('${context.read<HomeCubit>().latUserAddress}');
+    // print('${context.read<HomeCubit>().lonUserAddress}');
+    // print('?????????????????????????????????????');
+    // print('?????????????????????????????????????');
+    // print('?????????????????????????????????????');
+    // _applyCartAddress(
+    //   text: context.read<HomeCubit>().userAddress ?? '',
+    //   lat: context.read<HomeCubit>().latUserAddress ?? 0,
+    //   lon: context.read<HomeCubit>().lonUserAddress ?? 0,
+    // );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prefillCurrentLocation();
+      //_changeLocation(isRTL: context.locale == 'en' ? true : false);
     });
+    getAddressFromLatLon(lat: context.read<HomeCubit>().latUserAddress ?? 0, lon: context.read<HomeCubit>().lonUserAddress ?? 0);
+    _tempOrderAddress = OrderAddress(
+      text: context.read<HomeCubit>().userAddress ?? '',
+      latitude: context.read<HomeCubit>().latUserAddress ?? 0,
+      longitude: context.read<HomeCubit>().lonUserAddress ?? 0,
+    );
   }
 
   Future<void> _openRestaurantFromCart(int restaurantId) async {
@@ -156,17 +254,17 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     return list;
   }
 
-  Future<void> _applyCartAddress({
-    required String text,
-    required double lat,
-    required double lon,
-  }) async {
+  Future<void> _applyCartAddress({required String text, required double lat, required double lon}) async {
+    print('///////////////////////////');
+    print('??????????????????????????????????');
+    print('??????????????????????????????????');
+    print('$text');
+    print('$lon');
+    print('$lat');
+    print('??????????????????????????????????');
+    print('??????????????????????????????????');
     setState(() {
-      _tempOrderAddress = OrderAddress(
-        text: text,
-        latitude: lat,
-        longitude: lon,
-      );
+      _tempOrderAddress = OrderAddress(text: text, latitude: lat, longitude: lon);
       _tempDetailsCtrl.text = text;
     });
 
@@ -190,7 +288,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: sheetColorScheme.surface,
+            color: AppColor.Dark,
             borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
           ),
           padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
@@ -201,9 +299,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
               builder: (context, snap) {
                 final data = snap.data;
 
-                final addresses = (data != null && data.ok)
-                    ? _parseAddresses(data.data)
-                    : const <AddressModel>[];
+                final addresses = (data != null && data.ok) ? _parseAddresses(data.data) : const <AddressModel>[];
 
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -212,176 +308,99 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                     Container(
                       width: 44.w,
                       height: 4.h,
-                      decoration: BoxDecoration(
-                        color: sheetColorScheme.onSurface.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
+                      decoration: BoxDecoration(color: sheetColorScheme.onSurface.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
                     ),
                     SizedBox(height: 10.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.w,
-                        vertical: 6.h,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               isRTL ? "اختر عنوان" : "Choose address",
-                              style: TextStyle(
-                                color: sheetColorScheme.onSurface,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w900,
-                              ),
+                              style: TextStyle(color: sheetColorScheme.onSurface, fontSize: 14.sp, fontWeight: FontWeight.w900),
                             ),
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(ctx),
-                            icon: Icon(
-                              Icons.close,
-                              color: sheetColorScheme.onSurface,
-                            ),
+                            icon: Icon(Icons.close, color: sheetColorScheme.onSurface),
                           ),
                         ],
                       ),
                     ),
-                    Divider(
-                      height: 1,
-                      color: sheetColorScheme.outlineVariant.withOpacity(0.6),
-                    ),
+                    Divider(height: 1, color: AppColor.search.withOpacity(0.6)),
                     ListTile(
                       onTap: () => Navigator.pop(ctx, {"kind": "map"}),
-                      leading: Icon(
-                        Icons.map_outlined,
-                        color: sheetColorScheme.primary,
-                      ),
+                      leading: Icon(Icons.map_outlined, color: AppColor.primaryColor),
                       title: Text(
                         isRTL ? "اختيار من الخريطة" : "Pick on map",
-                        style: TextStyle(
-                          color: sheetColorScheme.onSurface,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: TextStyle(color: sheetColorScheme.onSurface, fontWeight: FontWeight.w800),
                       ),
-                      trailing: Icon(
-                        Icons.chevron_right,
-                        color: sheetColorScheme.onSurface.withOpacity(0.6),
+                      trailing: Icon(Icons.chevron_right, color: sheetColorScheme.onSurface.withOpacity(0.6)),
+                    ),
+                    ListTile(
+                      onTap: () => getLatLon(),
+                      leading: Icon(Icons.location_on, color: AppColor.primaryColor),
+                      title: Text(
+                        isRTL ? "الموقع الحالي" : "Current Location",
+                        style: TextStyle(color: sheetColorScheme.onSurface, fontWeight: FontWeight.w800),
                       ),
+                      trailing: Icon(Icons.chevron_right, color: sheetColorScheme.onSurface.withOpacity(0.6)),
                     ),
                     if (snap.connectionState == ConnectionState.waiting)
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 12.h,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
                         child: Row(
                           children: [
                             SizedBox(
                               width: 18.w,
                               height: 18.w,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: sheetColorScheme.primary,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primaryColor),
                             ),
                             SizedBox(width: 10.w),
                             Text(
-                              isRTL
-                                  ? "جارٍ تحميل العناوين..."
-                                  : "Loading addresses...",
-                              style: TextStyle(
-                                color: sheetColorScheme.onSurface.withOpacity(
-                                  0.7,
-                                ),
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              isRTL ? "جارٍ تحميل العناوين..." : "Loading addresses...",
+                              style: TextStyle(color: sheetColorScheme.onSurface.withOpacity(0.7), fontSize: 13.sp, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
                       )
                     else if (addresses.isEmpty)
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 12.h,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
                         child: Text(
-                          isRTL
-                              ? "لا يوجد عناوين محفوظة"
-                              : "No saved addresses",
-                          style: TextStyle(
-                            color: sheetColorScheme.onSurface.withOpacity(0.7),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          isRTL ? "لا يوجد عناوين محفوظة" : "No saved addresses",
+                          style: TextStyle(color: sheetColorScheme.onSurface.withOpacity(0.7), fontSize: 13.sp, fontWeight: FontWeight.w600),
                         ),
                       )
                     else
                       Flexible(
                         child: ListView.separated(
                           shrinkWrap: true,
-                          padding: EdgeInsets.only(
-                            left: 6.w,
-                            right: 6.w,
-                            bottom: 10.h,
-                          ),
+                          padding: EdgeInsets.only(left: 6.w, right: 6.w, bottom: 10.h),
                           itemCount: addresses.length,
-                          separatorBuilder: (_, __) => Divider(
-                            height: 1,
-                            color: sheetColorScheme.outlineVariant.withOpacity(
-                              0.35,
-                            ),
-                          ),
+                          separatorBuilder: (_, __) => Divider(height: 1, color: sheetColorScheme.outlineVariant.withOpacity(0.35)),
                           itemBuilder: (context, i) {
                             final a = addresses[i];
                             return ListTile(
-                              onTap: () => Navigator.pop(ctx, {
-                                "kind": "saved",
-                                "text": a.address,
-                                "lat": a.latitude,
-                                "lon": a.longitude,
-                              }),
-                              leading: Icon(
-                                Icons.location_on,
-                                color: sheetColorScheme.primary,
-                              ),
+                              onTap: () => Navigator.pop(ctx, {"kind": "saved", "text": a.address, "lat": a.latitude, "lon": a.longitude}),
+                              leading: Icon(Icons.location_on, color: sheetColorScheme.primary),
                               title: Text(
                                 a.address,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: sheetColorScheme.onSurface,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                                style: TextStyle(color: sheetColorScheme.onSurface, fontWeight: FontWeight.w800),
                               ),
                               trailing: a.isDefault
                                   ? Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w,
-                                        vertical: 4.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            sheetColorScheme.primaryContainer,
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                      decoration: BoxDecoration(color: sheetColorScheme.primaryContainer, borderRadius: BorderRadius.circular(999)),
                                       child: Text(
                                         isRTL ? "افتراضي" : "Default",
-                                        style: TextStyle(
-                                          color: sheetColorScheme
-                                              .onPrimaryContainer,
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                                        style: TextStyle(color: sheetColorScheme.onPrimaryContainer, fontSize: 11.sp, fontWeight: FontWeight.w800),
                                       ),
                                     )
-                                  : Icon(
-                                      Icons.chevron_right,
-                                      color: sheetColorScheme.onSurface
-                                          .withOpacity(0.6),
-                                    ),
+                                  : Icon(Icons.chevron_right, color: sheetColorScheme.onSurface.withOpacity(0.6)),
                             );
                           },
                         ),
@@ -411,9 +430,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       if (text.isEmpty || lat == 0 || lon == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isRTL ? "تعذر اختيار العنوان" : "Couldn't select address",
-            ),
+            content: Text(isRTL ? "تعذر اختيار العنوان" : "Couldn't select address"),
             behavior: SnackBarBehavior.floating,
             backgroundColor: colorScheme.error,
           ),
@@ -453,10 +470,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       }
 
       final data = (res.data as List? ?? const []);
-      final items = data
-          .where((e) => e is Map)
-          .map((e) => Appetizer.fromJson((e as Map).cast<String, dynamic>()))
-          .toList();
+      final items = data.where((e) => e is Map).map((e) => Appetizer.fromJson((e as Map).cast<String, dynamic>())).toList();
 
       setState(() {
         _appetizers = items;
@@ -471,10 +485,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     }
   }
 
-  Future<void> _syncAppetizer({
-    required int appetizerId,
-    required int quantity,
-  }) async {
+  Future<void> _syncAppetizer({required int appetizerId, required int quantity}) async {
     if (_syncingAppetizers.contains(appetizerId)) return;
 
     setState(() {
@@ -507,10 +518,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     }
   }
 
-  Widget _recommendedAppetizersSection({
-    required bool isRTL,
-    required CartResponse cart,
-  }) {
+  Widget _recommendedAppetizersSection({required bool isRTL, required CartResponse cart}) {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (_loadingAppetizers) {
@@ -521,19 +529,12 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
             SizedBox(
               width: 18.w,
               height: 18.w,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primaryColor),
             ),
             SizedBox(width: 10.w),
             Text(
               "cart.recommended_loading".tr(),
-              style: TextStyle(
-                color: colorScheme.onSurface.withOpacity(0.75),
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: AppColor.white.withOpacity(0.75), fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -560,11 +561,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
         children: [
           Text(
             "cart.people_also_added".tr(),
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w800,
-            ),
+            style: TextStyle(color: AppColor.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10.h),
           SizedBox(
@@ -580,12 +577,10 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                 final syncing = _syncingAppetizers.contains(a.id);
                 final disabled = syncing || !a.isAvailable;
 
-                final title = isRTL
-                    ? (a.nameAr.trim().isNotEmpty ? a.nameAr : a.nameEn)
-                    : (a.nameEn.trim().isNotEmpty ? a.nameEn : a.nameAr);
+                final title = isRTL ? (a.nameAr.trim().isNotEmpty ? a.nameAr : a.nameEn) : (a.nameEn.trim().isNotEmpty ? a.nameEn : a.nameAr);
 
                 return SizedBox(
-                  width: 145.w,
+                  width: 142.w,
                   child: Container(
                     decoration: BoxDecoration(
                       // color: colorScheme.surface,
@@ -604,29 +599,23 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                               Align(
                                 alignment: Alignment.topCenter,
                                 child: SizedBox(
-                                  width: 145.w,
-                                  height: 145.w,
+                                  width: 142.w,
+                                  height: 142.w,
                                   child: Stack(
                                     children: [
                                       (a.image == null || a.image!.isEmpty)
-                                          ? Image.asset(
-                                              "assets/images/003.jpg",
-                                              width: double.infinity,
-                                              height: double.infinity,
-                                              fit: BoxFit.cover,
-                                            )
+                                          ? Image.asset("assets/images/003.jpg", width: double.infinity, height: double.infinity, fit: BoxFit.cover)
                                           : Image.network(
                                               a.image!,
                                               width: double.infinity,
                                               height: double.infinity,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) =>
-                                                  Image.asset(
-                                                    "assets/images/003.jpg",
-                                                    width: double.infinity,
-                                                    height: double.infinity,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                              errorBuilder: (_, __, ___) => Image.asset(
+                                                "assets/images/003.jpg",
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                       Positioned(
                                         bottom: 5,
@@ -639,55 +628,27 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                                     ? null
                                                     : () {
                                                         setState(() {
-                                                          _appetizerQty[a.id] =
-                                                              1;
+                                                          _appetizerQty[a.id] = 1;
                                                         });
-                                                        _syncAppetizer(
-                                                          appetizerId: a.id,
-                                                          quantity: 1,
-                                                        );
+                                                        _syncAppetizer(appetizerId: a.id, quantity: 1);
                                                       },
                                                 child: Container(
                                                   width: 38.w,
                                                   height: 38.w,
                                                   decoration: BoxDecoration(
-                                                    color: disabled
-                                                        ? colorScheme
-                                                              .surfaceContainerHighest
-                                                        : colorScheme.surface,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12.r,
-                                                        ),
-                                                    border: Border.all(
-                                                      color: colorScheme.outline
-                                                          .withOpacity(0.22),
-                                                    ),
+                                                    color: disabled ? AppColor.Dark : AppColor.Dark,
+                                                    borderRadius: BorderRadius.circular(12.r),
+                                                    border: Border.all(color: AppColor.Dark.withOpacity(0.22)),
                                                   ),
                                                   child: syncing
                                                       ? Padding(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                10.w,
-                                                              ),
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                                color:
-                                                                    colorScheme
-                                                                        .primary,
-                                                              ),
+                                                          padding: EdgeInsets.all(10.w),
+                                                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primaryColor),
                                                         )
                                                       : Icon(
                                                           Icons.add,
-                                                          color: disabled
-                                                              ? colorScheme
-                                                                    .onSurface
-                                                                    .withOpacity(
-                                                                      0.35,
-                                                                    )
-                                                              : colorScheme
-                                                                    .primary,
+                                                          // color: disabled ? colorScheme.onSurface.withOpacity(0.35) : colorScheme.primary,
+                                                          color: AppColor.white,
                                                         ),
                                                 ),
                                               )
@@ -695,61 +656,34 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                               Container(
                                                 height: 38.w,
                                                 decoration: BoxDecoration(
-                                                  color: colorScheme.surface,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        999,
-                                                      ),
-                                                  border: Border.all(
-                                                    color: colorScheme.outline
-                                                        .withOpacity(0.22),
-                                                  ),
+                                                  color: AppColor.Dark,
+                                                  borderRadius: BorderRadius.circular(999),
+                                                  border: Border.all(color: AppColor.Dark.withOpacity(0.22)),
                                                 ),
                                                 child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     InkWell(
                                                       onTap: disabled
                                                           ? null
                                                           : () {
-                                                              final next =
-                                                                  (qty - 1)
-                                                                      .clamp(
-                                                                        0,
-                                                                        99,
-                                                                      );
+                                                              final next = (qty - 1).clamp(0, 99);
                                                               setState(() {
                                                                 if (next == 0) {
-                                                                  _appetizerQty
-                                                                      .remove(
-                                                                        a.id,
-                                                                      );
+                                                                  _appetizerQty.remove(a.id);
                                                                 } else {
-                                                                  _appetizerQty[a
-                                                                          .id] =
-                                                                      next;
+                                                                  _appetizerQty[a.id] = next;
                                                                 }
                                                               });
-                                                              _syncAppetizer(
-                                                                appetizerId:
-                                                                    a.id,
-                                                                quantity: next,
-                                                              );
+                                                              _syncAppetizer(appetizerId: a.id, quantity: next);
                                                             },
                                                       child: SizedBox(
                                                         width: 38.w,
                                                         height: 38.w,
                                                         child: Icon(
                                                           Icons.remove,
-                                                          color: disabled
-                                                              ? colorScheme
-                                                                    .onSurface
-                                                                    .withOpacity(
-                                                                      0.35,
-                                                                    )
-                                                              : colorScheme
-                                                                    .primary,
+                                                          // color: disabled ? colorScheme.onSurface.withOpacity(0.35) : colorScheme.primary,
+                                                          color: AppColor.white,
                                                         ),
                                                       ),
                                                     ),
@@ -760,24 +694,11 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                                             ? SizedBox(
                                                                 width: 14.w,
                                                                 height: 14.w,
-                                                                child: CircularProgressIndicator(
-                                                                  strokeWidth:
-                                                                      2,
-                                                                  color: colorScheme
-                                                                      .primary,
-                                                                ),
+                                                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primaryColor),
                                                               )
                                                             : Text(
                                                                 qty.toString(),
-                                                                style: TextStyle(
-                                                                  color: colorScheme
-                                                                      .onSurface,
-                                                                  fontSize:
-                                                                      13.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w900,
-                                                                ),
+                                                                style: TextStyle(color: AppColor.white, fontSize: 13.sp, fontWeight: FontWeight.w900),
                                                               ),
                                                       ),
                                                     ),
@@ -785,36 +706,19 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                                       onTap: disabled
                                                           ? null
                                                           : () {
-                                                              final next =
-                                                                  (qty + 1)
-                                                                      .clamp(
-                                                                        0,
-                                                                        99,
-                                                                      );
+                                                              final next = (qty + 1).clamp(0, 99);
                                                               setState(() {
-                                                                _appetizerQty[a
-                                                                        .id] =
-                                                                    next;
+                                                                _appetizerQty[a.id] = next;
                                                               });
-                                                              _syncAppetizer(
-                                                                appetizerId:
-                                                                    a.id,
-                                                                quantity: next,
-                                                              );
+                                                              _syncAppetizer(appetizerId: a.id, quantity: next);
                                                             },
                                                       child: SizedBox(
                                                         width: 38.w,
                                                         height: 38.w,
                                                         child: Icon(
                                                           Icons.add,
-                                                          color: disabled
-                                                              ? colorScheme
-                                                                    .onSurface
-                                                                    .withOpacity(
-                                                                      0.35,
-                                                                    )
-                                                              : colorScheme
-                                                                    .primary,
+                                                          // color: disabled ? colorScheme.onSurface.withOpacity(0.35) : colorScheme.primary,
+                                                          color: AppColor.white,
                                                         ),
                                                       ),
                                                     ),
@@ -828,53 +732,39 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                top: 8.h,
-                                left: 8.w,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.w,
-                                    vertical: 4.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  child: Text(
-                                    "cart.popular".tr(),
-                                    style: TextStyle(
-                                      color: colorScheme.onPrimary,
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // Positioned(
+                              //   top: 8.h,
+                              //   left: 8.w,
+                              //   child: Container(
+                              //     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                              //     decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(8.r)),
+                              //     child: Text(
+                              //       "cart.popular".tr(),
+                              //       style: TextStyle(color: colorScheme.onPrimary, fontSize: 11.sp, fontWeight: FontWeight.w800),
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 8.h),
+                          padding: EdgeInsetsDirectional.fromSTEB(0.w, 0.h, 10.w, 8.h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 title,
-                                maxLines: 1,
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: TextStyle(color: AppColor.white, fontSize: 12.sp, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 8.h),
+                              SizedBox(height: 0.h),
                               Text(
                                 context.syp(a.price),
                                 style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
+                                  color: AppColor.white,
+                                  fontSize: 12.sp,
+                                  // fontWeight: FontWeight.w800
                                 ),
                               ),
                               SizedBox(height: 5.h),
@@ -915,11 +805,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       final finalText = text.isNotEmpty ? text : fallback;
 
       setState(() {
-        _tempOrderAddress = OrderAddress(
-          text: finalText,
-          latitude: lat,
-          longitude: lon,
-        );
+        _tempOrderAddress = OrderAddress(text: finalText, latitude: lat, longitude: lon);
         _tempDetailsCtrl.text = finalText;
       });
       return;
@@ -932,18 +818,10 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
       final fallback = isRTL ? "موقعي الحالي" : "My current location";
 
-      final text = await LocationHelper.reverseGeocodeText(
-        lat: pos.latitude,
-        lng: pos.longitude,
-        fallback: fallback,
-      );
+      final text = await LocationHelper.reverseGeocodeText(lat: pos.latitude, lng: pos.longitude, fallback: fallback);
 
       setState(() {
-        _tempOrderAddress = OrderAddress(
-          text: text,
-          latitude: pos.latitude,
-          longitude: pos.longitude,
-        );
+        _tempOrderAddress = OrderAddress(text: text, latitude: pos.latitude, longitude: pos.longitude);
         _tempDetailsCtrl.text = text;
       });
     } catch (_) {
@@ -951,11 +829,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isRTL
-                ? "تعذر تحديد موقعك الحالي، اضغط تغيير لاختيار موقع"
-                : "Couldn't get your location. Tap Change to pick one.",
-          ),
+          content: Text(isRTL ? "تعذر تحديد موقعك الحالي، اضغط تغيير لاختيار موقع" : "Couldn't get your location. Tap Change to pick one."),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -963,9 +837,14 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
   }
 
   Future<void> _changeLocation({required bool isRTL}) async {
-    final init = _tempOrderAddress == null
-        ? null
-        : LatLng(_tempOrderAddress!.latitude, _tempOrderAddress!.longitude);
+    final init = _tempOrderAddress == null ? null : LatLng(_tempOrderAddress!.latitude, _tempOrderAddress!.longitude);
+
+    print('???????????????????????????????');
+    print('???????????????????????????????');
+    print('${_tempOrderAddress!.latitude}');
+    print('${_tempOrderAddress!.longitude}');
+    print('???????????????????????????????');
+    print('???????????????????????????????');
 
     final result = await Navigator.push<Map<String, dynamic>?>(
       context,
@@ -985,11 +864,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
       _tempDetailsCtrl.text = _tempOrderAddress!.text;
     });
 
-    await AuthStorageHelper.saveCartLocation(
-      text: _tempOrderAddress!.text,
-      lat: _tempOrderAddress!.latitude,
-      lon: _tempOrderAddress!.longitude,
-    );
+    await AuthStorageHelper.saveCartLocation(text: _tempOrderAddress!.text, lat: _tempOrderAddress!.latitude, lon: _tempOrderAddress!.longitude);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -1001,10 +876,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
   // Item note dialog
   // ----------------------------
 
-  Future<void> _editItemNote({
-    required bool isRTL,
-    required CartItem item,
-  }) async {
+  Future<void> _editItemNote({required bool isRTL, required CartItem item}) async {
     final ctrl = TextEditingController(text: _itemNotes[item.id] ?? "");
 
     // final ok = await showDialog<bool>(
@@ -1064,33 +936,25 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
   // Delete confirmation
   // ----------------------------
 
-  Future<bool> _confirmDelete(
-    BuildContext context, {
-    required bool isRTL,
-  }) async {
+  Future<bool> _confirmDelete(BuildContext context, {required bool isRTL}) async {
     final colorScheme = Theme.of(context).colorScheme;
     return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
-            backgroundColor: colorScheme.surface,
-            title: Text(
-              isRTL ? "حذف العنصر؟" : "Delete item?",
-              style: TextStyle(color: colorScheme.onSurface),
-            ),
+            backgroundColor: AppColor.Dark,
+            title: Text(isRTL ? "حذف العنصر؟" : "Delete item?", style: TextStyle(color: AppColor.white)),
             content: Text(
-              isRTL
-                  ? "هل تريد حذف هذا العنصر من السلة؟"
-                  : "Do you want to remove this item from cart?",
-              style: TextStyle(color: colorScheme.onSurface.withOpacity(0.8)),
+              isRTL ? "هل تريد حذف هذا العنصر من السلة؟" : "Do you want to remove this item from cart?",
+              style: TextStyle(color: AppColor.white.withOpacity(0.8)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(isRTL ? "إلغاء" : "Cancel"),
+                child: Text(isRTL ? "إلغاء" : "Cancel", style: TextStyle(color: AppColor.white)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(isRTL ? "حذف" : "Delete"),
+                child: Text(isRTL ? "حذف" : "Delete", style: TextStyle(color: AppColor.red)),
               ),
             ],
           ),
@@ -1103,37 +967,32 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
   // ----------------------------
 
   List<OrderExtraRequest> _extrasPayload(CartItem it) {
-    return it.extras
-        .map((e) => OrderExtraRequest(extraId: e.extraId, quantity: e.quantity))
-        .toList();
+    return it.extras.map((e) => OrderExtraRequest(extraId: e.extraId, quantity: e.quantity)).toList();
   }
 
-  Future<void> _storeOrder(
-    BuildContext context,
-    CartResponse cart,
-    bool isVip,
-    String paymentId,
-  ) async {
+  ///
+  ///
+  ///
+  Future<void> _storeOrder(BuildContext context, CartResponse cart, bool isVip, String paymentId) async {
     final isRTL = Directionality.of(context) == mt.TextDirection.rtl;
 
-    final hasTemp =
-        _tempOrderAddress != null &&
-        _tempOrderAddress!.latitude != 0 &&
-        _tempOrderAddress!.longitude != 0;
+    final hasTemp = _tempOrderAddress != null && _tempOrderAddress!.latitude != 0 && _tempOrderAddress!.longitude != 0;
 
     if (_deliveryType == "delivery" && !hasTemp) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isRTL
-                ? "تعذر تحديد عنوان. اضغط تغيير لاختيار موقع"
-                : "No address. Tap Change to pick a location",
-          ),
+          content: Text(isRTL ? "تعذر تحديد عنوان. اضغط تغيير لاختيار موقع" : "No address. Tap Change to pick a location"),
           behavior: SnackBarBehavior.floating,
         ),
       );
       return;
     }
+    // if (_orderNotesCtrl.text.isEmpty) {
+    //   ScaffoldMessenger.of(
+    //     context,
+    //   ).showSnackBar(SnackBar(content: Text(isRTL ? "ملاحظة الموقع مطلوبة" : "Order note is required "), behavior: SnackBarBehavior.floating));
+    //   return;
+    // }
 
     final addressToSend = _tempOrderAddress!;
 
@@ -1163,6 +1022,9 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
     context.read<OrderFlowCubit>().store(req);
   }
 
+  ///
+  ///
+  ///
   // ----------------------------
   // UI
   // ----------------------------
@@ -1174,31 +1036,29 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.h),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: BlocBuilder<CartCubit, CartState>(
-            builder: (context, state) {
-              final title = state.maybeWhen(
-                cartLoaded: (cart, updatingIds, toast, isRefreshing) =>
-                    cart.restaurantName.isNotEmpty
-                    ? cart.restaurantName
-                    : (isRTL ? "سلّتي" : "My Cart"),
-                orElse: () => isRTL ? "سلّتي" : "My Cart",
-              );
-
-              return CustomAppbarProfile(
-                title: title,
-                icon: Icons.arrow_back_ios,
-                ontap: () => Navigator.pop(context),
-                backgroundcolor: Colors.transparent,
-              );
-            },
-          ),
-        ),
-      ),
+      backgroundColor: AppColor.Dark,
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(60.h),
+      //   child: Padding(
+      //     padding: const EdgeInsets.symmetric(horizontal: 16),
+      //     child: BlocBuilder<CartCubit, CartState>(
+      //       builder: (context, state) {
+      //         final title = state.maybeWhen(
+      //           cartLoaded: (cart, updatingIds, toast, isRefreshing) =>
+      //               cart.restaurantName.isNotEmpty ? cart.restaurantName : (isRTL ? "سلّتي" : "My Cart"),
+      //           orElse: () => isRTL ? "سلّتي" : "My Cart",
+      //         );
+      //
+      //         return CustomAppbarProfile(
+      //           title: title,
+      //           icon: Icons.arrow_back_ios,
+      //           ontap: () => Navigator.pop(context),
+      //           backgroundcolor: Colors.transparent,
+      //         );
+      //       },
+      //     ),
+      //   ),
+      // ),
       body: Stack(
         children: [
           // Positioned.fill(
@@ -1216,11 +1076,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                 await state.maybeWhen(
                   loading: () async {
                     if (!EasyLoading.isShow) {
-                      EasyLoading.show(
-                        status: isRTL
-                            ? "جارٍ إرسال الطلب..."
-                            : "Placing order...",
-                      );
+                      EasyLoading.show(status: isRTL ? "جارٍ إرسال الطلب..." : "Placing order...");
                     }
                   },
                   success: (orderId, status, pricing, raw) async {
@@ -1228,12 +1084,8 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                     if (!context.mounted) return;
 
                     await AppDialog.showSuccessDialog(
-                      title: isRTL
-                          ? "تم إرسال الطلب بنجاح"
-                          : "Order placed successfully",
-                      message: isRTL
-                          ? "رقم الطلب: #$orderId\nالحالة: $status"
-                          : "Order ID: #$orderId\nStatus: $status",
+                      title: isRTL ? "تم إرسال الطلب بنجاح" : "Order placed successfully",
+                      message: isRTL ? "رقم الطلب: #$orderId\nالحالة: $status" : "Order ID: #$orderId\nStatus: $status",
                     );
 
                     if (!context.mounted) return;
@@ -1245,9 +1097,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          isRTL ? "❌ فشل إنشاء الطلب: $msg" : "❌ Failed: $msg",
-                        ),
+                        content: Text(isRTL ? "❌ فشل إنشاء الطلب: $msg" : "❌ Failed: $msg"),
                         backgroundColor: colorScheme.error,
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -1261,13 +1111,9 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
               child: BlocBuilder<CartCubit, CartState>(
                 builder: (context, state) {
                   return state.maybeWhen(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const Center(child: CircularProgressIndicator(color: AppColor.primaryColor)),
                     error: (msg) => Center(
-                      child: Text(
-                        msg,
-                        style: TextStyle(color: colorScheme.error),
-                      ),
+                      child: Text(msg, style: TextStyle(color: colorScheme.error)),
                     ),
                     cartLoaded: (cart, updatingIds, toast, isRefreshing) {
                       if (_lastCartRestaurantId != cart.restaurantId) {
@@ -1281,32 +1127,47 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                         }
                       }
 
-                      if (cart.restaurantId > 0 &&
-                          _appetizersRestaurantId != cart.restaurantId &&
-                          !_loadingAppetizers) {
+                      if (cart.restaurantId > 0 && _appetizersRestaurantId != cart.restaurantId && !_loadingAppetizers) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (!mounted) return;
                           _loadAppetizers(cart.restaurantId);
                         });
                       }
 
-                      final isPlacingOrder = context
-                          .watch<OrderFlowCubit>()
-                          .state
-                          .maybeWhen(loading: () => true, orElse: () => false);
+                      final isPlacingOrder = context.watch<OrderFlowCubit>().state.maybeWhen(loading: () => true, orElse: () => false);
 
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 8.h,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (toast != null && toast.trim().isNotEmpty)
-                                _ToastBox(toast: toast),
+                              if (toast != null && toast.trim().isNotEmpty) _ToastBox(toast: toast),
 
+                              BlocBuilder<CartCubit, CartState>(
+                                builder: (context, state) {
+                                  final title = state.maybeWhen(
+                                    cartLoaded: (cart, updatingIds, toast, isRefreshing) =>
+                                        cart.restaurantName.isNotEmpty ? cart.restaurantName : (isRTL ? "سلّتي" : "My Cart"),
+                                    orElse: () => isRTL ? "سلّتي" : "My Cart",
+                                  );
+
+                                  return Container(
+                                    // height: 100.h,
+                                    // color: Colors.red,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: 0.h),
+                                      child: CustomAppbarProfile(
+                                        title: title,
+                                        icon: Icons.arrow_back_ios,
+                                        ontap: () => Navigator.pop(context),
+                                        backgroundcolor: Colors.transparent,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                               SizedBox(height: 10.h),
 
                               if (cart.items.isEmpty)
@@ -1317,47 +1178,40 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                   isRTL: isRTL,
                                   updatingIds: updatingIds,
                                   itemNotes: _itemNotes,
-                                  onAddMore: () => _openRestaurantFromCart(
-                                    cart.restaurantId,
-                                  ),
-                                  onEditNote: (it) =>
-                                      _editItemNote(isRTL: isRTL, item: it),
+                                  onAddMore: () => _openRestaurantFromCart(cart.restaurantId),
+                                  onEditNote: (it) => _editItemNote(isRTL: isRTL, item: it),
                                   onDelete: (it) async {
-                                    final ok = await _confirmDelete(
-                                      context,
-                                      isRTL: isRTL,
-                                    );
+                                    final ok = await _confirmDelete(context, isRTL: isRTL);
                                     if (!ok) return;
 
                                     context.read<CartCubit>().removeItem(it.id);
                                     setState(() => _itemNotes.remove(it.id));
                                   },
                                   onQtyChange: (it, newQty) {
-                                    context.read<CartCubit>().updateQty(
-                                      cartItemId: it.id,
-                                      quantity: newQty,
-                                    );
+                                    context.read<CartCubit>().updateQty(cartItemId: it.id, quantity: newQty);
                                   },
                                 ),
 
-                              SizedBox(height: 10.h),
-                              Divider(),
-                              _recommendedAppetizersSection(
-                                isRTL: isRTL,
-                                cart: cart,
-                              ),
+                              SizedBox(height: 5.h),
+                              Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
+                              _recommendedAppetizersSection(isRTL: isRTL, cart: cart),
 
                               if (_appetizers.isNotEmpty) ...[
                                 // SizedBox(height: 10.h),
-                                Divider(),
+                                Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
                               ],
 
                               if (_deliveryType == "delivery") ...[
+                                ///
+                                /// 34.8795309
+                                ///
+                                /// //////////////
+                                /// 35.9011717
                                 AddressSection(
                                   isRTL: isRTL,
                                   address: _tempOrderAddress,
-                                  onChangeTap: () =>
-                                      _onChangeAddressTap(isRTL: isRTL),
+                                  onChangeTap: () => _onChangeAddressTap(isRTL: isRTL),
+                                  onMapTap: () async => await _changeLocation(isRTL: isRTL),
                                   detailsCtrl: _tempDetailsCtrl,
                                   detailsFocus: _tempDetailsFocus,
                                   onDetailsChanged: (v) {
@@ -1371,56 +1225,67 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
                                     });
                                   },
                                 ),
-                                SizedBox(height: 10.h),
+                                // SizedBox(height: 10.h),
                                 // Divider(),
                               ],
+                              // SizedBox(height: 10.h),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Padding(
+                                    //   padding: EdgeInsetsDirectional.only(start: 20.w),
+                                    //   child: Text(
+                                    //     'cart.order_note'.tr(),
+                                    //     style: TextStyle(color: AppColor.white, fontSize: 12.sp),
+                                    //   ),
+                                    // ),
+                                    _OrderNotesSection(ctrl: _orderNotesCtrl, isRTL: isRTL),
+                                  ],
+                                ),
+                              ),
 
                               // VIP Section
                               if (cart.vip != null)
-                                _VipSection(
-                                  vip: cart.vip!,
-                                  isVipEnabled: _isVipEnabled,
-                                  onToggleVip: (enabled) {
-                                    setState(() {
-                                      _isVipEnabled = enabled;
-                                    });
-                                  },
+                                Column(
+                                  children: [
+                                    // Divider(height: 1.w, thickness: 0.7.w),
+                                    SizedBox(height: 25.h),
+                                    _VipSection(
+                                      vip: cart.vip!,
+                                      isVipEnabled: _isVipEnabled,
+                                      onToggleVip: (enabled) {
+                                        setState(() {
+                                          _isVipEnabled = enabled;
+                                        });
+                                      },
+                                    ),
+                                  ],
                                 ),
 
-                              _TotalsSection(
-                                cart: cart,
-                                isVipEnabled: _isVipEnabled,
+                              // Divider(height: 1.w, thickness: 0.7.w),
+                              Padding(
+                                padding: EdgeInsetsDirectional.only(start: 12.w, top: 13.h),
+                                child: Text(
+                                  isRTL ? " تفاصيل الدفع" : "Payment Detail",
+                                  style: TextStyle(color: AppColor.white, fontSize: 19.sp, fontWeight: FontWeight.w800),
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
-                              _OrderNotesSection(
-                                ctrl: _orderNotesCtrl,
-                                isRTL: isRTL,
-                              ),
+                              _TotalsSection(cart: cart, isVipEnabled: _isVipEnabled),
 
+                              // SizedBox(height: 10.h),
+                              // _OrderNotesSection(ctrl: _orderNotesCtrl, isRTL: isRTL),
                               SizedBox(height: 10.h),
 
                               PaymentMethodSection(
-                                amountText: context.money(
-                                  cart.grandAfter +
-                                      (_isVipEnabled
-                                          ? (cart.vip?.price?.toDouble() ?? 0.0)
-                                          : 0.0),
-                                ),
+                                amountText: context.money(cart.grandAfter + (_isVipEnabled ? (cart.vip?.price?.toDouble() ?? 0.0) : 0.0)),
                                 methods: methods,
                                 initialSelectedId: _selectedPayment,
-                                onChanged: (id) =>
-                                    setState(() => _selectedPayment = id),
-                                onOrder: isPlacingOrder
-                                    ? null
-                                    : (paymentId) => _storeOrder(
-                                        context,
-                                        cart,
-                                        _isVipEnabled,
-                                        paymentId,
-                                      ),
+                                onChanged: (id) => setState(() => _selectedPayment = id),
+                                onOrder: isPlacingOrder ? null : (paymentId) => _storeOrder(context, cart, _isVipEnabled, paymentId),
                               ),
-
                               SizedBox(height: 18.h),
                             ],
                           ),
@@ -1445,6 +1310,7 @@ class _RequestOrderScreenState extends State<RequestOrderScreen> {
 
 class _ToastBox extends StatelessWidget {
   final String toast;
+
   const _ToastBox({required this.toast});
 
   @override
@@ -1459,16 +1325,14 @@ class _ToastBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: colorScheme.error.withOpacity(0.35)),
       ),
-      child: Text(
-        toast,
-        style: TextStyle(color: colorScheme.onErrorContainer, fontSize: 12),
-      ),
+      child: Text(toast, style: TextStyle(color: colorScheme.onErrorContainer, fontSize: 12)),
     );
   }
 }
 
 class _EmptyCart extends StatelessWidget {
   final bool isRTL;
+
   const _EmptyCart({required this.isRTL});
 
   @override
@@ -1515,15 +1379,13 @@ class _CartItemsSection extends StatelessWidget {
     for (final it in cart.items) {
       final isUpdating = updatingIds.contains(it.id);
 
-      final title = isRTL
-          ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn)
-          : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
+      final title = isRTL ? (it.nameAr.trim().isNotEmpty ? it.nameAr : it.nameEn) : (it.nameEn.trim().isNotEmpty ? it.nameEn : it.nameAr);
 
       final note = (it.specialNotes ?? "").trim();
 
       children.add(
         Padding(
-          padding: EdgeInsets.only(bottom: 8.h),
+          padding: EdgeInsetsDirectional.only(bottom: 12.h, start: 0.w),
           child: Slidable(
             key: ValueKey("cart_item_${it.id}"),
             endActionPane: ActionPane(
@@ -1532,8 +1394,8 @@ class _CartItemsSection extends StatelessWidget {
               children: [
                 SlidableAction(
                   onPressed: isUpdating ? null : (_) => onDelete(it),
-                  backgroundColor: colorScheme.error,
-                  foregroundColor: colorScheme.onError,
+                  backgroundColor: AppColor.red,
+                  foregroundColor: Colors.white,
                   icon: Icons.delete_outline,
                   label: isRTL ? "حذف" : "Delete",
                 ),
@@ -1548,17 +1410,19 @@ class _CartItemsSection extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  MealCard(
-                    key: ValueKey(it.id),
-                    image: it.image,
-                    name: title,
-                    price: it.unitPrice,
-                    counter: CounterRequest(
-                      value: it.quantity,
-                      loading: isUpdating,
-                      onChanged: (newQty) => onQtyChange(it, newQty),
+                  Padding(
+                    padding: EdgeInsetsDirectional.only(start: 8.w),
+                    child: MealCard(
+                      key: ValueKey(it.id),
+                      image: it.image,
+                      name: title,
+                      price: it.unitPrice,
+                      counter: CounterRequest(value: it.quantity, loading: isUpdating, onChanged: (newQty) => onQtyChange(it, newQty)),
                     ),
                   ),
+                  if (it != cart.items.last) SizedBox(height: 10.h),
+
+                  if (it != cart.items.last) Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
                 ],
               ),
             ),
@@ -1571,7 +1435,8 @@ class _CartItemsSection extends StatelessWidget {
       children.add(
         Column(
           children: [
-            Divider(),
+            // Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
+            Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -1581,25 +1446,14 @@ class _CartItemsSection extends StatelessWidget {
               child: InkWell(
                 onTap: onAddMore,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 14.h,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.add_circle,
-                        color: colorScheme.primary,
-                        size: 24.sp,
-                      ),
+                      Icon(Icons.add_circle, color: AppColor.primaryColor, size: 24.sp),
                       SizedBox(width: 10.w),
                       Text(
                         isRTL ? "أضف المزيد" : "Add more",
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: TextStyle(color: AppColor.primaryColor, fontSize: 14.sp, fontWeight: FontWeight.w800),
                       ),
                     ],
                   ),
@@ -1641,6 +1495,14 @@ class _TotalsSection extends StatelessWidget {
       child: Column(
         children: [
           _totalLine(
+            title: isRTL ? "طريقة الدفع" : "payment method",
+            value: cart.itemsTotalAfter,
+            before: cart.itemsTotalBefore,
+            paymentMethod: isRTL ? "دفع نقدي" : "Cash",
+            money: (n) => context.syp(n),
+            context: context,
+          ),
+          _totalLine(
             title: isRTL ? "المجموع الفرعي" : "Sub total",
             value: cart.itemsTotalAfter,
             before: cart.itemsTotalBefore,
@@ -1648,12 +1510,7 @@ class _TotalsSection extends StatelessWidget {
             context: context,
           ),
           if (cart.appetizersTotal > 0)
-            _totalLine(
-              title: isRTL ? "المقبلات" : "Appetizers",
-              value: cart.appetizersTotal,
-              money: (n) => context.syp(n),
-              context: context,
-            ),
+            _totalLine(title: isRTL ? "المقبلات" : "Appetizers", value: cart.appetizersTotal, money: (n) => context.syp(n), context: context),
           _totalLine(
             title: isRTL ? "التوصيل" : "Delivery",
             value: cart.deliveryAfter,
@@ -1664,22 +1521,11 @@ class _TotalsSection extends StatelessWidget {
 
           // VIP line if enabled
           if (isVipEnabled && vipPrice > 0)
-            _totalLine(
-              title: isRTL ? "خدمة VIP" : "VIP Service",
-              value: vipPrice.toDouble(),
-              money: (n) => context.syp(n),
-              context: context,
-            ),
+            _totalLine(title: isRTL ? "خدمة VIP" : "VIP Service", value: vipPrice.toDouble(), money: (n) => context.syp(n), context: context),
 
           Padding(
             padding: EdgeInsets.symmetric(vertical: 6.h),
-            child: Divider(
-              height: 1,
-              thickness: 0.8,
-              color: colorScheme.outline.withOpacity(0.25),
-              indent: 4.w,
-              endIndent: 4.w,
-            ),
+            child: Divider(height: 1, thickness: 0.5.w, color: AppColor.search),
           ),
           _totalLine(
             title: isRTL ? "الإجمالي" : "Total",
@@ -1706,7 +1552,8 @@ class _OrderNotesSection extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(12.w),
+      height: 50.h,
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
         // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
@@ -1714,22 +1561,16 @@ class _OrderNotesSection extends StatelessWidget {
       ),
       child: TextField(
         controller: ctrl,
-        maxLines: 3,
-        style: TextStyle(color: colorScheme.onSurface, fontSize: 13.sp),
+        maxLines: 1,
+        style: TextStyle(color: AppColor.white, fontSize: 13.sp),
         decoration: InputDecoration(
-          hintText: isRTL
-              ? "ملاحظات للطلب (اختياري) مثال: اتصل قبل الوصول..."
-              : "Order notes (optional) e.g. call before arrival...",
-          hintStyle: TextStyle(
-            color: colorScheme.onSurface.withOpacity(0.6),
-            fontSize: 12.sp,
-          ),
+          hintText: isRTL ? "ملاحظات الموقع" : "Location notes  ",
+          hintStyle: TextStyle(color: AppColor.white.withOpacity(0.6), fontSize: 12.sp),
           filled: true,
-          fillColor: colorScheme.surfaceContainerHighest,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide.none,
-          ),
+          fillColor: AppColor.search,
+          contentPadding: EdgeInsetsDirectional.only(start: 12.w),
+
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
         ),
       ),
     );
@@ -1744,11 +1585,7 @@ class _VipSection extends StatelessWidget {
   final bool isVipEnabled;
   final ValueChanged<bool> onToggleVip;
 
-  const _VipSection({
-    required this.vip,
-    required this.isVipEnabled,
-    required this.onToggleVip,
-  });
+  const _VipSection({required this.vip, required this.isVipEnabled, required this.onToggleVip});
 
   @override
   Widget build(BuildContext context) {
@@ -1764,25 +1601,15 @@ class _VipSection extends StatelessWidget {
         //     ? colorScheme.primary.withOpacity(0.1)
         //     : colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isVipEnabled
-              ? colorScheme.primary.withOpacity(0.3)
-              : colorScheme.outline.withOpacity(0.25),
-        ),
+        border: Border.all(color: AppColor.search),
       ),
       child: InkWell(
-        onTap: () => _showVipPopup(context),
+        onTap: () => _showVipPopup(context, isVipEnabled),
         borderRadius: BorderRadius.circular(12.r),
         child: Row(
           children: [
             // VIP Crown Icon
-            Icon(
-              Icons.emoji_events,
-              color: isVipEnabled
-                  ? const Color(0xFFFFD700)
-                  : const Color(0xFFFFD700).withOpacity(0.7),
-              size: 25.sp,
-            ),
+            Icon(Icons.emoji_events, color: isVipEnabled ? const Color(0xFFFFD700) : const Color(0xFFFFD700).withOpacity(0.7), size: 25.sp),
             SizedBox(width: 10.w),
             Expanded(
               child: Column(
@@ -1790,41 +1617,23 @@ class _VipSection extends StatelessWidget {
                 children: [
                   Text(
                     isRTL ? "خدمة VIP" : "VIP Service",
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: TextStyle(color: AppColor.white, fontSize: 14.sp, fontWeight: FontWeight.w800),
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    isRTL
-                        ? "سعر الخدمة: ${context.money(vip.price ?? 0)}"
-                        : "Service price: ${context.money(vip.price ?? 0)}",
-                    style: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontSize: 12.sp,
-                    ),
+                    isRTL ? "سعر الخدمة: ${context.money(vip.price ?? 0)}" : "Service price: ${context.money(vip.price ?? 0)}",
+                    style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp),
                   ),
                 ],
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: isVipEnabled
-                    ? colorScheme.primary
-                    : colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20.r),
-              ),
+              decoration: BoxDecoration(color: isVipEnabled ? AppColor.primaryColor : AppColor.search, borderRadius: BorderRadius.circular(20.r)),
               child: Text(
-                isVipEnabled
-                    ? (isRTL ? "مفعل" : "Enabled")
-                    : (isRTL ? "تفعيل" : "Enable"),
+                isVipEnabled ? (isRTL ? "مفعل" : "Enabled") : (isRTL ? "تفعيل" : "Enable"),
                 style: TextStyle(
-                  color: isVipEnabled
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurface.withOpacity(0.8),
+                  color: isVipEnabled ? AppColor.white : AppColor.white.withOpacity(0.8),
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1836,7 +1645,7 @@ class _VipSection extends StatelessWidget {
     );
   }
 
-  void _showVipPopup(BuildContext context) {
+  void _showVipPopup(BuildContext context, bool enabled) {
     final isRTL = Directionality.of(context) == mt.TextDirection.rtl;
     final colorScheme = Theme.of(context).colorScheme;
     final w = MediaQuery.of(context).size.width;
@@ -1846,13 +1655,10 @@ class _VipSection extends StatelessWidget {
       builder: (context) => AlertDialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 24.h),
         contentPadding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 10.h),
-        backgroundColor: colorScheme.surface,
+        backgroundColor: AppColor.Dark,
         title: SizedBox(
           width: w * 0.92,
-          child: Text(
-            isRTL ? "خدمة VIP" : "VIP Service",
-            style: TextStyle(color: colorScheme.onSurface),
-          ),
+          child: Text(isRTL ? "خدمة VIP" : "VIP Service", style: TextStyle(color: AppColor.white)),
         ),
         content: SizedBox(
           width: w * 0.92,
@@ -1880,10 +1686,7 @@ class _VipSection extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: colorScheme.onSurface.withOpacity(0.5),
-                          ),
+                          child: Icon(Icons.image_not_supported, color: colorScheme.onSurface.withOpacity(0.5)),
                         ),
                       ),
                     );
@@ -1895,7 +1698,7 @@ class _VipSection extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(isRTL ? "إلغاء" : "Cancel"),
+            child: Text(isRTL ? "إلغاء" : "Cancel", style: TextStyle(color: AppColor.white)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1903,14 +1706,10 @@ class _VipSection extends StatelessWidget {
               onToggleVip(!isVipEnabled);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
+              backgroundColor: isVipEnabled ? AppColor.red : AppColor.primaryColor,
               foregroundColor: colorScheme.onPrimary,
             ),
-            child: Text(
-              isVipEnabled
-                  ? (isRTL ? "إلغاء التفعيل" : "Disable")
-                  : (isRTL ? "تفعيل" : "Enable"),
-            ),
+            child: Text(isVipEnabled ? (isRTL ? "إلغاء التفعيل" : "Disable") : (isRTL ? "تفعيل" : "Enable"), style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1923,6 +1722,8 @@ class _VipSection extends StatelessWidget {
 // ----------------------------
 Widget _totalLine({
   required String title,
+  String? paymentMethod,
+
   required double value,
   double? before,
   bool isTotal = false,
@@ -1940,9 +1741,7 @@ Widget _totalLine({
           child: Text(
             title,
             style: TextStyle(
-              color: isTotal
-                  ? colorScheme.onSurface
-                  : colorScheme.onSurface.withOpacity(0.8),
+              color: isTotal ? AppColor.white : AppColor.white.withOpacity(0.8),
               fontSize: isTotal ? 14 : 13,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
             ),
@@ -1951,18 +1750,24 @@ Widget _totalLine({
         if (hasBefore) ...[
           Text(
             money(before!),
+
             style: TextStyle(
-              color: colorScheme.error,
+              color: AppColor.white.withOpacity(0.7),
               fontSize: 12,
               decoration: TextDecoration.lineThrough,
+              decorationColor: AppColor.white.withOpacity(0.7),
             ),
           ),
           SizedBox(width: 8.w),
         ],
         Text(
-          money(value),
+          paymentMethod ?? money(value),
           style: TextStyle(
-            color: isTotal ? colorScheme.primary : colorScheme.onSurface,
+            color: isTotal
+                ? AppColor.white
+                : hasBefore
+                ? AppColor.red
+                : AppColor.white,
             fontSize: isTotal ? 15 : 13,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
           ),

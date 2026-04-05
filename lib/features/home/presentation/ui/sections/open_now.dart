@@ -90,7 +90,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           SizedBox(width: 3.w),
                           Text(
                             _rating.toStringAsFixed(1),
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -105,7 +105,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                         child: Center(
                           child: Text(
                             "restaurant.closed".tr(),
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: AppColor.red, fontSize: 13.sp, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
@@ -113,7 +113,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 ],
               ),
 
-              SizedBox(height: 6.h), // نفس gapH الطبيعي
+              SizedBox(height: 0.h), // نفس gapH الطبيعي
               // 🏷️ Name (center مثل Discount)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0.w),
@@ -123,7 +123,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+                  style: TextStyle(color: AppColor.white, fontSize: 15.sp, fontWeight: FontWeight.w700),
                 ),
               ),
 
@@ -135,11 +135,11 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: colorScheme.onSurface),
+                    Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.6)),
                     SizedBox(width: 4.w),
                     Text(
                       context.syp(feeText, decimals: 0),
-                      style: TextStyle(color: colorScheme.onSurface, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: AppColor.white.withOpacity(0.6), fontSize: 11.sp, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -174,23 +174,26 @@ class OpenNow extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsetsDirectional.only(top: 10, start: 16, end: 0.2),
+      padding: EdgeInsetsDirectional.only(top: 10, start: 0, end: 0.2),
       child: SizedBox(
         height: 160.h, // نفس منطق الخصومات
+
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final itemWidth = constraints.maxWidth / 2.2;
+            final itemWidth = constraints.maxWidth / 2.3;
 
             return ListView.builder(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
+              padding: EdgeInsetsDirectional.only(start: 11.w),
               itemCount: restaurants.length,
               itemBuilder: (context, index) {
                 final r = restaurants[index];
 
                 return Container(
                   width: itemWidth,
-                  margin: EdgeInsetsDirectional.only(end: 10.w),
+                  // margin: EdgeInsetsDirectional.only(end: 10.w),
+                  margin: EdgeInsetsDirectional.only(start: index == 0 ? 9.w : 0, end: 10.w),
                   child: RestaurantCard(restaurant: r, onTap: onTap == null ? null : () => onTap!(r)),
                 );
               },

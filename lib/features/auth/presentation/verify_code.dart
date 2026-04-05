@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:breezefood/core/component/color.dart' show AppColor;
 import 'package:breezefood/features/auth/presentation/information_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -103,19 +104,14 @@ class _VerfiyCodeState extends State<VerfiyCode> {
               EasyLoading.dismiss();
               if (mounted) setState(() => _isResending = false);
 
-              final msg = (data is Map)
-                  ? (data["message"] ?? "auth.code_sent".tr())
-                  : "auth.code_sent".tr();
+              final msg = (data is Map) ? (data["message"] ?? "auth.code_sent".tr()) : "auth.code_sent".tr();
               _showSuccess(msg.toString());
             },
             verified: (data) {
               EasyLoading.dismiss();
               if (mounted) setState(() => _isVerifying = false);
 
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const InformationScreen()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const InformationScreen()));
             },
           );
         },
@@ -129,10 +125,7 @@ class _VerfiyCodeState extends State<VerfiyCode> {
               errorBuilder: (_, __, ___) => Container(
                 color: colorScheme.surface,
                 alignment: Alignment.center,
-                child: Text(
-                  "common.placeholder".tr(),
-                  style: TextStyle(color: colorScheme.onSurface),
-                ),
+                child: Text("common.placeholder".tr(), style: TextStyle(color: colorScheme.onSurface)),
               ),
             ),
             SafeArea(
@@ -149,28 +142,18 @@ class _VerfiyCodeState extends State<VerfiyCode> {
                         decoration: BoxDecoration(
                           color: colorScheme.surface,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: colorScheme.outline.withOpacity(0.35),
-                          ),
+                          border: Border.all(color: colorScheme.outline.withOpacity(0.35)),
                         ),
                         child: Padding(
                           padding: EdgeInsetsDirectional.only(start: 5),
-                          child: Icon(
-                            Icons.arrow_back_ios,
-                            color: colorScheme.onSurface,
-                            size: 16.sp,
-                          ),
+                          child: Icon(Icons.arrow_back_ios, color: colorScheme.onSurface, size: 16.sp),
                         ),
                       ),
                     ),
                     SizedBox(height: 10.h),
                     Text(
                       "auth.enter_code_title".tr(),
-                      style: TextStyle(
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
+                      style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                     ),
                     SizedBox(height: 8.h),
                     Text(
@@ -195,27 +178,22 @@ class _VerfiyCodeState extends State<VerfiyCode> {
                           borderRadius: BorderRadius.circular(10),
                           fieldHeight: 70,
                           fieldWidth: 70,
-                          activeColor: colorScheme.primary,
-                          selectedColor: colorScheme.primary,
-                          inactiveColor: colorScheme.outline.withOpacity(0.5),
+                          activeColor: AppColor.primaryColor,
+                          selectedColor: AppColor.primaryColor,
+                          inactiveColor: AppColor.primaryColor.withOpacity(0.5),
                           activeBorderWidth: 4,
                           selectedBorderWidth: 4,
                           inactiveBorderWidth: 4,
-                          activeFillColor: colorScheme.surface,
-                          selectedFillColor: colorScheme.surface,
-                          inactiveFillColor:
-                              colorScheme.surfaceContainerHighest,
+                          activeFillColor: AppColor.search,
+                          selectedFillColor: AppColor.search,
+                          inactiveFillColor: AppColor.search,
                         ),
                         animationDuration: const Duration(milliseconds: 300),
                         enableActiveFill: true,
                         enabled: !_isVerifying,
                         onCompleted: _verifyCode,
                         onChanged: (_) {},
-                        textStyle: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        textStyle: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp, fontWeight: FontWeight.w700),
                       ),
                     ),
                     if (_message != null)
@@ -223,28 +201,19 @@ class _VerfiyCodeState extends State<VerfiyCode> {
                         padding: EdgeInsets.symmetric(vertical: 10.h),
                         child: Text(
                           _message!,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: _messageColor,
-                          ),
+                          style: TextStyle(fontSize: 14.sp, color: _messageColor),
                         ),
                       ),
                     SizedBox(height: 20.h),
                     InkWell(
-                      onTap: (_isResending || _isVerifying)
-                          ? null
-                          : _resendCode,
+                      onTap: (_isResending || _isVerifying) ? null : _resendCode,
                       child: Text(
-                        _isResending
-                            ? "common.sending".tr()
-                            : "auth.resend_code".tr(),
+                        _isResending ? "common.sending".tr() : "auth.resend_code".tr(),
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontFamily: "Manrope",
                           fontWeight: FontWeight.w400,
-                          color: (_isResending || _isVerifying)
-                              ? colorScheme.onSurface.withOpacity(0.5)
-                              : colorScheme.primary,
+                          color: (_isResending || _isVerifying) ? AppColor.primaryColor.withOpacity(0.5) : AppColor.primaryColor,
                         ),
                       ),
                     ),

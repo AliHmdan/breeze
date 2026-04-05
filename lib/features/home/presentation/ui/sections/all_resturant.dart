@@ -1,8 +1,10 @@
 import 'package:breezefood/core/component/app_image.dart';
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/services/del_price_helper.dart' show deliveryFeeText;
 import 'package:breezefood/core/services/detect_language.dart' show extractLocalizedText;
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
+import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -84,7 +86,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
 
-                            child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: colorScheme.onInverseSurface, fontsize: 13.sp),
+                            child: CustomSubTitle(subtitle: "restaurant.closed".tr(), color: AppColor.red, fontsize: 13.sp),
                           ),
                         ),
                       ),
@@ -103,7 +105,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           SizedBox(width: 3.w),
                           Text(
                             _rating.toStringAsFixed(1),
-                            style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -112,22 +114,22 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 ],
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 0.h),
             CustomSubTitle(
               // subtitle: '(r.name).trim()',
               subtitle: extractLocalizedText(r.name, context.locale),
-              color: colorScheme.onSurface,
-              fontsize: 16.sp,
+              color: AppColor.white,
+              fontsize: 15.sp,
             ),
-            SizedBox(height: 5.h),
+            SizedBox(height: 1.h),
             Container(
               padding: EdgeInsets.symmetric(vertical: 2.h),
 
               child: Row(
                 children: [
-                  Image.asset("assets/icons/new_del.png", width: 16.w, height: 16.h, color: colorScheme.onSurface),
+                  Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.7)),
                   SizedBox(width: 8.w),
-                  CustomSubTitle(subtitle: feeText, color: colorScheme.onSurface, fontsize: 12),
+                  CustomSubTitle(subtitle: feeText, color: AppColor.white.withOpacity(0.7), fontsize: 11.sp),
                 ],
               ),
             ),
@@ -147,14 +149,14 @@ class AllResturant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = AppColor.Dark;
     if (restaurants.isEmpty) {
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 14.h),
         child: Center(
           child: Text(
             "No restaurants available",
-            style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7), fontSize: 12.sp),
+            style: TextStyle(color: colorScheme.withOpacity(0.7), fontSize: 12.sp),
           ),
         ),
       );
@@ -162,12 +164,17 @@ class AllResturant extends StatelessWidget {
 
     return ListView.separated(
       shrinkWrap: true,
+
       physics: const BouncingScrollPhysics(),
       itemCount: restaurants.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      padding: EdgeInsetsDirectional.only(top: 60.h),
+      separatorBuilder: (_, __) => Container(height: 12.h, color: AppColor.Dark),
       itemBuilder: (context, index) {
         final r = restaurants[index];
-        return RestaurantCard(restaurant: r, onTap: onTap == null ? null : () => onTap!(r));
+        return Container(
+          color: AppColor.Dark,
+          child: RestaurantCard(restaurant: r, onTap: onTap == null ? null : () => onTap!(r)),
+        );
       },
     );
   }

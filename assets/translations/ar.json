@@ -62,7 +62,11 @@
     "language": "اللغة",
     "help_center": "مركز المساعدة",
     "terms": "الشروط والأحكام",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "english": "الانكليزية",
+    "arabic": "العربية",
+    "dark_mode": "الوضع الليلي",
+    "light_mode": "الوضع النهاري"
   },
   "logout": {
     "confirm": "هل أنت متأكد من تسجيل الخروج؟",
@@ -143,14 +147,16 @@
     "stores": "المتاجر",
     "favorites": "المفضلة",
     "orders": "الطلبات",
-    "Profile": "بروفايل"
+    "Profile": "حسابي"
   },
   "cart": {
     "item_notes_optional": "ملاحظات الوجبة ",
     "item_notes_hint": "مثال: بدون بصل، سبايسي خفيف...",
     "recommended_to_you": "مقترح لك",
     "recommended_loading": "جارٍ تحميل المقترحات...",
-    "people_also_added": "أشخاص أضافوا أيضاً",
+    "people_also_added": "أضف مع طلبك",
+    "orders_history": "سجل الطلبات",
+    "order_note": "ملاحظة للطلب",
     "popular": "الأكثر طلباً",
     "view_cart": "عرض السلة",
     "view_cart_loading": "عرض السلة ..."
@@ -171,6 +177,7 @@
   "tracking.error_missing_locations": "لا يمكن تحميل بيانات التتبع",
   "orders": {
     "price": "السعر: ",
+    "Order": "أطلب",
     "empty_history": "لا توجد طلبات سابقة",
     "cancel_order": "إلغاء الطلب",
     "cancel_confirm_title": "إلغاء الطلب؟",
@@ -230,7 +237,7 @@
     "empty": "فارغ",
     "save": "حفظ",
     "min": "دقيقة",
-    "search": "بحث",
+    "search": "بحث ",
     "close": "إغلاق",
     "copy": "نسخ",
     "currency": "ل.س",
@@ -253,6 +260,10 @@
     }
   },
   "reviews": {
+    "Success":"نجاح!",
+    "Your_Order_was_completed.": "تم تنفيذ طلبك",
+    "Your_order_was_complete_successfully": "تم إتمام طلبك بنجاح!",
+    "done": "تم",
     "your_rate_title": "تقييمك",
     "already_rated_hint": "أنت مقيّم هذا المطعم مسبقاً. يمكنك حذف تقييمك إذا أردت.",
     "delete": "حذف التقييم",

@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/money.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/orders/add_order_sheet/add_order_description.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class AddOrderBody extends StatefulWidget {
   final String title;
   final double price;
+  final ScrollController scrollController;
   final double oldPrice;
   final String imagePathOrUrl;
   final String description;
@@ -32,6 +34,7 @@ class AddOrderBody extends StatefulWidget {
   const AddOrderBody({
     super.key,
     required this.isRestaurantOpen,
+    required this.scrollController,
     required this.extraGroups,
     required this.restaurantId,
     required this.menuItemId,
@@ -70,10 +73,7 @@ class _AddOrderBodyState extends State<AddOrderBody> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final sg = _sizeGroup;
-      if (mounted &&
-          sg != null &&
-          sg.items.isNotEmpty &&
-          _selectedSizeExtraId == null) {
+      if (mounted && sg != null && sg.items.isNotEmpty && _selectedSizeExtraId == null) {
         setState(() => _highlightSizeRequired = true);
       }
     });
@@ -85,16 +85,13 @@ class _AddOrderBodyState extends State<AddOrderBody> {
     super.dispose();
   }
 
-  bool get _hasDiscount =>
-      widget.oldPrice > widget.price && widget.oldPrice > 0;
+  bool get _hasDiscount => widget.oldPrice > widget.price && widget.oldPrice > 0;
 
   bool get _isRTL => Directionality.of(context) == mt.TextDirection.rtl;
 
-  ExtraGrouped? get _sizeGroup =>
-      ExtrasHelper.findSizeGroup(widget.extraGroups);
+  ExtraGrouped? get _sizeGroup => ExtrasHelper.findSizeGroup(widget.extraGroups);
 
-  List<ExtraGrouped> get _otherGroups =>
-      ExtrasHelper.otherGroups(widget.extraGroups, _sizeGroup);
+  List<ExtraGrouped> get _otherGroups => ExtrasHelper.otherGroups(widget.extraGroups, _sizeGroup);
 
   double get _extrasTotal => ExtrasHelper.computeExtrasTotal(
     sizeGroup: _sizeGroup,
@@ -114,9 +111,7 @@ class _AddOrderBodyState extends State<AddOrderBody> {
 
     ids.addAll(_selectedExtrasIds);
 
-    return ids
-        .map((id) => AddToCartExtraRequest(extraId: id, quantity: 1))
-        .toList();
+    return ids.map((id) => AddToCartExtraRequest(extraId: id, quantity: 1)).toList();
   }
 
   String _buildShareText() {
@@ -129,10 +124,7 @@ class _AddOrderBodyState extends State<AddOrderBody> {
         .where((s) => s.trim().isNotEmpty)
         .toList();
 
-    final groupedSelectedIds = _selectedGroupChoice.values.toSet()
-      ..addAll(
-        _selectedSizeExtraId == null ? const {} : {_selectedSizeExtraId!},
-      );
+    final groupedSelectedIds = _selectedGroupChoice.values.toSet()..addAll(_selectedSizeExtraId == null ? const {} : {_selectedSizeExtraId!});
 
     final groupedNames = widget.extraGroups
         .expand((g) => g.items)
@@ -143,9 +135,7 @@ class _AddOrderBodyState extends State<AddOrderBody> {
 
     final extrasNames = [...groupedNames, ...legacyNames];
 
-    final extrasLine = extrasNames.isEmpty
-        ? ""
-        : "\nExtras: ${extrasNames.join(", ")}";
+    final extrasLine = extrasNames.isEmpty ? "" : "\nExtras: ${extrasNames.join(", ")}";
 
     final spicyLine = _withSpicy ? "\n🌶️ Hot: Yes" : "\n🌶️ Hot: No";
 
@@ -186,18 +176,13 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  controller: widget.scrollController,
                   child: Column(
                     children: [
-                      AddOrderHeaderImage(
-                        imagePathOrUrl: widget.imagePathOrUrl,
-                        shareText: _buildShareText(),
-                      ),
+                      AddOrderHeaderImage(imagePathOrUrl: widget.imagePathOrUrl, shareText: _buildShareText()),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -234,8 +219,7 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
                                   highlightRequired: _highlightSizeRequired,
                                   onSelect: (id) => setState(() {
                                     _selectedSizeExtraId = id;
-                                    _highlightSizeRequired =
-                                        false; // ✅ يطفي بعد الاختيار
+                                    _highlightSizeRequired = false; // ✅ يطفي بعد الاختيار
                                   }),
                                 ),
                                 SizedBox(height: 12.h),
@@ -261,7 +245,18 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
 
                             SizedBox(height: 10.h),
 
-                            NotesField(controller: _noteCtrl),
+                            NotesField(
+                              controller: _noteCtrl,
+                              onTap: () async {
+                                Future.delayed(Duration(seconds: 2)).then((onValue) {
+                                  widget.scrollController.animateTo(
+                                    widget.scrollController.position.maxScrollExtent,
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeOut,
+                                  );
+                                });
+                              },
+                            ),
 
                             SizedBox(height: 10.h),
 
@@ -275,11 +270,8 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
               ),
               SafeArea(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  color: Theme.of(context).colorScheme.surface,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  color: AppColor.Dark,
                   child: CounterSheet(
                     count: _qty,
                     onInc: () => setState(() => _qty++),
@@ -292,8 +284,7 @@ ${productUrl.isEmpty ? "" : "\n$productUrl"}
                     extrasTotal: _extrasTotal,
                     isSizeRequired: sg != null && sg.items.isNotEmpty,
                     isSizeSelected: _selectedSizeExtraId != null,
-                    onMissingSize: () =>
-                        setState(() => _highlightSizeRequired = true),
+                    onMissingSize: () => setState(() => _highlightSizeRequired = true),
                     onAdd: (qty) {
                       final req = AddToCartRequest(
                         restaurantId: widget.restaurantId,

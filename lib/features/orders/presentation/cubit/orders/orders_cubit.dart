@@ -20,6 +20,11 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   Future<void> loadActive() async {
     emit(const OrdersState.loadingActive());
+    print('/////////////////////////');
+    print('/////////////////////////');
+    print('loadActive');
+    print('/////////////////////////');
+    print('/////////////////////////');
 
     final res = await repo.getActiveOrders();
     if (!res.ok) {
@@ -37,6 +42,12 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> loadHistory() async {
     emit(const OrdersState.loadingHistory());
 
+    print('/////////////////////////');
+    print('/////////////////////////');
+    print('loadHistory');
+    print('/////////////////////////');
+    print('/////////////////////////');
+
     final res = await repo.getOrdersHistory();
     if (!res.ok) {
       emit(OrdersState.errorHistory(res.message ?? "خطأ"));
@@ -53,6 +64,11 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<int?> fetchOrderCustomerCode(int orderId) async {
     final res = await repo.getMyOrderDetails(orderId);
     if (!res.ok) return null;
+    print('/////////////////////////');
+    print('/////////////////////////');
+    print('fetchOrderCustomerCode');
+    print('/////////////////////////');
+    print('/////////////////////////');
 
     final map = (res.data as Map?)?.cast<String, dynamic>() ?? {};
 

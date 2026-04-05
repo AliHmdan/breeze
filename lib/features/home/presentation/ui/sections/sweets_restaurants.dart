@@ -89,7 +89,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                       Text(
                         _rating.toStringAsFixed(1),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onInverseSurface,
+                          color: Colors.white,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w700,
                           fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
@@ -111,7 +111,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: AppColor.white,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w700,
                 fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
@@ -122,7 +122,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
 
           Row(
             children: [
-              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
+              Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.7)),
               SizedBox(width: 4.w),
               Text(
                 context.syp(feeText, decimals: 0),
@@ -130,7 +130,7 @@ class _SweetsRestaurantCardState extends State<SweetsRestaurantCard> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: AppColor.white.withOpacity(0.7),
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
                   fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
@@ -186,6 +186,7 @@ class SweetsRestaurantsSection extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: restaurants.length,
+        padding: EdgeInsetsDirectional.only(start: 11.w),
         itemBuilder: (context, index) {
           final r = restaurants[index];
 

@@ -33,7 +33,8 @@ class BottomNavBreeze extends StatelessWidget {
       child: Container(
         height: context.locale == "en" ? 60.h : 70.h,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          // color: Theme.of(context).colorScheme.surface,
+          color: AppColor.Dark,
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
         ),
         child: Row(
@@ -60,10 +61,7 @@ class BottomNavBreeze extends StatelessWidget {
                           key: ValueKey('${isSelected}_$index'),
                           width: 24.sp,
                           height: 24.sp,
-                          colorFilter: ColorFilter.mode(
-                            isSelected ? Theme.of(context).colorScheme.onSurface : AppColor.gry.withOpacity(0.7),
-                            BlendMode.srcIn,
-                          ),
+                          colorFilter: ColorFilter.mode(isSelected ? AppColor.white : AppColor.gry.withOpacity(0.7), BlendMode.srcIn),
                         ),
                       ),
 
@@ -76,7 +74,7 @@ class BottomNavBreeze extends StatelessWidget {
                         style: TextStyle(
                           fontSize: isSelected ? 12.sp : 11.sp,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                          color: isSelected ? Theme.of(context).colorScheme.onSurface : AppColor.gry.withOpacity(0.7),
+                          color: isSelected ? AppColor.white : AppColor.gry.withOpacity(0.7),
                           fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
                         ),
                         child: Text(_labelKeys[index].tr()),

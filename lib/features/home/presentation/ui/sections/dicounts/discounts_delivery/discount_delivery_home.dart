@@ -47,16 +47,17 @@ class DiscountDeliveryHome extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsetsDirectional.only(top: 10, start: 8, end: 0.2),
+          padding: EdgeInsetsDirectional.only(top: 10, start: 0, end: 0.2),
           child: SizedBox(
             height: 150.h,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / 2.2;
+                final itemWidth = constraints.maxWidth / 2.3;
 
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: discountDelivery.length,
+                  padding: EdgeInsetsDirectional.only(start: 11.w),
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
                     final d = discountDelivery[index];
@@ -66,7 +67,8 @@ class DiscountDeliveryHome extends StatelessWidget {
 
                     return Container(
                       width: itemWidth,
-                      margin: EdgeInsetsDirectional.only(end: 10.w),
+                      // margin: EdgeInsetsDirectional.only(end: 10.w),
+                      margin: EdgeInsetsDirectional.only(start: index == 0 ? 9.w : 0, end: 10.w),
                       child: Discount(
                         isOpen: d.isOpen,
                         onTap: () => openRestaurantById(context, d.restaurantId),

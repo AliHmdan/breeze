@@ -9,19 +9,12 @@ class CustomAppbarProfile extends StatelessWidget {
   final Color? backgroundcolor;
   final VoidCallback ontap;
 
-  const CustomAppbarProfile({
-    super.key,
-    this.icon,
-    this.subtitle,
-    this.title,
-    required this.ontap,
-    this.backgroundcolor,
-  });
+  const CustomAppbarProfile({super.key, this.icon, this.subtitle, this.title, required this.ontap, this.backgroundcolor});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, top: 30),
+      padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 22.h),
       child: SizedBox(
         height: 48.h,
         child: Stack(
@@ -44,13 +37,7 @@ class CustomAppbarProfile extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsetsDirectional.only(start: 6),
-                      child: Icon(
-                        icon,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
-                        size: 16.sp,
-                      ),
+                      child: Icon(icon, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, size: 16.sp),
                     ),
                   ),
                 ),
@@ -67,10 +54,7 @@ class CustomAppbarProfile extends StatelessWidget {
                     fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColor.white,
-                    fontFamily:
-                        Localizations.localeOf(context).languageCode == 'ar'
-                        ? 'Cairo'
-                        : 'Inter',
+                    fontFamily: Localizations.localeOf(context).languageCode == 'ar' ? 'Cairo' : 'Inter',
                   ),
                 ),
               ),

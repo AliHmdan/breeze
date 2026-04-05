@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -6,12 +7,7 @@ class CounterRequest extends StatefulWidget {
   final bool loading; // ✅ لودينغ على نفس العنصر
   final ValueChanged<int>? onChanged;
 
-  const CounterRequest({
-    super.key,
-    required this.value,
-    this.loading = false,
-    this.onChanged,
-  });
+  const CounterRequest({super.key, required this.value, this.loading = false, this.onChanged});
 
   @override
   State<CounterRequest> createState() => _CounterRequestState();
@@ -52,7 +48,7 @@ class _CounterRequestState extends State<CounterRequest> {
       alignment: Alignment.center,
       children: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 6.h),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -61,11 +57,7 @@ class _CounterRequestState extends State<CounterRequest> {
               SizedBox(width: 10.w),
               Text(
                 "x$_count",
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(color: AppColor.white, fontSize: 14.sp, fontWeight: FontWeight.w700),
               ),
               SizedBox(width: 10.w),
               _btn(icon: Icons.add, onTap: () => _set(_count + 1)),
@@ -76,19 +68,9 @@ class _CounterRequestState extends State<CounterRequest> {
         if (widget.loading)
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surface.withOpacity(0.35),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
+              decoration: BoxDecoration(color: colorScheme.surface.withOpacity(0.35), borderRadius: BorderRadius.circular(12.r)),
               child: Center(
-                child: SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: colorScheme.primary,
-                  ),
-                ),
+                child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.primary)),
               ),
             ),
           ),
@@ -104,11 +86,8 @@ class _CounterRequestState extends State<CounterRequest> {
       child: Container(
         width: 26.w,
         height: 26.w,
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: Icon(icon, size: 16, color: colorScheme.onSurface),
+        decoration: BoxDecoration(color: AppColor.search, borderRadius: BorderRadius.circular(99)),
+        child: Icon(icon, size: 16, color: AppColor.white),
       ),
     );
   }

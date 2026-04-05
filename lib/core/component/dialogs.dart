@@ -16,18 +16,12 @@ class AppDialog {
         iconColor: AppColor.red,
         title: title,
         message: message,
-        actions: CustomButton(
-          title: 'حسناً',
-          onPressed: () => Navigator.pop(NavigationKey.context),
-        ),
+        actions: CustomButton(title: 'حسناً', onPressed: () => Navigator.pop(NavigationKey.context)),
       ),
     );
   }
 
-  static Future<void> showSuccessDialog({
-    String title = "تمت العملية بنجاح",
-    String message = "",
-  }) {
+  static Future<void> showSuccessDialog({String title = "تمت العملية بنجاح", String message = ""}) {
     return showDialog(
       context: NavigationKey.context,
       barrierDismissible: true,
@@ -37,10 +31,7 @@ class AppDialog {
         iconColor: AppColor.green,
         title: title,
         message: message,
-        actions: CustomButton(
-          title: 'موافق',
-          onPressed: () => Navigator.pop(NavigationKey.context),
-        ),
+        actions: CustomButton(title: 'موافق', onPressed: () => Navigator.pop(NavigationKey.context)),
       ),
     );
   }
@@ -75,10 +66,7 @@ class AppDialog {
             ),
             SizedBox(width: 12.w),
             Expanded(
-              child: CustomButton(
-                title: yesText,
-                onPressed: () => Navigator.pop(NavigationKey.context, true),
-              ),
+              child: CustomButton(title: yesText, onPressed: () => Navigator.pop(NavigationKey.context, true)),
             ),
           ],
         ),
@@ -94,20 +82,14 @@ class _BreezeDialogShell extends StatelessWidget {
   final String message;
   final Widget actions;
 
-  const _BreezeDialogShell({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.message,
-    required this.actions,
-  });
+  const _BreezeDialogShell({required this.icon, required this.iconColor, required this.title, required this.message, required this.actions});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: AppColor.white,
+      backgroundColor: AppColor.Dark,
       contentPadding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -115,21 +97,14 @@ class _BreezeDialogShell extends StatelessWidget {
           Container(
             width: 64.w,
             height: 64.w,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: iconColor.withOpacity(0.12), shape: BoxShape.circle),
             child: Icon(icon, color: iconColor, size: 30),
           ),
           SizedBox(height: 18.h),
 
           Text(
             title,
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w700,
-              color: AppColor.black,
-            ),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppColor.white),
             textAlign: TextAlign.center,
           ),
 
@@ -137,11 +112,7 @@ class _BreezeDialogShell extends StatelessWidget {
             SizedBox(height: 8.h),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w400,
-                color: AppColor.black.withOpacity(0.75),
-              ),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppColor.white.withOpacity(0.75)),
               textAlign: TextAlign.center,
             ),
           ],

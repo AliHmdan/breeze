@@ -1,9 +1,11 @@
 import 'package:breezefood/core/component/bottom_cart_action.dart';
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/component/have_order.dart';
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/pick_by_langu.dart';
+import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart' show HomeCubit;
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_button_order.dart';
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/model/active_orders_response.dart';
@@ -25,12 +27,7 @@ class MarketPagePrice extends StatelessWidget {
   final int marketId;
   final String title;
   final OrderInfo? haveOrder; // ✅ جديد
-  const MarketPagePrice({
-    this.haveOrder,
-    super.key,
-    required this.marketId,
-    required this.title,
-  });
+  const MarketPagePrice({this.haveOrder, super.key, required this.marketId, required this.title});
 
   int _cartCount(dynamic cart) {
     if (cart == null) return 0;
@@ -95,10 +92,7 @@ class MarketPagePrice extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => MarketDetailsCubit(
-            repo: getIt<SuperMarketRepo>(),
-            marketId: marketId,
-          )..load(),
+          create: (_) => MarketDetailsCubit(repo: getIt<SuperMarketRepo>(), marketId: marketId)..load(),
         ),
         BlocProvider(create: (_) => getIt<CartCubit>()..loadCart()),
       ],
@@ -124,16 +118,12 @@ class MarketPagePrice extends StatelessWidget {
                 loading: () => EasyLoading.show(status: "Adding...".tr()),
                 addedSuccess: (msg) {
                   EasyLoading.dismiss();
-                  EasyLoading.showSuccess(
-                    msg.isEmpty ? "added_success".tr() : msg,
-                  );
+                  EasyLoading.showSuccess(msg.isEmpty ? "added_success".tr() : msg);
                   context.read<CartCubit>().loadCart();
                 },
                 error: (msg) {
                   EasyLoading.dismiss();
-                  EasyLoading.showError(
-                    msg.isEmpty ? "something_wrong".tr() : msg,
-                  );
+                  EasyLoading.showError(msg.isEmpty ? "something_wrong".tr() : msg);
                 },
               );
             },
@@ -163,10 +153,7 @@ class MarketPagePrice extends StatelessWidget {
 
                     if (state.error != null) {
                       return Center(
-                        child: Text(
-                          state.error!,
-                          style: const TextStyle(color: Colors.white),
-                        ),
+                        child: Text(state.error!, style: const TextStyle(color: Colors.white)),
                       );
                     }
 
@@ -185,27 +172,16 @@ class MarketPagePrice extends StatelessWidget {
                               final selected = c.id == state.selectedCategoryId;
 
                               return InkWell(
-                                onTap: () => context
-                                    .read<MarketDetailsCubit>()
-                                    .selectCategory(c.id),
+                                onTap: () => context.read<MarketDetailsCubit>().selectCategory(c.id),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 14.w,
-                                    vertical: 10.h,
-                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                                   decoration: BoxDecoration(
-                                    color: selected
-                                        ? const Color(0xFF4CAF50)
-                                        : const Color(0xFF1C1C1C),
+                                    color: selected ? const Color(0xFF4CAF50) : const Color(0xFF1C1C1C),
                                     borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   child: Text(
                                     c.name,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13.sp,
-                                    ),
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13.sp),
                                   ),
                                 ),
                               );
@@ -226,47 +202,31 @@ class MarketPagePrice extends StatelessWidget {
                                   ),
                                   physics: const BouncingScrollPhysics(),
                                   itemCount: state.items.length,
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        crossAxisSpacing:
-                                            16.w, // مسافة أفقية واضحة
-                                        mainAxisSpacing:
-                                            20.h, // 👈 مسافة عمودية متل الصورة
-                                        mainAxisExtent:
-                                            230.h, // 👈 ارتفاع ثابت للكرت
-                                      ),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 16.w, // مسافة أفقية واضحة
+                                    mainAxisSpacing: 20.h, // 👈 مسافة عمودية متل الصورة
+                                    mainAxisExtent: 230.h, // 👈 ارتفاع ثابت للكرت
+                                  ),
                                   itemBuilder: (context, index) {
                                     final it = state.items[index];
 
-                                    final titleTxt = context.pick(
-                                      ar: it.nameAr,
-                                      en: it.nameEn,
-                                    );
+                                    final titleTxt = context.pick(ar: it.nameAr, en: it.nameEn);
 
-                                    final descTxt = context.pick(
-                                      ar: it.descriptionAr,
-                                      en: it.descriptionEn,
-                                    );
+                                    final descTxt = context.pick(ar: it.descriptionAr, en: it.descriptionEn);
 
-                                    final imgUrl =
-                                        UrlHelper.toFullUrl(it.image) ?? "";
+                                    final imgUrl = UrlHelper.toFullUrl(it.image) ?? "";
 
                                     return InkWell(
                                       onTap: !it.isAvailable
-                                          ? () => EasyLoading.showInfo(
-                                              "Not available".tr(),
-                                            )
+                                          ? () => EasyLoading.showInfo("Not available".tr())
                                           : () async {
-                                              final res =
-                                                  await showSupermarketAddOrderDialog(
-                                                    context,
-                                                    title: titleTxt,
-                                                    price: it.basePrice,
-                                                    imagePath: imgUrl.isNotEmpty
-                                                        ? imgUrl
-                                                        : "assets/images/bread.png",
-                                                  );
+                                              final res = await showSupermarketAddOrderDialog(
+                                                context,
+                                                title: titleTxt,
+                                                price: it.basePrice,
+                                                imagePath: imgUrl.isNotEmpty ? imgUrl : "assets/images/bread.png",
+                                              );
 
                                               if (res == null) return;
 
@@ -283,13 +243,8 @@ class MarketPagePrice extends StatelessWidget {
                                         product: Product(
                                           title: titleTxt,
                                           desc: descTxt,
-                                          price: context.syp(
-                                            it.basePrice,
-                                            decimals: 0,
-                                          ),
-                                          image: imgUrl.isNotEmpty
-                                              ? imgUrl
-                                              : "assets/images/bread.png",
+                                          price: context.syp(it.basePrice, decimals: 0),
+                                          image: imgUrl.isNotEmpty ? imgUrl : "assets/images/bread.png",
                                         ),
                                       ),
                                     );
@@ -331,8 +286,7 @@ class MarketPagePrice extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: BottomCartAction(
                               haveOrder: haveOrder,
-                              usePrimaryButton:
-                                  false, // لأنه هون كنت تستعمل CustomButtonOrder
+                              usePrimaryButton: false, // لأنه هون كنت تستعمل CustomButtonOrder
                               showCountAndTotal: true,
                               onViewCart: () async {
                                 await Navigator.push(
@@ -340,21 +294,17 @@ class MarketPagePrice extends StatelessWidget {
                                   MaterialPageRoute(
                                     builder: (_) => MultiBlocProvider(
                                       providers: [
-                                        BlocProvider.value(
-                                          value: context.read<CartCubit>(),
-                                        ),
-                                        BlocProvider(
-                                          create: (_) =>
-                                              getIt<OrderFlowCubit>(),
-                                        ),
+                                        BlocProvider.value(value: context.read<CartCubit>()),
+                                        BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
                                       ],
-                                      child: const RequestOrderScreen(),
+                                      child: RequestOrderScreen(
+                                        // addressTitle: context.read<HomeCubit>().homeData!.provinceDetected ?? ''
+                                      ),
                                     ),
                                   ),
                                 );
 
-                                if (context.mounted)
-                                  context.read<CartCubit>().loadCart();
+                                if (context.mounted) context.read<CartCubit>().loadCart();
                               },
                             ),
                           ),
@@ -366,10 +316,8 @@ class MarketPagePrice extends StatelessWidget {
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: CustomButtonOrder(
-                            title: "home.your_order"
-                                .tr(), // أو "home.track_order".tr()
-                            onPressed: () =>
-                                openHaveOrderTracking(context, haveOrder!.id),
+                            title: "home.your_order".tr(), // أو "home.track_order".tr()
+                            onPressed: () => openHaveOrderTracking(context, haveOrder!.id),
                           ),
                         );
                       }
@@ -407,14 +355,12 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18.r),
           child: SizedBox(
             width: double.infinity,
-            height: 170.h, // 👈 أكبر شوي متل الصورة
-            child: product.isNetworkImage
-                ? Image.network(product.image, fit: BoxFit.cover)
-                : Image.asset(product.image, fit: BoxFit.cover),
+            height: 150.h, // 👈 أكبر شوي متل الصورة
+            child: product.isNetworkImage ? Image.network(product.image, fit: BoxFit.cover) : Image.asset(product.image, fit: BoxFit.cover),
           ),
         ),
 
-        SizedBox(height: 10.h),
+        SizedBox(height: 0.h),
 
         /// Title
         Padding(
@@ -423,26 +369,18 @@ class ProductCard extends StatelessWidget {
             product.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600, color: AppColor.white),
           ),
         ),
 
-        SizedBox(height: 4.h),
+        SizedBox(height: 0.h),
 
         /// Price
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 6.w),
           child: Text(
             product.price,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+            style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500, color: AppColor.white.withOpacity(0.7)),
           ),
         ),
       ],
@@ -460,12 +398,7 @@ class Product {
   final String image;
   final String desc;
 
-  Product({
-    required this.title,
-    required this.desc,
-    required this.price,
-    required this.image,
-  });
+  Product({required this.title, required this.desc, required this.price, required this.image});
 
   bool get isNetworkImage => image.startsWith("http");
 }

@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/assistant/presentation/cubit/assistant_cubit.dart';
 import 'package:breezefood/features/assistant/presentation/cubit/assistant_state.dart';
@@ -28,16 +29,12 @@ Future<void> showAssistantChatSheet(BuildContext context) async {
         removeTop: true,
         child: AnimatedPadding(
           duration: const Duration(milliseconds: 250),
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(sheetCtx).viewInsets.bottom,
-          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
           child: Container(
             height: height,
             decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              color: AppColor.Dark,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: MultiBlocProvider(
               providers: [
@@ -74,15 +71,11 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scroll.hasClients) return;
-      _scroll.animateTo(
-        _scroll.position.maxScrollExtent + 120,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-      );
+      _scroll.animateTo(_scroll.position.maxScrollExtent + 120, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
     });
   }
 
-  Future<void> _openRestaurant(BuildContext context, int id) async {
+  Future<void> _openRestaurant(BuildContext context, int id,) async {
     if (id <= 0) return;
 
     await Navigator.push(
@@ -122,24 +115,17 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                   Expanded(
                     child: Text(
                       "AI Assistant",
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w900,
-                      ),
+                      style: TextStyle(color: AppColor.white, fontSize: 16.sp, fontWeight: FontWeight.w900),
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, color: colorScheme.onSurface),
+                    icon: Icon(Icons.close, color: AppColor.white),
                   ),
                 ],
               ),
             ),
-            Divider(
-              height: 1,
-              color: colorScheme.outlineVariant.withOpacity(0.6),
-            ),
+            Divider(height: 1, color: AppColor.search.withOpacity(0.6)),
             Expanded(
               child: ListView(
                 controller: _scroll,
@@ -150,48 +136,30 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                       padding: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         state.message,
-                        style: TextStyle(
-                          color: colorScheme.error,
-                          fontSize: 13.sp,
-                        ),
+                        style: TextStyle(color: colorScheme.error, fontSize: 13.sp),
                       ),
                     ),
                   if (loaded != null)
                     ...loaded.messages.map((m) {
                       final isUser = m.role.toLowerCase() == "user";
-                      final bg = isUser
-                          ? colorScheme.primary.withOpacity(0.10)
-                          : colorScheme.surfaceContainerHighest.withOpacity(
-                              0.65,
-                            );
-                      final borderColor = colorScheme.outlineVariant
-                          .withOpacity(0.55);
-                      final align = isUser
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft;
+                      final bg = isUser ? colorScheme.primary.withOpacity(0.10) : colorScheme.surfaceContainerHighest.withOpacity(0.65);
+                      final borderColor = colorScheme.outlineVariant.withOpacity(0.55);
+                      final align = isUser ? Alignment.centerRight : Alignment.centerLeft;
 
                       return Align(
                         alignment: align,
                         child: Container(
                           margin: EdgeInsets.only(bottom: 10.h),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 10.h,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
                           constraints: BoxConstraints(maxWidth: 0.82.sw),
                           decoration: BoxDecoration(
-                            color: bg,
+                            color: AppColor.search,
                             borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(color: borderColor),
+                            border: Border.all(color: AppColor.search),
                           ),
                           child: Text(
                             m.message,
-                            style: TextStyle(
-                              color: colorScheme.onSurface,
-                              fontSize: 13.sp,
-                              height: 1.2,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: TextStyle(color: AppColor.white, fontSize: 13.sp, height: 1.2, fontWeight: FontWeight.w600),
                           ),
                         ),
                       );
@@ -200,45 +168,29 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                     SizedBox(height: 6.h),
                     Text(
                       "Restaurants",
-                      style: TextStyle(
-                        color: colorScheme.onSurface.withOpacity(0.75),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: TextStyle(color: AppColor.white.withOpacity(0.75), fontSize: 12.sp, fontWeight: FontWeight.w800),
                     ),
                     SizedBox(height: 8.h),
                     ...loaded.restaurants.map((r) {
-                      final tileBorder = colorScheme.outlineVariant.withOpacity(
-                        0.6,
-                      );
+                      final tileBorder = colorScheme.outlineVariant.withOpacity(0.6);
                       return InkWell(
-                        onTap: () => _openRestaurant(context, r.id),
+                        onTap: () => _openRestaurant(context, r.id,),
                         borderRadius: BorderRadius.circular(14.r),
                         child: Container(
                           margin: EdgeInsets.only(bottom: 10.h),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 12.h,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                           decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHighest
-                                .withOpacity(0.65),
+                            color: AppColor.search.withOpacity(0.65),
                             borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(color: tileBorder),
+                            border: Border.all(color: AppColor.white),
                           ),
                           child: Row(
                             children: [
                               Container(
                                 width: 34.w,
                                 height: 34.w,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primaryContainer,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Icon(
-                                  Icons.storefront,
-                                  color: colorScheme.onPrimaryContainer,
-                                ),
+                                decoration: BoxDecoration(color: AppColor.white, borderRadius: BorderRadius.circular(10.r)),
+                                child: Icon(Icons.storefront, color: colorScheme.onPrimaryContainer),
                               ),
                               SizedBox(width: 10.w),
                               Expanded(
@@ -246,18 +198,11 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                                   r.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: colorScheme.onSurface,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: TextStyle(color: colorScheme.onSurface, fontSize: 13.sp, fontWeight: FontWeight.w800),
                                 ),
                               ),
                               SizedBox(width: 8.w),
-                              Icon(
-                                Icons.chevron_right,
-                                color: colorScheme.onSurface.withOpacity(0.65),
-                              ),
+                              Icon(Icons.chevron_right, color: colorScheme.onSurface.withOpacity(0.65)),
                             ],
                           ),
                         ),
@@ -272,19 +217,12 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                           SizedBox(
                             width: 16.w,
                             height: 16.w,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colorScheme.primary,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primaryColor),
                           ),
                           SizedBox(width: 10.w),
                           Text(
                             "Typing...",
-                            style: TextStyle(
-                              color: colorScheme.onSurface.withOpacity(0.7),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -299,34 +237,23 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                   Expanded(
                     child: TextField(
                       controller: _ctrl,
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 13.sp,
-                      ),
+                      style: TextStyle(color: AppColor.white, fontSize: 13.sp),
                       decoration: InputDecoration(
                         hintText: "اكتب طلبك...",
-                        hintStyle: TextStyle(
-                          color: colorScheme.onSurface.withOpacity(0.5),
-                        ),
+                        hintStyle: TextStyle(color: AppColor.white.withOpacity(0.5)),
                         filled: true,
-                        fillColor: colorScheme.surfaceContainerHighest,
+                        fillColor: AppColor.search,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(
-                            color: colorScheme.outlineVariant,
-                          ),
+                          borderSide: BorderSide(color: AppColor.search),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(
-                            color: colorScheme.outlineVariant,
-                          ),
+                          borderSide: BorderSide(color: AppColor.search),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(
-                            color: colorScheme.primary.withOpacity(0.8),
-                          ),
+                          borderSide: BorderSide(color: AppColor.search.withOpacity(0.8)),
                         ),
                       ),
                       onSubmitted: (_) {
@@ -345,15 +272,9 @@ class _AssistantChatBodyState extends State<_AssistantChatBody> {
                     },
                     borderRadius: BorderRadius.circular(14.r),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.w,
-                        vertical: 12.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      child: Icon(Icons.send, color: colorScheme.onPrimary),
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                      decoration: BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(14.r)),
+                      child: Icon(Icons.send, color: AppColor.Dark),
                     ),
                   ),
                 ],

@@ -2,11 +2,13 @@ import 'package:hive/hive.dart';
 
 class AuthStorageHelper {
   static const String _authBoxName = 'auth_box';
+  static const String _userBack = 'user_back';
   static const String _prefsBoxName = 'app_prefs_box';
   static const String _them = 'them';
   static const String _themKey = 'themKey';
 
   static const String _tokenKey = 'auth_token';
+  static const String _userBackKey = 'user_back_key';
   static const String _roleKey = 'user_role';
   static const String _isGuestKey = 'is_guest';
 
@@ -115,6 +117,28 @@ class AuthStorageHelper {
   static Future<bool> hasToken() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  ///
+  ///
+  static Future<void> saveBack(String back) async {
+    final box = await Hive.openBox(_userBack);
+    await box.put(_userBackKey, back);
+  }
+
+  static Future<String?> getBack() async {
+    final box = await Hive.openBox(_userBack);
+    return box.get(_userBackKey);
+  }
+
+  static Future<void> removeBack() async {
+    final box = await Hive.openBox(_userBack);
+    await box.delete(_userBackKey);
+  }
+
+  static Future<bool> hasBack() async {
+    final back = await getToken();
+    return back != null ? false : true;
   }
 
   // -------------------------------------------------------------

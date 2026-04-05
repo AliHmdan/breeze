@@ -35,18 +35,19 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
     final cart = getIt<CartCubit>();
 
     // لو فشل GPS ما بدنا نوقف كل شيء
-    try {
-      await home.sendMyLocationOnce();
-    } catch (_) {}
-
-    // load كلاتهم سوا
-    await Future.wait([home.load(), profile.load(), cart.loadCart()]);
+    // try {
+    //   await home.sendMyLocationOnce();
+    // } catch (_) {}
+    //
+    // // load كلاتهم سوا
+    // await Future.wait([home.load(), profile.load(), cart.loadCart()]);
   }
 
   Future<void> _initVideo() async {
     _controller = VideoPlayerController.asset('assets/video/splachscreene.mp4');
     _controller.setLooping(false);
     _controller.setVolume(_isMuted ? 0.0 : 1.0);
+    _controller.setPlaybackSpeed(1.5);
 
     await _controller.initialize();
     if (!mounted) return;
@@ -55,7 +56,7 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
     _controller.play();
 
     // بعد 8 ثواني منبلّش الانتقال (وبنستنى bootstrap)
-    _timer = Timer(const Duration(seconds: 8), _goNext);
+    _timer = Timer(const Duration(milliseconds: 1900), _goNext);
   }
 
   Future<void> _goNext() async {
@@ -69,9 +70,7 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
 
     if (!mounted) return;
 
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell()));
   }
 
   Future<void> _toggleMute() async {
@@ -100,11 +99,7 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
             SizedBox.expand(
               child: FittedBox(
                 fit: BoxFit.cover, // 👈 هذا المهم
-                child: SizedBox(
-                  width: _controller.value.size.width,
-                  height: _controller.value.size.height,
-                  child: VideoPlayer(_controller),
-                ),
+                child: SizedBox(width: _controller.value.size.width, height: _controller.value.size.height, child: VideoPlayer(_controller)),
               ),
             )
           else
@@ -120,14 +115,7 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
                 if (snap.connectionState == ConnectionState.done) {
                   return const SizedBox.shrink();
                 }
-                return const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                );
+                return const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white));
               },
             ),
           ),
@@ -143,11 +131,7 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
                     color: Colors.black.withOpacity(0.35),
                     shape: const CircleBorder(),
                     clipBehavior: Clip.antiAlias,
-                    child: IconButton(
-                      icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
-                      color: Colors.white,
-                      onPressed: _toggleMute,
-                    ),
+                    child: IconButton(icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up), color: Colors.white, onPressed: _toggleMute),
                   ),
                 ),
               ),

@@ -91,7 +91,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                       SizedBox(width: 3.w),
                       Text(
                         _rating.toStringAsFixed(1),
-                        style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface, fontSize: 12.sp, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -106,7 +106,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(color: AppColor.white, fontSize: 15.sp, fontWeight: FontWeight.w700),
             ),
           ),
 
@@ -118,7 +118,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: Theme.of(context).colorScheme.onSurface),
+                Image.asset("assets/icons/new_del.png", width: 15.w, height: 15.h, color: AppColor.white.withOpacity(0.7)),
                 SizedBox(width: 4.w),
                 Text(
                   context.syp(feeText, decimals: 0),
@@ -126,7 +126,7 @@ class _BreakfastRestaurantCardState extends State<BreakfastRestaurantCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: AppColor.white.withOpacity(0.7),
                     fontSize: 11.sp,
                     // fontWeight: FontWeight.w700,
                   ),
@@ -170,6 +170,7 @@ class BreakfastRestaurantsSection extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
+        padding: EdgeInsetsDirectional.only(start: 11.w),
         itemCount: restaurants.length,
         itemBuilder: (context, index) {
           final r = restaurants[index];

@@ -6,6 +6,8 @@ import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/core/services/money.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/core/services/pick_by_langu.dart';
+import 'package:breezefood/features/app/bloc/app_cubit.dart' show AppCubit;
+import 'package:breezefood/features/home/presentation/cubit/home_cubit.dart' show HomeCubit;
 import 'package:breezefood/features/orders/cart/request_order_screen.dart';
 import 'package:breezefood/features/orders/presentation/cubit/cart_cubit.dart';
 import 'package:breezefood/features/orders/presentation/cubit/orders/order_flow_cubit.dart';
@@ -17,6 +19,7 @@ import 'package:breezefood/features/stores/presentation/cubit/restaurant_details
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,21 +33,21 @@ import 'widgets/rd_sections_sliver_list.dart';
 class ResturantDetails extends StatefulWidget {
   final int restaurant_id;
   final int? initialMenuItemId;
+  // final String headerImage;
 
   const ResturantDetails({
     super.key,
     required this.restaurant_id,
     this.initialMenuItemId,
+    // required this.headerImage
   });
 
   @override
   State<ResturantDetails> createState() => _ResturantDetailsState();
 }
 
-class _ResturantDetailsState extends State<ResturantDetails>
-    with SingleTickerProviderStateMixin {
-  late final RestaurantDetailsScrollController scrollCtl =
-      RestaurantDetailsScrollController()..init();
+class _ResturantDetailsState extends State<ResturantDetails> with SingleTickerProviderStateMixin {
+  late final RestaurantDetailsScrollController scrollCtl = RestaurantDetailsScrollController()..init();
 
   late final RestaurantDetailsCubit cubit;
 
@@ -86,16 +89,9 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
     final delta = currentCenterX - desiredCenterX;
 
-    final target = (_tabsController.offset + delta).clamp(
-      _tabsController.position.minScrollExtent,
-      _tabsController.position.maxScrollExtent,
-    );
+    final target = (_tabsController.offset + delta).clamp(_tabsController.position.minScrollExtent, _tabsController.position.maxScrollExtent);
 
-    _tabsController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-    );
+    _tabsController.animateTo(target, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
   }
 
   Future<void> _precacheImage(String url) async {
@@ -103,10 +99,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
     if (_preloadedImages.contains(url)) return;
 
     try {
-      await precacheImage(
-        CachedNetworkImageProvider(url, cacheManager: AppCacheManager.instance),
-        context,
-      );
+      await precacheImage(CachedNetworkImageProvider(url, cacheManager: AppCacheManager.instance), context);
       _preloadedImages.add(url);
     } catch (_) {}
   }
@@ -116,16 +109,13 @@ class _ResturantDetailsState extends State<ResturantDetails>
     super.initState();
     cubit = getIt<RestaurantDetailsCubit>();
 
-    _overlapController =
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 230),
-        )..addListener(() {
-          final a = _overlapAnim;
-          if (a == null) return;
-          final v = a.value;
-          if (_headerOverlap != v) setState(() => _headerOverlap = v);
-        });
+    _overlapController = AnimationController(vsync: this, duration: const Duration(milliseconds: 230))
+      ..addListener(() {
+        final a = _overlapAnim;
+        if (a == null) return;
+        final v = a.value;
+        if (_headerOverlap != v) setState(() => _headerOverlap = v);
+      });
 
     _activeIdxListener = () {
       final idx = scrollCtl.activeIndex.value;
@@ -166,9 +156,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
     _overlapController.stop();
     _overlapController.reset();
-    _overlapAnim = Tween<double>(begin: _headerOverlap, end: 24.0).animate(
-      CurvedAnimation(parent: _overlapController, curve: Curves.easeOutCubic),
-    );
+    _overlapAnim = Tween<double>(begin: _headerOverlap, end: 24.0).animate(CurvedAnimation(parent: _overlapController, curve: Curves.easeOutCubic));
     _overlapController.forward();
   }
 
@@ -182,37 +170,46 @@ class _ResturantDetailsState extends State<ResturantDetails>
   }
 
   Widget _loadingView() {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator(color: AppColor.primaryColor));
   }
 
   Widget _errorView(String msg) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/wifi.png',
-              width: 450.w,
-              height: 450.h,
-              fit: BoxFit.cover, // طريقة تمدد الصورة
-            ),
-            SizedBox(height: 10.h),
-            Text(
-              msg,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
-            ),
-            SizedBox(height: 14.h),
-            SizedBox(
-              height: 44.h,
-              child: ElevatedButton(
-                onPressed: () => cubit.load(widget.restaurant_id),
-                child: Text("common.retry".tr()),
+    return Container(
+      color: AppColor.Dark,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/wifi.png',
+                width: 150.w,
+                height: 150.h,
+                fit: BoxFit.cover, // طريقة تمدد الصورة
               ),
-            ),
-          ],
+              SizedBox(height: 10.h),
+              Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              ),
+              SizedBox(height: 14.h),
+              Container(
+                height: 44.h,
+                //color: AppColor.search,
+                child: ElevatedButton(
+                  onPressed: () => cubit.load(widget.restaurant_id),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 8.h),
+                    backgroundColor: AppColor.search,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.r)),
+                  ),
+                  child: Text("common.retry".tr(), style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -285,14 +282,10 @@ class _ResturantDetailsState extends State<ResturantDetails>
     final hasMostPopular = mostPopularItems.isNotEmpty;
 
     final allItems = sections.expand((s) => s.items).toList();
-    discountedItems = allItems.where((x) => x.hasDiscount).toList()
-      ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
+    discountedItems = allItems.where((x) => x.hasDiscount).toList()..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
     final hasDiscountSection = discountedItems.isNotEmpty;
 
-    final totalCount =
-        sections.length +
-        (hasMostPopular ? 1 : 0) +
-        (hasDiscountSection ? 1 : 0);
+    final totalCount = sections.length + (hasMostPopular ? 1 : 0) + (hasDiscountSection ? 1 : 0);
 
     scrollCtl.setCategoryKeys(totalCount);
 
@@ -312,11 +305,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
       ...menuCats,
     ];
 
-    itemsByCategory = [
-      if (hasDiscountSection) discountedItems,
-      if (hasMostPopular) mostPopularItems,
-      ...sections.map((e) => e.items),
-    ];
+    itemsByCategory = [if (hasDiscountSection) discountedItems, if (hasMostPopular) mostPopularItems, ...sections.map((e) => e.items)];
 
     for (final section in sections) {
       for (final item in section.items.take(4)) {
@@ -347,17 +336,8 @@ class _ResturantDetailsState extends State<ResturantDetails>
                   height: 260.h,
                   child: ClipRect(
                     child: _headerReady
-                        ? AppNetworkImage(
-                            height: 260,
-                            path: headerImageUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            "assets/images/meal_breeze.jpeg",
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                        ? AppNetworkImage(height: 260, path: headerImageUrl, width: double.infinity, fit: BoxFit.cover)
+                        : Image.asset("assets/images/meal_breeze.jpeg", width: double.infinity, fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -374,12 +354,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Colors.green.withOpacity(0.2),
-                Colors.black.withOpacity(0.8),
-                Colors.black.withOpacity(0.8),
-                Colors.green.withOpacity(0.9),
-              ],
+              colors: [Colors.green.withOpacity(0.2), Colors.black.withOpacity(0.8), Colors.black.withOpacity(0.8), Colors.green.withOpacity(0.9)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -397,15 +372,9 @@ class _ResturantDetailsState extends State<ResturantDetails>
                 if (_overlapController.isAnimating) {
                   _overlapController.stop();
                 }
-                final nextPull = (_pullExtent + (-n.overscroll)).clamp(
-                  0.0,
-                  120.0,
-                );
+                final nextPull = (_pullExtent + (-n.overscroll)).clamp(0.0, 120.0);
                 final nextZoom = (1.0 + (nextPull / 260.0)).clamp(1.0, 1.35);
-                final nextOverlap = (24.0 + (nextPull * 0.35)).clamp(
-                  24.0,
-                  70.0,
-                );
+                final nextOverlap = (24.0 + (nextPull * 0.35)).clamp(24.0, 70.0);
                 if (nextPull != _pullExtent || nextZoom != _headerZoom) {
                   setState(() {
                     _pullExtent = nextPull;
@@ -418,8 +387,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
             if (n is ScrollUpdateNotification) {
               // If user scrolls down into content, ensure we reset.
-              if (n.metrics.pixels > 0 &&
-                  (_pullExtent != 0.0 || _headerZoom != 1.0)) {
+              if (n.metrics.pixels > 0 && (_pullExtent != 0.0 || _headerZoom != 1.0)) {
                 _overlapController.stop();
                 setState(() {
                   _pullExtent = 0.0;
@@ -446,19 +414,16 @@ class _ResturantDetailsState extends State<ResturantDetails>
           child: NestedScrollView(
             key: scrollCtl.nestedKey,
             controller: scrollCtl.outer,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             headerSliverBuilder: (context, innerBoxIsScrolled) {
-              scrollCtl.setStickyExtent(
-                165.h,
-              ); // نفس minExtent/maxExtent تبع RDStickyInfoTabsSliver
+              scrollCtl.setStickyExtent(165.h); // نفس minExtent/maxExtent تبع RDStickyInfoTabsSliver
 
               return [
+                ///
+                /// here header photo , back arrow and search
+                ///
                 SliverOverlapAbsorber(
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context,
-                  ),
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: RDHeaderSliver(
                     overlap: _headerOverlap,
                     innerBoxIsScrolled: innerBoxIsScrolled,
@@ -467,17 +432,14 @@ class _ResturantDetailsState extends State<ResturantDetails>
                     reviewsCountText: reviewsCountText,
                     onBack: () => Navigator.pop(context),
                     onSearch: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              Search(restaurantId: widget.restaurant_id),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => Search(restaurantId: widget.restaurant_id)));
                     },
                   ),
                 ),
 
+                ///
+                ///here rate, delivery price and time
+                ///
                 ValueListenableBuilder<int>(
                   valueListenable: scrollCtl.activeIndex,
                   builder: (_, activeIdx, __) {
@@ -492,13 +454,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
                       categories: categories,
                       activeIndex: activeIdx,
                       onSearch: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                Search(restaurantId: widget.restaurant_id),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => Search(restaurantId: widget.restaurant_id)));
                       },
                       onTapCategory: (i) {
                         if (scrollCtl.activeIndex.value != i) {
@@ -510,8 +466,7 @@ class _ResturantDetailsState extends State<ResturantDetails>
                       reviewsCountText: reviewsCountText,
                       onRateTap: () async {
                         final reviewId = myReviewId;
-                        final hasMyRating =
-                            (reviewId ?? 0) > 0 && myUserRating > 0;
+                        final hasMyRating = (reviewId ?? 0) > 0 && myUserRating > 0;
 
                         final res = await showRateDialog(
                           context,
@@ -525,22 +480,16 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
                         if (res.delete) {
                           if ((reviewId ?? 0) == 0) {
-                            EasyLoading.showError(
-                              "reviews.no_review_to_delete".tr(),
-                            );
+                            EasyLoading.showError("reviews.no_review_to_delete".tr());
                             return;
                           }
 
-                          await submitCubit.deleteRestaurantRate(
-                            reviewId: reviewId!,
-                          );
+                          await submitCubit.deleteRestaurantRate(reviewId: reviewId!);
                           if (!mounted) return;
 
                           submitCubit.state.maybeWhen(
                             deleteSuccess: () async {
-                              EasyLoading.showSuccess(
-                                "reviews.delete_success".tr(),
-                              );
+                              EasyLoading.showSuccess("reviews.delete_success".tr());
                               await cubit.load(widget.restaurant_id);
                             },
                             error: (msg) => EasyLoading.showError(msg.tr()),
@@ -554,18 +503,13 @@ class _ResturantDetailsState extends State<ResturantDetails>
                           return;
                         }
 
-                        await submitCubit.submitRestaurantRate(
-                          restaurantId: widget.restaurant_id,
-                          rating: res.rating!,
-                        );
+                        await submitCubit.submitRestaurantRate(restaurantId: widget.restaurant_id, rating: res.rating!);
 
                         if (!mounted) return;
 
                         submitCubit.state.maybeWhen(
                           success: () async {
-                            EasyLoading.showSuccess(
-                              "reviews.rate_success".tr(),
-                            );
+                            EasyLoading.showSuccess("reviews.rate_success".tr());
                             await cubit.load(widget.restaurant_id);
                           },
                           error: (msg) => EasyLoading.showError(msg.tr()),
@@ -579,13 +523,10 @@ class _ResturantDetailsState extends State<ResturantDetails>
             },
             body: Builder(
               builder: (context) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => scrollCtl.attachInner(),
-                );
+                WidgetsBinding.instance.addPostFrameCallback((_) => scrollCtl.attachInner());
 
                 return Container(
-                  color:
-                      AppColor.Dark, // ✅ أهم سطر: يمنع ظهور الغلاف ورا الوجبات
+                  color: AppColor.Dark, // ✅ أهم سطر: يمنع ظهور الغلاف ورا الوجبات
                   child: RDSectionsSliverList(
                     restaurantId: widget.restaurant_id,
                     isRestaurantOpen: _isRestaurantOpen,
@@ -609,57 +550,60 @@ class _ResturantDetailsState extends State<ResturantDetails>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppCubit.get(context).isThemDark();
     return MultiBlocProvider(
       providers: [BlocProvider(create: (_) => getIt<RatingSubmitCubit>())],
       child: SafeArea(
         child: AndroidSwipeBack(
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            extendBodyBehindAppBar: true,
-            bottomNavigationBar: SafeArea(
-              child: BottomCartAction(
-                haveOrder: null,
-                usePrimaryButton: true,
-                showCountAndTotal: true,
-                onViewCart: () async {
-                  if (!_isRestaurantOpen) {
-                    EasyLoading.showInfo(
-                      "restaurant.closed_cannot_checkout".tr(),
-                    );
-                    return;
-                  }
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: AppColor.Dark,
 
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MultiBlocProvider(
-                        providers: [
-                          BlocProvider.value(value: context.read<CartCubit>()),
-                          BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
-                        ],
-                        child: const RequestOrderScreen(),
+              statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark, // icons color
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              extendBodyBehindAppBar: true,
+              bottomNavigationBar: SafeArea(
+                child: BottomCartAction(
+                  haveOrder: null,
+                  usePrimaryButton: true,
+                  showCountAndTotal: true,
+                  onViewCart: () async {
+                    if (!_isRestaurantOpen) {
+                      EasyLoading.showInfo("restaurant.closed_cannot_checkout".tr());
+                      return;
+                    }
+
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider.value(value: context.read<CartCubit>()),
+                            BlocProvider(create: (_) => getIt<OrderFlowCubit>()),
+                          ],
+                          child: RequestOrderScreen(
+                            // addressTitle: context.read<HomeCubit>().homeData!.provinceDetected ?? ''
+                          ),
+                        ),
                       ),
-                    ),
-                  );
+                    );
 
-                  if (context.mounted) {
-                    try {
-                      context.read<CartCubit>().loadCart();
-                    } catch (_) {}
-                  }
+                    if (context.mounted) {
+                      try {
+                        context.read<CartCubit>().loadCart();
+                      } catch (_) {}
+                    }
+                  },
+                ),
+              ),
+              body: BlocBuilder<RestaurantDetailsCubit, RestaurantDetailsState>(
+                bloc: cubit,
+                builder: (context, state) {
+                  return state.when(initial: _loadingView, loading: _loadingView, error: _errorView, loaded: (data) => _buildLoaded(context, data));
                 },
               ),
-            ),
-            body: BlocBuilder<RestaurantDetailsCubit, RestaurantDetailsState>(
-              bloc: cubit,
-              builder: (context, state) {
-                return state.when(
-                  initial: _loadingView,
-                  loading: _loadingView,
-                  error: _errorView,
-                  loaded: (data) => _buildLoaded(context, data),
-                );
-              },
             ),
           ),
         ),

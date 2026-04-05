@@ -6,13 +6,7 @@ class CustomArrow extends StatelessWidget {
   final Color color;
   final Color background;
   final Color? colorborder;
-  const CustomArrow({
-    super.key,
-    required this.onTap,
-    required this.color,
-    required this.background,
-    this.colorborder,
-  });
+  const CustomArrow({super.key, required this.onTap, required this.color, required this.background, this.colorborder});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +24,7 @@ class CustomArrow extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding:  REdgeInsetsDirectional.only(start: 5),
+          padding: REdgeInsetsDirectional.only(start: 5),
           child: Icon(Icons.arrow_back_ios, color: color, size: 16.sp),
         ),
       ),

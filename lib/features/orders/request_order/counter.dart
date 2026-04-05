@@ -10,13 +10,7 @@ class QtyCounter extends StatelessWidget {
   final num? pricePerItem;
   final int moneyDecimals;
 
-  const QtyCounter({
-    super.key,
-    required this.value,
-    required this.onChanged,
-    this.pricePerItem,
-    this.moneyDecimals = 0,
-  });
+  const QtyCounter({super.key, required this.value, required this.onChanged, this.pricePerItem, this.moneyDecimals = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +20,16 @@ class QtyCounter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        /// 💰 Total Price (optional)
+        if (totalNum != null) ...[
+          SizedBox(width: 12.w),
+          Text(
+            context.money(totalNum, decimals: moneyDecimals),
+            style: TextStyle(color: AppColor.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
+          ),
+        ],
+        Spacer(),
+
         /// 🔹 Counter Container
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
@@ -39,11 +43,7 @@ class QtyCounter extends StatelessWidget {
               /// ➖ Decrease
               GestureDetector(
                 onTap: value > 1 ? () => onChanged(value - 1) : null,
-                child: Icon(
-                  Icons.remove,
-                  size: 26.sp,
-                  color: isDark ? Colors.white : AppColor.lightblack,
-                ),
+                child: Icon(Icons.remove, size: 26.sp, color: isDark ? Colors.white : AppColor.lightblack),
               ),
 
               SizedBox(width: 25.w),
@@ -51,11 +51,7 @@ class QtyCounter extends StatelessWidget {
               /// 🔢 Value
               Text(
                 "$value",
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500, color: isDark ? Colors.white : Colors.black),
               ),
 
               SizedBox(width: 25.w),
@@ -63,28 +59,11 @@ class QtyCounter extends StatelessWidget {
               /// ➕ Increase
               GestureDetector(
                 onTap: () => onChanged(value + 1),
-                child: Icon(
-                  Icons.add,
-                  size: 26.sp,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
+                child: Icon(Icons.add, size: 26.sp, color: isDark ? Colors.white : Colors.black),
               ),
             ],
           ),
         ),
-
-        /// 💰 Total Price (optional)
-        if (totalNum != null) ...[
-          SizedBox(width: 12.w),
-          Text(
-            context.money(totalNum, decimals: moneyDecimals),
-            style: TextStyle(
-              color: AppColor.yellow,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ],
     );
   }

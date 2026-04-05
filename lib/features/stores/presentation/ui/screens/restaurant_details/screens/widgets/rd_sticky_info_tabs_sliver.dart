@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/services/pick_by_langu.dart';
+import 'package:breezefood/features/home/presentation/ui/widgets/custom_arrow.dart' show CustomArrow;
 import 'package:breezefood/features/search/presentation/ui/search_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -71,11 +74,7 @@ class RDStickyInfoTabsSliver extends StatelessWidget {
 }
 
 class _RDHeaderProgressCrossFade extends StatelessWidget {
-  const _RDHeaderProgressCrossFade({
-    required this.t,
-    required this.expanded,
-    required this.compact,
-  });
+  const _RDHeaderProgressCrossFade({required this.t, required this.expanded, required this.compact});
 
   final double t;
   final Widget expanded;
@@ -94,20 +93,14 @@ class _RDHeaderProgressCrossFade extends StatelessWidget {
           ignoring: expandedOpacity < 0.6,
           child: Opacity(
             opacity: expandedOpacity,
-            child: Transform.translate(
-              offset: Offset(0, -6 * clamped),
-              child: expanded,
-            ),
+            child: Transform.translate(offset: Offset(0, -6 * clamped), child: expanded),
           ),
         ),
         IgnorePointer(
           ignoring: compactOpacity < 0.6,
           child: Opacity(
             opacity: compactOpacity,
-            child: Transform.translate(
-              offset: Offset(0, 6 * (1 - compactOpacity)),
-              child: compact,
-            ),
+            child: Transform.translate(offset: Offset(0, 6 * (1 - compactOpacity)), child: compact),
           ),
         ),
       ],
@@ -142,10 +135,7 @@ class _RDExpandedInfoRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: AppColor.Dark,
-          borderRadius: BorderRadius.circular(14.r),
-        ),
+        decoration: BoxDecoration(color: AppColor.Dark, borderRadius: BorderRadius.circular(14.r)),
         child: Row(
           children: [
             Expanded(
@@ -163,11 +153,7 @@ class _RDExpandedInfoRow extends StatelessWidget {
                         SizedBox(width: 4.w),
                         Text(
                           avgRatingText,
-                          style: TextStyle(
-                            color: AppColor.white,
-                            fontSize: 11.5.sp,
-                            fontFamily: context.isAr ? 'Cairo' : 'Inter',
-                          ),
+                          style: TextStyle(color: AppColor.white, fontSize: 11.5.sp, fontFamily: context.isAr ? 'Cairo' : 'Inter'),
                         ),
                         SizedBox(width: 6.w),
                         Text(
@@ -202,12 +188,7 @@ class _RDExpandedInfoRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(height: 9.h),
-                  Image.asset(
-                    "assets/icons/new_del.png",
-                    width: 20.w,
-                    height: 20.h,
-                    color: AppColor.white,
-                  ),
+                  Image.asset("assets/icons/new_del.png", width: 20.w, height: 20.h, color: AppColor.white),
                   SizedBox(height: 12.h),
                   if (showTwoPrices) ...[
                     Text(
@@ -250,12 +231,7 @@ class _RDExpandedInfoRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(height: 10.h),
-                  Image.asset(
-                    "assets/icons/clock_new.png",
-                    width: 17.w,
-                    height: 17.h,
-                    color: AppColor.white,
-                  ),
+                  Image.asset("assets/icons/clock_new.png", width: 17.w, height: 17.h, color: AppColor.white),
                   SizedBox(height: 10.h),
                   Text(
                     deliveryTimeText,
@@ -277,12 +253,7 @@ class _RDExpandedInfoRow extends StatelessWidget {
 }
 
 class _RDCompactHeaderRow extends StatelessWidget {
-  const _RDCompactHeaderRow({
-    required this.restaurantName,
-    required this.avgRatingText,
-    required this.reviewsCountText,
-    required this.onSearch,
-  });
+  const _RDCompactHeaderRow({required this.restaurantName, required this.avgRatingText, required this.reviewsCountText, required this.onSearch});
 
   final String restaurantName;
   final String avgRatingText;
@@ -292,19 +263,39 @@ class _RDCompactHeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.only(
-        start: 8.w,
-        end: 8.w,
-        top: 12.h,
-        bottom: 6.h,
-      ),
+      padding: EdgeInsetsDirectional.only(start: 8.w, end: 8.w, top: 12.h, bottom: 6.h),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
+          // IconButton(
+          //   onPressed: () {
+          //     Navigator.of(context).pop();
+          //   },
+          //   icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
+          // ),
+          Stack(
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(width: 42.w, height: 42.w, color: Colors.transparent),
+              ),
+              _GlassCircleButton(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                height: 32.w,
+                width: 32.w,
+                child: CustomArrow(
+                  color: AppColor.white,
+                  background: Colors.transparent,
+                  colorborder: Colors.transparent,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
           ),
           SizedBox(width: 6.w),
           Expanded(
@@ -318,11 +309,63 @@ class _RDCompactHeaderRow extends StatelessWidget {
               addShadows: false,
             ),
           ),
-          IconButton(
-            onPressed: onSearch,
-            icon: const Icon(Icons.search, color: Colors.red),
+          Stack(
+            children: [
+              InkWell(
+                onTap: onSearch,
+                child: Container(width: 42.w, height: 42.w, color: Colors.transparent),
+              ),
+              _GlassCircleButton(
+                onTap: onSearch,
+                width: 32.w,
+                height: 32.w,
+                child: Icon(Icons.search, color: AppColor.white, size: 22),
+              ),
+            ],
           ),
+
+          // IconButton(
+          //   onPressed: onSearch,
+          //   icon: const Icon(Icons.search, color: Colors.red),
+          // ),
         ],
+      ),
+    );
+  }
+}
+
+class _GlassCircleButton extends StatelessWidget {
+  _GlassCircleButton({required this.child, required this.onTap, this.width, this.height});
+
+  final Widget child;
+  final VoidCallback onTap;
+  double? width;
+  double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: width ?? 42.w,
+              height: height ?? 42.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.10),
+                border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+                shape: BoxShape.circle,
+              ),
+              child: child,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -366,16 +409,8 @@ class _TitleBlock extends StatelessWidget {
             fontFamily: font,
             shadows: addShadows
                 ? [
-                    Shadow(
-                      color: AppColor.Dark.withOpacity(0.65),
-                      offset: const Offset(0, 3),
-                      blurRadius: 14,
-                    ),
-                    Shadow(
-                      color: AppColor.Dark.withOpacity(0.35),
-                      offset: const Offset(0, 1),
-                      blurRadius: 4,
-                    ),
+                    Shadow(color: AppColor.Dark.withOpacity(0.65), offset: const Offset(0, 3), blurRadius: 14),
+                    Shadow(color: AppColor.Dark.withOpacity(0.35), offset: const Offset(0, 1), blurRadius: 4),
                   ]
                 : null,
           ),
@@ -444,11 +479,7 @@ class _RDStickyDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 165.h;
 
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     final range = (maxExtent - minExtent).clamp(1.0, 9999.0);
     final rawT = (shrinkOffset / range).clamp(0.0, 1.0);
     final t = Curves.easeOutCubic.transform(rawT);
@@ -490,11 +521,7 @@ class _RDStickyDelegate extends SliverPersistentHeaderDelegate {
                 offset: Offset(0, 10 * tabsOffsetY),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  child: RDTabsBar(
-                    categories: categories,
-                    activeIndex: activeIndex,
-                    onTap: onTapCategory,
-                  ),
+                  child: RDTabsBar(categories: categories, activeIndex: activeIndex, onTap: onTapCategory),
                 ),
               ),
             ),

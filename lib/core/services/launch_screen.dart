@@ -32,17 +32,11 @@ class _LaunchScreenState extends State<LaunchScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => getIt<FavoritesCubit>(),
-            child: const SplashVideoScreen(),
-          ),
+          builder: (_) => BlocProvider(create: (context) => getIt<FavoritesCubit>(), child: const SplashVideoScreen()),
         ),
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Login()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
     }
   }
 

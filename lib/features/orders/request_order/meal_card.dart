@@ -1,6 +1,8 @@
+import 'package:breezefood/core/component/color.dart' show AppColor;
 import 'package:breezefood/core/component/url_helper.dart';
 import 'package:breezefood/core/prices_helper.dart';
 import 'package:breezefood/features/home/presentation/ui/widgets/custom_sub_title.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,13 +12,7 @@ class MealCard extends StatelessWidget {
   final double price;
   final Widget? counter; // ✅ بدل showCounter/qty
 
-  const MealCard({
-    super.key,
-    required this.image,
-    required this.name,
-    required this.price,
-    this.counter,
-  });
+  const MealCard({super.key, required this.image, required this.name, required this.price, this.counter});
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +29,7 @@ class MealCard extends StatelessWidget {
                 height: 60.h,
                 width: 60.w,
                 child: ClipRRect(
-                  borderRadius: const BorderRadiusDirectional.all(
-                    Radius.circular(12),
-                  ),
+                  borderRadius: const BorderRadiusDirectional.all(Radius.circular(12)),
                   child: _MealImage(image: image),
                 ),
               ),
@@ -45,29 +39,19 @@ class MealCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomSubTitle(
-                      subtitle: name,
-                      color: colorScheme.onSurface,
-                      fontsize: 14.sp,
-                    ),
+                    CustomSubTitle(subtitle: name, color: AppColor.white, fontsize: 14.sp),
                     const SizedBox(height: 4),
 
                     RichText(
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: "Price : ",
-                            style: TextStyle(
-                              color: colorScheme.onSurface.withOpacity(0.7),
-                              fontSize: 14.sp,
-                            ),
+                            text: "orders.price_label".tr(),
+                            style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 14.sp),
                           ),
                           TextSpan(
                             text: context.syp(price),
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 14.sp,
-                            ),
+                            style: TextStyle(color: AppColor.white, fontSize: 14.sp, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -98,31 +82,14 @@ class _MealImage extends StatelessWidget {
     final fullUrl = UrlHelper.toFullUrl(raw);
 
     if (fullUrl != null) {
-      return Image.network(
-        fullUrl,
-        width: 100.w,
-        height: 105.h,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _fallback(),
-      );
+      return Image.network(fullUrl, width: 100.w, height: 105.h, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _fallback());
     }
 
     final asset = raw.isNotEmpty ? raw : "assets/images/shawarma_box.png";
-    return Image.asset(
-      asset,
-      width: 100.w,
-      height: 105.h,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => _fallback(),
-    );
+    return Image.asset(asset, width: 100.w, height: 105.h, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _fallback());
   }
 
   Widget _fallback() {
-    return Image.asset(
-      "assets/images/shawarma_box.png",
-      width: 100.w,
-      height: 105.h,
-      fit: BoxFit.cover,
-    );
+    return Image.asset("assets/images/shawarma_box.png", width: 100.w, height: 105.h, fit: BoxFit.cover);
   }
 }

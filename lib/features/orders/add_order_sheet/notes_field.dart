@@ -6,11 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NotesField extends StatefulWidget {
   final TextEditingController controller;
+  final void Function()? onTap;
 
-  const NotesField({
-    super.key,
-    required this.controller,
-  });
+  const NotesField({super.key, required this.controller, this.onTap});
 
   @override
   State<NotesField> createState() => _NotesFieldState();
@@ -42,11 +40,7 @@ class _NotesFieldState extends State<NotesField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         /// TITLE
-        CustomSubTitle(
-          subtitle: "cart.item_notes_optional".tr(),
-          color: AppColor.white,
-          fontsize: 14.sp,
-        ),
+        CustomSubTitle(subtitle: "cart.item_notes_optional".tr(), color: AppColor.white, fontsize: 14.sp),
 
         SizedBox(height: 12.h),
 
@@ -60,30 +54,19 @@ class _NotesFieldState extends State<NotesField> {
             maxLines: 2,
             cursorColor: AppColor.white,
             cursorWidth: 2,
+            onTap: widget.onTap,
             cursorRadius: const Radius.circular(2),
-            style: TextStyle(
-              color: AppColor.white,
-              fontSize: 14.sp,
-            ),
+            style: TextStyle(color: AppColor.white, fontSize: 14.sp),
             textAlignVertical: TextAlignVertical.bottom,
             decoration: InputDecoration(
               hintText: "cart.item_notes_hint".tr(),
-              hintStyle: TextStyle(
-                color: AppColor.LightActive,
-                fontSize: 12.sp,
-              ),
+              hintStyle: TextStyle(color: AppColor.LightActive, fontSize: 12.sp),
 
               isDense: true,
               contentPadding: EdgeInsets.zero,
 
-              enabledBorder:  UnderlineInputBorder(
-                borderSide:
-                BorderSide(color: Color(0xFF373737), width: 1),
-              ),
-              focusedBorder:  UnderlineInputBorder(
-                borderSide:
-                BorderSide(color: Color(0xFF373737), width: 1),
-              ),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF373737), width: 1)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF373737), width: 1)),
             ),
           ),
         ),

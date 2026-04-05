@@ -39,7 +39,8 @@ class _BreezeLoadingIndicator extends StatelessWidget {
       child: CircularProgressIndicator(
         strokeWidth: 3.2,
         valueColor: AlwaysStoppedAnimation(AppColor.primaryColor),
-        backgroundColor: AppColor.light, // أو AppColor.gry
+        backgroundColor: AppColor.light,
+        color: AppColor.primaryColor, // أو AppColor.gry
       ),
     );
   }

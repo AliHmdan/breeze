@@ -1,4 +1,6 @@
 import 'package:breezefood/core/component/color.dart';
+import 'package:breezefood/core/component/dialogs.dart' show AppDialog;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -24,10 +26,7 @@ class PaymentMethod {
     this.imageWidth = 40,
     this.imageHeight = 24,
     this.fit = BoxFit.contain,
-  }) : assert(
-         trailingIcon != null || imageAsset != null,
-         'PaymentMethod يحتاج إما trailingIcon أو imageAsset',
-       );
+  }) : assert(trailingIcon != null || imageAsset != null, 'PaymentMethod يحتاج إما trailingIcon أو imageAsset');
 }
 
 /// ويدجت اختيار طريقة الدفع + زر الطلب
@@ -75,9 +74,7 @@ class _PaymentMethodSectionState extends State<PaymentMethodSection> {
   @override
   void initState() {
     super.initState();
-    _selectedId =
-        widget.initialSelectedId ??
-        (widget.methods.isNotEmpty ? widget.methods.first.id : "");
+    _selectedId = widget.initialSelectedId ?? (widget.methods.isNotEmpty ? widget.methods.first.id : "");
   }
 
   @override
@@ -118,35 +115,35 @@ class _PaymentMethodSectionState extends State<PaymentMethodSection> {
           // ),
 
           // قائمة طرق الدفع
-          if (widget.methods.isEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.h),
-              child: Text(
-                'No payment methods',
-                style: TextStyle(color: AppColor.light, fontSize: 12.sp),
-              ),
-            )
-          else
-            ...widget.methods.map((m) {
-              final selected = _selectedId == m.id;
-              return _PaymentTile(
-                method: m,
-                selected: selected,
-                onTap: () {
-                  if (!selected) {
-                    setState(() => _selectedId = m.id);
-                    widget.onChanged?.call(m.id);
-                  }
-                },
-                radius: radius,
-                tileColor:
-                    widget.tileColor ?? Theme.of(context).colorScheme.surface,
-                radioActive: widget.radioActive,
-                radioInactive: widget.radioInactive ??= AppColor.white,
-              );
-            }),
-
-          SizedBox(height: 10.h),
+          /// ////////////////////////////////////////////
+          // if (widget.methods.isEmpty)
+          //   Padding(
+          //     padding: EdgeInsets.symmetric(vertical: 8.h),
+          //     child: Text(
+          //       'No payment methods',
+          //       style: TextStyle(color: AppColor.light, fontSize: 12.sp),
+          //     ),
+          //   )
+          // else
+          //   ...widget.methods.map((m) {
+          //     final selected = _selectedId == m.id;
+          //     return _PaymentTile(
+          //       method: m,
+          //       selected: selected,
+          //       onTap: () {
+          //         if (!selected) {
+          //           setState(() => _selectedId = m.id);
+          //           widget.onChanged?.call(m.id);
+          //         }
+          //       },
+          //       radius: radius,
+          //       tileColor: widget.tileColor ?? Theme.of(context).colorScheme.surface,
+          //       radioActive: widget.radioActive,
+          //       radioInactive: widget.radioInactive ??= AppColor.white,
+          //     );
+          //   }),
+          //
+          // SizedBox(height: 10.h),
 
           // زر الطلب
           SizedBox(
@@ -154,21 +151,20 @@ class _PaymentMethodSectionState extends State<PaymentMethodSection> {
             height: 44.h,
             child: ElevatedButton(
               onPressed: () => widget.onOrder?.call(_selectedId),
-
+              // onPressed: () async {
+              //   await AppDialog.showSuccessDialog(
+              //     title: context.locale == 'en' ? "تم إرسال الطلب بنجاح" : "Order placed successfully",
+              //     message: context.locale == 'en' ? "رقم الطلب: #1\nالحالة: fss" : "Order ID: #sadass\nStatus: sadasd",
+              //   );
+              // },
               style: ElevatedButton.styleFrom(
                 backgroundColor: widget.orderBtnColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                 elevation: 0,
               ),
               child: Text(
-                "Order",
-                style: TextStyle(
-                  color: widget.orderTextColor,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
+                "orders.Order".tr(),
+                style: TextStyle(color: widget.orderTextColor, fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
           ),
@@ -201,8 +197,7 @@ class _PaymentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dpr = MediaQuery.of(context).devicePixelRatio;
-    final targetW = (method.imageWidth.w * dpr)
-        .round(); // حجم فعلي مناسب للجهاز
+    final targetW = (method.imageWidth.w * dpr).round(); // حجم فعلي مناسب للجهاز
     final targetH = (method.imageHeight.h * dpr).round();
 
     final Widget trailing =
@@ -237,20 +232,12 @@ class _PaymentTile extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
           child: Row(
             children: [
-              _RadioVisual(
-                activeColor: radioActive,
-                inactiveColor: radioInactive,
-                selected: selected,
-              ),
+              _RadioVisual(activeColor: radioActive, inactiveColor: radioInactive, selected: selected),
               SizedBox(width: 10.w),
               Expanded(
                 child: Text(
                   method.title,
-                  style: TextStyle(
-                    color: AppColor.light,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(color: AppColor.light, fontSize: 14.sp, fontWeight: FontWeight.w600),
                 ),
               ),
               trailing,
@@ -268,11 +255,7 @@ class _RadioVisual extends StatelessWidget {
   final Color activeColor;
   final Color inactiveColor;
 
-  const _RadioVisual({
-    required this.selected,
-    required this.activeColor,
-    required this.inactiveColor,
-  });
+  const _RadioVisual({required this.selected, required this.activeColor, required this.inactiveColor});
 
   @override
   Widget build(BuildContext context) {
@@ -284,20 +267,14 @@ class _RadioVisual extends StatelessWidget {
       height: outerSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: selected ? activeColor : inactiveColor,
-          width: 2,
-        ),
+        border: Border.all(color: selected ? activeColor : inactiveColor, width: 2),
       ),
       alignment: Alignment.center,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: selected ? innerSize : 0,
         height: selected ? innerSize : 0,
-        decoration: BoxDecoration(
-          color: selected ? activeColor : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: selected ? activeColor : Colors.transparent, shape: BoxShape.circle),
       ),
     );
   }

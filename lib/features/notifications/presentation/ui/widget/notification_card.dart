@@ -6,7 +6,7 @@ Widget notificationCard({required String title, required String subtitle, requir
   return Container(
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(color: isActive ? AppColor.primaryColor : AppColor.black, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(color: isActive ? AppColor.primaryColor : AppColor.search, borderRadius: BorderRadius.circular(20)),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

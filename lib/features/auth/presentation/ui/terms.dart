@@ -1,3 +1,4 @@
+import 'package:breezefood/core/component/color.dart';
 import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/terms/presentation/cubit/terms_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -21,7 +22,7 @@ class _TermsDialogState extends State<TermsDialog> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Dialog(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: AppColor.Dark,
       insetPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
       child: BlocProvider(
@@ -38,19 +39,12 @@ class _TermsDialogState extends State<TermsDialog> {
                     Expanded(
                       child: Text(
                         "terms.title".tr(),
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: TextStyle(color: AppColor.white, fontSize: 15.sp, fontWeight: FontWeight.w800),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context, false),
-                      icon: Icon(
-                        Icons.close,
-                        color: colorScheme.onSurface.withOpacity(0.7),
-                      ),
+                      icon: Icon(Icons.close, color: AppColor.white.withOpacity(0.7)),
                       tooltip: "common.close".tr(),
                     ),
                   ],
@@ -63,32 +57,23 @@ class _TermsDialogState extends State<TermsDialog> {
                 child: Container(
                   padding: EdgeInsets.all(6.r),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
+                    // color: colorScheme.surfaceContainerHighest,
+                    color: AppColor.search,
                     borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(
-                      color: colorScheme.outline.withOpacity(0.35),
-                    ),
+                    border: Border.all(color: AppColor.white.withOpacity(0.35)),
                   ),
                   child: Row(
                     children: [
-                      _segButton(
-                        title: "AR",
-                        selected: _langIndex == 0,
-                        onTap: () => setState(() => _langIndex = 0),
-                      ),
+                      _segButton(title: "AR", selected: _langIndex == 0, onTap: () => setState(() => _langIndex = 0)),
                       SizedBox(width: 8.w),
-                      _segButton(
-                        title: "EN",
-                        selected: _langIndex == 1,
-                        onTap: () => setState(() => _langIndex = 1),
-                      ),
+                      _segButton(title: "EN", selected: _langIndex == 1, onTap: () => setState(() => _langIndex = 1)),
                     ],
                   ),
                 ),
               ),
 
-              SizedBox(height: 10.h),
-              Divider(color: colorScheme.outline.withOpacity(0.25), height: 1),
+              // SizedBox(height: 10.h),
+              // Divider(color: AppColor.search.withOpacity(0.25), height: 1),
 
               // Body
               Expanded(
@@ -99,12 +84,7 @@ class _TermsDialogState extends State<TermsDialog> {
                       return state.when(
                         initial: () => const SizedBox.shrink(),
                         loading: () => Center(
-                          child: Text(
-                            "common.loading".tr(),
-                            style: TextStyle(
-                              color: colorScheme.onSurface.withOpacity(0.7),
-                            ),
-                          ),
+                          child: Text("common.loading".tr(), style: TextStyle(color: AppColor.primaryColor.withOpacity(0.7))),
                         ),
                         error: (msg) => Center(
                           child: Text(
@@ -121,29 +101,20 @@ class _TermsDialogState extends State<TermsDialog> {
 
                           return Container(
                             padding: EdgeInsets.all(12.w),
+                            width: 350.w,
                             decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainerHighest,
+                              color: AppColor.search,
                               borderRadius: BorderRadius.circular(14.r),
-                              border: Border.all(
-                                color: colorScheme.outline.withOpacity(0.35),
-                              ),
+                              border: Border.all(color: AppColor.search.withOpacity(0.35)),
                             ),
                             child: Scrollbar(
                               child: SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),
                                 child: Directionality(
-                                  textDirection: _langIndex == 0
-                                      ? mt.TextDirection.rtl
-                                      : mt.TextDirection.ltr,
+                                  textDirection: _langIndex == 0 ? mt.TextDirection.rtl : mt.TextDirection.ltr,
                                   child: Text(
                                     text.isEmpty ? "—" : text,
-                                    style: TextStyle(
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.88,
-                                      ),
-                                      fontSize: 13.sp,
-                                      height: 1.65,
-                                    ),
+                                    style: TextStyle(color: AppColor.white.withOpacity(0.88), fontSize: 13.sp, height: 1.65),
                                   ),
                                 ),
                               ),
@@ -164,15 +135,10 @@ class _TermsDialogState extends State<TermsDialog> {
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: colorScheme.onSurface.withOpacity(
-                            0.7,
-                          ),
-                          side: BorderSide(
-                            color: colorScheme.outline.withOpacity(0.35),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                          ),
+                          foregroundColor: AppColor.white.withOpacity(0.7),
+                          backgroundColor: AppColor.Dark,
+                          side: BorderSide(color: AppColor.white.withOpacity(0.35)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                         onPressed: () => Navigator.pop(context, false),
@@ -183,11 +149,9 @@ class _TermsDialogState extends State<TermsDialog> {
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                          ),
+                          backgroundColor: AppColor.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                         onPressed: () => Navigator.pop(context, true),
@@ -204,11 +168,7 @@ class _TermsDialogState extends State<TermsDialog> {
     );
   }
 
-  Widget _segButton({
-    required String title,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
+  Widget _segButton({required String title, required bool selected, required VoidCallback onTap}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: InkWell(
@@ -217,18 +177,10 @@ class _TermsDialogState extends State<TermsDialog> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? colorScheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
+          decoration: BoxDecoration(color: selected ? AppColor.primaryColor : Colors.transparent, borderRadius: BorderRadius.circular(12.r)),
           child: Text(
             title,
-            style: TextStyle(
-              color: selected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurface.withOpacity(0.7),
-              fontWeight: FontWeight.w800,
-            ),
+            style: TextStyle(color: selected ? Colors.white : AppColor.white.withOpacity(0.7), fontWeight: FontWeight.w800),
           ),
         ),
       ),

@@ -59,7 +59,7 @@ void showLogoutDialog(BuildContext context) {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.h),
-                        backgroundColor: AppColor.black,
+                        backgroundColor: AppColor.Dark,
                         foregroundColor: AppColor.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11.r)),
                       ),
