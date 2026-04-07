@@ -38,7 +38,9 @@
     "failed_update_address": "Failed to update address. Please try again.",
     "open_location_settings": "Open location settings",
     "open_app_settings": "Open app settings",
-    "address_added": "Address saved successfully"
+    "address_added": "Address saved successfully",
+    "only_numbers": "Please enter numbers only",
+    "auth.phone_must_be_9_digits": "Phone number must be exactly 9 digits"
   },
   "terms": {
     "title": "Terms & Conditions",

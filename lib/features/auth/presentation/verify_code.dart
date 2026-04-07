@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:breezefood/core/component/color.dart' show AppColor;
 import 'package:breezefood/features/auth/presentation/information_screen.dart';
+import 'package:breezefood/features/home/presentation/ui/home_screen.dart';
+import 'package:breezefood/features/main_shell.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -90,6 +93,7 @@ class _VerfiyCodeState extends State<VerfiyCode> {
         listener: (context, state) {
           state.whenOrNull(
             loading: () => EasyLoading.show(status: "auth.verifying".tr()),
+
             error: (msg) {
               EasyLoading.dismiss();
               if (mounted) {
@@ -100,21 +104,70 @@ class _VerfiyCodeState extends State<VerfiyCode> {
               }
               _showError(msg.tr());
             },
+
             codeResent: (data) {
               EasyLoading.dismiss();
               if (mounted) setState(() => _isResending = false);
-
-              final msg = (data is Map) ? (data["message"] ?? "auth.code_sent".tr()) : "auth.code_sent".tr();
-              _showSuccess(msg.toString());
+              _showSuccess("auth.code_sent".tr());
             },
-            verified: (data) {
+
+            // ✅ المستخدم مكتمل → روح عالهوم
+            authenticated: (data) {
               EasyLoading.dismiss();
               if (mounted) setState(() => _isVerifying = false);
 
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const InformationScreen()));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => MainShell()),
+              );
+            },
+
+            // ✅ المستخدم جديد → كمل معلوماته
+            needProfileCompletion: (data) {
+              EasyLoading.dismiss();
+              if (mounted) setState(() => _isVerifying = false);
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const InformationScreen()),
+              );
+            },
+
+            // (اختياري)
+            verified: (data) {
+              EasyLoading.dismiss();
+              if (mounted) setState(() => _isVerifying = false);
             },
           );
         },
+        // listener: (context, state) {
+        //   state.whenOrNull(
+        //     loading: () => EasyLoading.show(status: "auth.verifying".tr()),
+        //     error: (msg) {
+        //       EasyLoading.dismiss();
+        //       if (mounted) {
+        //         setState(() {
+        //           _isVerifying = false;
+        //           _isResending = false;
+        //         });
+        //       }
+        //       _showError(msg.tr());
+        //     },
+        //     codeResent: (data) {
+        //       EasyLoading.dismiss();
+        //       if (mounted) setState(() => _isResending = false);
+        //
+        //       final msg = (data is Map) ? (data["message"] ?? "auth.code_sent".tr()) : "auth.code_sent".tr();
+        //       _showSuccess(msg.toString());
+        //     },
+        //     verified: (data) {
+        //       EasyLoading.dismiss();
+        //       if (mounted) setState(() => _isVerifying = false);
+        //
+        //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const InformationScreen()));
+        //     },
+        //   );
+        // },
         child: Stack(
           children: [
             Image.asset(
@@ -168,10 +221,16 @@ class _VerfiyCodeState extends State<VerfiyCode> {
                     SizedBox(height: 45.h),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: PinCodeTextField(
+                      child:
+                      PinCodeTextField(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                         appContext: context,
                         length: 4,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // 👈 يمنع الحروف
+                        ],
                         animationType: AnimationType.fade,
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,

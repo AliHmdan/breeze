@@ -38,7 +38,9 @@
     "failed_update_address": "فشل تحديث العنوان، حاول مرة أخرى.",
     "open_location_settings": "فتح إعدادات الموقع",
     "open_app_settings": "فتح إعدادات التطبيق",
-    "address_added": "تم حفظ العنوان بنجاح"
+    "address_added": "تم حفظ العنوان بنجاح",
+    "only_numbers": "يرجى إدخال أرقام فقط",
+    "auth.phone_must_be_9_digits": "يجب أن يتكون رقم الهاتف من 9 أرقام"
   },
   "terms": {
     "title": "الشروط والأحكام",

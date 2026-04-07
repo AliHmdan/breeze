@@ -3,6 +3,7 @@ import 'package:breezefood/core/di/di.dart';
 import 'package:breezefood/features/auth/presentation/cubit/auth_flow_cubit.dart';
 import 'package:breezefood/features/auth/presentation/update_address_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -42,23 +43,62 @@ class _InformationScreenState extends State<InformationScreen> {
     cubit.updateProfile(firstName: first, lastName: last);
   }
 
-  Widget _buildTextField({required String hint, required TextEditingController controller}) {
+  Widget _buildTextField({
+    required String hint,
+    required TextEditingController controller,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(15.r),
         border: Border.all(color: colorScheme.outline.withOpacity(0.25)),
-        boxShadow: [BoxShadow(color: colorScheme.shadow.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 5))],
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          )
+        ],
       ),
       child: TextFormField(
         controller: controller,
         cursorColor: AppColor.primaryColor,
         style: TextStyle(color: AppColor.white, fontSize: 16.sp),
+
+        //  ممنوع الأرقام
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Zء-ي\s]')),
+        ],
+
+        //  validation
+        validator: (v) {
+          final val = (v ?? '').trim();
+
+          if (val.isEmpty) {
+            return "يرجى إدخال النص";
+          }
+
+          if (val.length < 3) {
+            return "يجب أن يحتوي على 3 أحرف على الأقل";
+          }
+
+          if (!RegExp(r'^[a-zA-Zء-ي\s]+$').hasMatch(val)) {
+            return "يسمح بإدخال الأحرف فقط";
+          }
+
+          return null;
+        },
+
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6), fontSize: 16.sp),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+          hintStyle: TextStyle(
+            color: colorScheme.onSurface.withOpacity(0.6),
+            fontSize: 16.sp,
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: OutlineInputBorder(
@@ -69,7 +109,6 @@ class _InformationScreenState extends State<InformationScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -147,9 +186,9 @@ class _InformationScreenState extends State<InformationScreen> {
                         child: _isLoading
                             ? CircularProgressIndicator(color: AppColor.primaryColor)
                             : Text(
-                                "common.save".tr(),
-                                style: TextStyle(fontSize: 16.sp, color: colorScheme.onPrimary, fontWeight: FontWeight.bold, fontFamily: 'Manrope'),
-                              ),
+                          "common.save".tr(),
+                          style: TextStyle(fontSize: 16.sp, color: colorScheme.onPrimary, fontWeight: FontWeight.bold, fontFamily: 'Manrope'),
+                        ),
                       ),
                     ),
                     SizedBox(height: 40.h),

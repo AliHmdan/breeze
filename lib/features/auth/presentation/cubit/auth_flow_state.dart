@@ -14,4 +14,7 @@ class AuthFlowState with _$AuthFlowState {
 
   // ✅ جديد
   const factory AuthFlowState.loggedOut(String message) = _LoggedOut;
+  //firstname
+  const factory AuthFlowState.needProfileCompletion(dynamic data) = _NeedProfileCompletion;
+  const factory AuthFlowState.authenticated(dynamic data) = _Authenticated;
 }

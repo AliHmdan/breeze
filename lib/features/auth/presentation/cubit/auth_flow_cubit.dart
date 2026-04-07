@@ -39,7 +39,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
     emit(AuthFlowState.codeSent(res.data));
   }
-
   Future<void> verify({
     required String phone,
     required String code,
@@ -69,8 +68,52 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
 
     await AuthStorageHelper.clearGuestMode();
-    emit(AuthFlowState.verified(res.data));
+
+    // 🔥 check بيانات المستخدم
+    final user = res.data['user'];
+
+    final firstName = user['first_name'];
+    final lastName = user['last_name'];
+
+    bool isEmpty(String? v) => v == null || v.toString().trim().isEmpty;
+
+    if (isEmpty(firstName) || isEmpty(lastName)) {
+      emit(AuthFlowState.needProfileCompletion(res.data));
+    } else {
+      emit(AuthFlowState.authenticated(res.data));
+    }
   }
+  // Future<void> verify({
+  //   required String phone,
+  //   required String code,
+  //   String? deviceToken,
+  // }) async {
+  //   emit(const AuthFlowState.loading());
+  //
+  //   String? fcm = deviceToken;
+  //
+  //   try {
+  //     if (fcm == null || fcm.trim().isEmpty) {
+  //       fcm = await FirebaseMessaging.instance.getToken();
+  //     }
+  //   } catch (_) {}
+  //
+  //   print("📲 FCM token to send: ${fcm?.substring(0, 25)}...");
+  //
+  //   final res = await repo.verifyPhone(
+  //     phone: phone,
+  //     code: code,
+  //     firebaseToken: fcm,
+  //   );
+  //
+  //   if (!res.ok) {
+  //     emit(AuthFlowState.error(res.message ?? "خطأ"));
+  //     return;
+  //   }
+  //
+  //   await AuthStorageHelper.clearGuestMode();
+  //   emit(AuthFlowState.verified(res.data));
+  // }
 
   Future<void> resend({required String phone}) async {
     emit(const AuthFlowState.loading());

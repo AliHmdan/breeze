@@ -27,6 +27,8 @@ mixin _$AuthFlowState {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -40,6 +42,8 @@ mixin _$AuthFlowState {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -53,6 +57,8 @@ mixin _$AuthFlowState {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -67,6 +73,9 @@ mixin _$AuthFlowState {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -80,6 +89,8 @@ mixin _$AuthFlowState {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -93,6 +104,8 @@ mixin _$AuthFlowState {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -163,6 +176,8 @@ class _$InitialImpl implements _Initial {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return initial();
   }
@@ -179,6 +194,8 @@ class _$InitialImpl implements _Initial {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return initial?.call();
   }
@@ -195,6 +212,8 @@ class _$InitialImpl implements _Initial {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -215,6 +234,9 @@ class _$InitialImpl implements _Initial {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return initial(this);
   }
@@ -231,6 +253,8 @@ class _$InitialImpl implements _Initial {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return initial?.call(this);
   }
@@ -247,6 +271,8 @@ class _$InitialImpl implements _Initial {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -307,6 +333,8 @@ class _$LoadingImpl implements _Loading {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return loading();
   }
@@ -323,6 +351,8 @@ class _$LoadingImpl implements _Loading {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return loading?.call();
   }
@@ -339,6 +369,8 @@ class _$LoadingImpl implements _Loading {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -359,6 +391,9 @@ class _$LoadingImpl implements _Loading {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return loading(this);
   }
@@ -375,6 +410,8 @@ class _$LoadingImpl implements _Loading {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return loading?.call(this);
   }
@@ -391,6 +428,8 @@ class _$LoadingImpl implements _Loading {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -477,6 +516,8 @@ class _$ErrorImpl implements _Error {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return error(message);
   }
@@ -493,6 +534,8 @@ class _$ErrorImpl implements _Error {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return error?.call(message);
   }
@@ -509,6 +552,8 @@ class _$ErrorImpl implements _Error {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -529,6 +574,9 @@ class _$ErrorImpl implements _Error {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return error(this);
   }
@@ -545,6 +593,8 @@ class _$ErrorImpl implements _Error {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return error?.call(this);
   }
@@ -561,6 +611,8 @@ class _$ErrorImpl implements _Error {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -653,6 +705,8 @@ class _$CodeSentImpl implements _CodeSent {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return codeSent(data);
   }
@@ -669,6 +723,8 @@ class _$CodeSentImpl implements _CodeSent {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return codeSent?.call(data);
   }
@@ -685,6 +741,8 @@ class _$CodeSentImpl implements _CodeSent {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (codeSent != null) {
@@ -705,6 +763,9 @@ class _$CodeSentImpl implements _CodeSent {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return codeSent(this);
   }
@@ -721,6 +782,8 @@ class _$CodeSentImpl implements _CodeSent {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return codeSent?.call(this);
   }
@@ -737,6 +800,8 @@ class _$CodeSentImpl implements _CodeSent {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (codeSent != null) {
@@ -829,6 +894,8 @@ class _$CodeResentImpl implements _CodeResent {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return codeResent(data);
   }
@@ -845,6 +912,8 @@ class _$CodeResentImpl implements _CodeResent {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return codeResent?.call(data);
   }
@@ -861,6 +930,8 @@ class _$CodeResentImpl implements _CodeResent {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (codeResent != null) {
@@ -881,6 +952,9 @@ class _$CodeResentImpl implements _CodeResent {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return codeResent(this);
   }
@@ -897,6 +971,8 @@ class _$CodeResentImpl implements _CodeResent {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return codeResent?.call(this);
   }
@@ -913,6 +989,8 @@ class _$CodeResentImpl implements _CodeResent {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (codeResent != null) {
@@ -1005,6 +1083,8 @@ class _$VerifiedImpl implements _Verified {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return verified(data);
   }
@@ -1021,6 +1101,8 @@ class _$VerifiedImpl implements _Verified {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return verified?.call(data);
   }
@@ -1037,6 +1119,8 @@ class _$VerifiedImpl implements _Verified {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (verified != null) {
@@ -1057,6 +1141,9 @@ class _$VerifiedImpl implements _Verified {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return verified(this);
   }
@@ -1073,6 +1160,8 @@ class _$VerifiedImpl implements _Verified {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return verified?.call(this);
   }
@@ -1089,6 +1178,8 @@ class _$VerifiedImpl implements _Verified {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (verified != null) {
@@ -1182,6 +1273,8 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return profileUpdated(data);
   }
@@ -1198,6 +1291,8 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return profileUpdated?.call(data);
   }
@@ -1214,6 +1309,8 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (profileUpdated != null) {
@@ -1234,6 +1331,9 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return profileUpdated(this);
   }
@@ -1250,6 +1350,8 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return profileUpdated?.call(this);
   }
@@ -1266,6 +1368,8 @@ class _$ProfileUpdatedImpl implements _ProfileUpdated {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (profileUpdated != null) {
@@ -1358,6 +1462,8 @@ class _$AddressAddedImpl implements _AddressAdded {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return addressAdded(data);
   }
@@ -1374,6 +1480,8 @@ class _$AddressAddedImpl implements _AddressAdded {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return addressAdded?.call(data);
   }
@@ -1390,6 +1498,8 @@ class _$AddressAddedImpl implements _AddressAdded {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (addressAdded != null) {
@@ -1410,6 +1520,9 @@ class _$AddressAddedImpl implements _AddressAdded {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return addressAdded(this);
   }
@@ -1426,6 +1539,8 @@ class _$AddressAddedImpl implements _AddressAdded {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return addressAdded?.call(this);
   }
@@ -1442,6 +1557,8 @@ class _$AddressAddedImpl implements _AddressAdded {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (addressAdded != null) {
@@ -1533,6 +1650,8 @@ class _$LoggedOutImpl implements _LoggedOut {
     required TResult Function(dynamic data) profileUpdated,
     required TResult Function(dynamic data) addressAdded,
     required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
   }) {
     return loggedOut(message);
   }
@@ -1549,6 +1668,8 @@ class _$LoggedOutImpl implements _LoggedOut {
     TResult? Function(dynamic data)? profileUpdated,
     TResult? Function(dynamic data)? addressAdded,
     TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
   }) {
     return loggedOut?.call(message);
   }
@@ -1565,6 +1686,8 @@ class _$LoggedOutImpl implements _LoggedOut {
     TResult Function(dynamic data)? profileUpdated,
     TResult Function(dynamic data)? addressAdded,
     TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
     required TResult orElse(),
   }) {
     if (loggedOut != null) {
@@ -1585,6 +1708,9 @@ class _$LoggedOutImpl implements _LoggedOut {
     required TResult Function(_ProfileUpdated value) profileUpdated,
     required TResult Function(_AddressAdded value) addressAdded,
     required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
   }) {
     return loggedOut(this);
   }
@@ -1601,6 +1727,8 @@ class _$LoggedOutImpl implements _LoggedOut {
     TResult? Function(_ProfileUpdated value)? profileUpdated,
     TResult? Function(_AddressAdded value)? addressAdded,
     TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
   }) {
     return loggedOut?.call(this);
   }
@@ -1617,6 +1745,8 @@ class _$LoggedOutImpl implements _LoggedOut {
     TResult Function(_ProfileUpdated value)? profileUpdated,
     TResult Function(_AddressAdded value)? addressAdded,
     TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
     required TResult orElse(),
   }) {
     if (loggedOut != null) {
@@ -1632,5 +1762,386 @@ abstract class _LoggedOut implements AuthFlowState {
   String get message;
   @JsonKey(ignore: true)
   _$$LoggedOutImplCopyWith<_$LoggedOutImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$NeedProfileCompletionImplCopyWith<$Res> {
+  factory _$$NeedProfileCompletionImplCopyWith(
+          _$NeedProfileCompletionImpl value,
+          $Res Function(_$NeedProfileCompletionImpl) then) =
+      __$$NeedProfileCompletionImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic data});
+}
+
+/// @nodoc
+class __$$NeedProfileCompletionImplCopyWithImpl<$Res>
+    extends _$AuthFlowStateCopyWithImpl<$Res, _$NeedProfileCompletionImpl>
+    implements _$$NeedProfileCompletionImplCopyWith<$Res> {
+  __$$NeedProfileCompletionImplCopyWithImpl(_$NeedProfileCompletionImpl _value,
+      $Res Function(_$NeedProfileCompletionImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = freezed,
+  }) {
+    return _then(_$NeedProfileCompletionImpl(
+      freezed == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$NeedProfileCompletionImpl implements _NeedProfileCompletion {
+  const _$NeedProfileCompletionImpl(this.data);
+
+  @override
+  final dynamic data;
+
+  @override
+  String toString() {
+    return 'AuthFlowState.needProfileCompletion(data: $data)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NeedProfileCompletionImpl &&
+            const DeepCollectionEquality().equals(other.data, data));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(data));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NeedProfileCompletionImplCopyWith<_$NeedProfileCompletionImpl>
+      get copyWith => __$$NeedProfileCompletionImplCopyWithImpl<
+          _$NeedProfileCompletionImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(String message) error,
+    required TResult Function(dynamic data) codeSent,
+    required TResult Function(dynamic data) codeResent,
+    required TResult Function(dynamic data) verified,
+    required TResult Function(dynamic data) profileUpdated,
+    required TResult Function(dynamic data) addressAdded,
+    required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
+  }) {
+    return needProfileCompletion(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(String message)? error,
+    TResult? Function(dynamic data)? codeSent,
+    TResult? Function(dynamic data)? codeResent,
+    TResult? Function(dynamic data)? verified,
+    TResult? Function(dynamic data)? profileUpdated,
+    TResult? Function(dynamic data)? addressAdded,
+    TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
+  }) {
+    return needProfileCompletion?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(String message)? error,
+    TResult Function(dynamic data)? codeSent,
+    TResult Function(dynamic data)? codeResent,
+    TResult Function(dynamic data)? verified,
+    TResult Function(dynamic data)? profileUpdated,
+    TResult Function(dynamic data)? addressAdded,
+    TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (needProfileCompletion != null) {
+      return needProfileCompletion(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Error value) error,
+    required TResult Function(_CodeSent value) codeSent,
+    required TResult Function(_CodeResent value) codeResent,
+    required TResult Function(_Verified value) verified,
+    required TResult Function(_ProfileUpdated value) profileUpdated,
+    required TResult Function(_AddressAdded value) addressAdded,
+    required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
+  }) {
+    return needProfileCompletion(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Error value)? error,
+    TResult? Function(_CodeSent value)? codeSent,
+    TResult? Function(_CodeResent value)? codeResent,
+    TResult? Function(_Verified value)? verified,
+    TResult? Function(_ProfileUpdated value)? profileUpdated,
+    TResult? Function(_AddressAdded value)? addressAdded,
+    TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
+  }) {
+    return needProfileCompletion?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Error value)? error,
+    TResult Function(_CodeSent value)? codeSent,
+    TResult Function(_CodeResent value)? codeResent,
+    TResult Function(_Verified value)? verified,
+    TResult Function(_ProfileUpdated value)? profileUpdated,
+    TResult Function(_AddressAdded value)? addressAdded,
+    TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (needProfileCompletion != null) {
+      return needProfileCompletion(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _NeedProfileCompletion implements AuthFlowState {
+  const factory _NeedProfileCompletion(final dynamic data) =
+      _$NeedProfileCompletionImpl;
+
+  dynamic get data;
+  @JsonKey(ignore: true)
+  _$$NeedProfileCompletionImplCopyWith<_$NeedProfileCompletionImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$AuthenticatedImplCopyWith<$Res> {
+  factory _$$AuthenticatedImplCopyWith(
+          _$AuthenticatedImpl value, $Res Function(_$AuthenticatedImpl) then) =
+      __$$AuthenticatedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic data});
+}
+
+/// @nodoc
+class __$$AuthenticatedImplCopyWithImpl<$Res>
+    extends _$AuthFlowStateCopyWithImpl<$Res, _$AuthenticatedImpl>
+    implements _$$AuthenticatedImplCopyWith<$Res> {
+  __$$AuthenticatedImplCopyWithImpl(
+      _$AuthenticatedImpl _value, $Res Function(_$AuthenticatedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = freezed,
+  }) {
+    return _then(_$AuthenticatedImpl(
+      freezed == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$AuthenticatedImpl implements _Authenticated {
+  const _$AuthenticatedImpl(this.data);
+
+  @override
+  final dynamic data;
+
+  @override
+  String toString() {
+    return 'AuthFlowState.authenticated(data: $data)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AuthenticatedImpl &&
+            const DeepCollectionEquality().equals(other.data, data));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(data));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AuthenticatedImplCopyWith<_$AuthenticatedImpl> get copyWith =>
+      __$$AuthenticatedImplCopyWithImpl<_$AuthenticatedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(String message) error,
+    required TResult Function(dynamic data) codeSent,
+    required TResult Function(dynamic data) codeResent,
+    required TResult Function(dynamic data) verified,
+    required TResult Function(dynamic data) profileUpdated,
+    required TResult Function(dynamic data) addressAdded,
+    required TResult Function(String message) loggedOut,
+    required TResult Function(dynamic data) needProfileCompletion,
+    required TResult Function(dynamic data) authenticated,
+  }) {
+    return authenticated(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(String message)? error,
+    TResult? Function(dynamic data)? codeSent,
+    TResult? Function(dynamic data)? codeResent,
+    TResult? Function(dynamic data)? verified,
+    TResult? Function(dynamic data)? profileUpdated,
+    TResult? Function(dynamic data)? addressAdded,
+    TResult? Function(String message)? loggedOut,
+    TResult? Function(dynamic data)? needProfileCompletion,
+    TResult? Function(dynamic data)? authenticated,
+  }) {
+    return authenticated?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(String message)? error,
+    TResult Function(dynamic data)? codeSent,
+    TResult Function(dynamic data)? codeResent,
+    TResult Function(dynamic data)? verified,
+    TResult Function(dynamic data)? profileUpdated,
+    TResult Function(dynamic data)? addressAdded,
+    TResult Function(String message)? loggedOut,
+    TResult Function(dynamic data)? needProfileCompletion,
+    TResult Function(dynamic data)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (authenticated != null) {
+      return authenticated(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Error value) error,
+    required TResult Function(_CodeSent value) codeSent,
+    required TResult Function(_CodeResent value) codeResent,
+    required TResult Function(_Verified value) verified,
+    required TResult Function(_ProfileUpdated value) profileUpdated,
+    required TResult Function(_AddressAdded value) addressAdded,
+    required TResult Function(_LoggedOut value) loggedOut,
+    required TResult Function(_NeedProfileCompletion value)
+        needProfileCompletion,
+    required TResult Function(_Authenticated value) authenticated,
+  }) {
+    return authenticated(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Error value)? error,
+    TResult? Function(_CodeSent value)? codeSent,
+    TResult? Function(_CodeResent value)? codeResent,
+    TResult? Function(_Verified value)? verified,
+    TResult? Function(_ProfileUpdated value)? profileUpdated,
+    TResult? Function(_AddressAdded value)? addressAdded,
+    TResult? Function(_LoggedOut value)? loggedOut,
+    TResult? Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult? Function(_Authenticated value)? authenticated,
+  }) {
+    return authenticated?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Error value)? error,
+    TResult Function(_CodeSent value)? codeSent,
+    TResult Function(_CodeResent value)? codeResent,
+    TResult Function(_Verified value)? verified,
+    TResult Function(_ProfileUpdated value)? profileUpdated,
+    TResult Function(_AddressAdded value)? addressAdded,
+    TResult Function(_LoggedOut value)? loggedOut,
+    TResult Function(_NeedProfileCompletion value)? needProfileCompletion,
+    TResult Function(_Authenticated value)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (authenticated != null) {
+      return authenticated(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Authenticated implements AuthFlowState {
+  const factory _Authenticated(final dynamic data) = _$AuthenticatedImpl;
+
+  dynamic get data;
+  @JsonKey(ignore: true)
+  _$$AuthenticatedImplCopyWith<_$AuthenticatedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

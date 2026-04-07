@@ -11,6 +11,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart'; // 👈 هون بالضبط
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -168,13 +169,13 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
                 // height: screenHeight * 0.75,
                 child: _videoController.value.isInitialized
                     ? FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _videoController.value.size.width,
-                          height: _videoController.value.size.height,
-                          child: VideoPlayer(_videoController),
-                        ),
-                      )
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: _videoController.value.size.width,
+                    height: _videoController.value.size.height,
+                    child: VideoPlayer(_videoController),
+                  ),
+                )
                     : const SizedBox(),
               ),
 
@@ -313,18 +314,31 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
                                         ),
                                         SizedBox(width: 10.w),
                                         Expanded(
-                                          child: _CustomTextFormField(
+                                          child:
+                                          _CustomTextFormField(
                                             controller: phoneController,
                                             keyboardType: TextInputType.number,
                                             hintText: "auth.phone_number".tr(),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.digitsOnly, // يمنع أي شي غير الأرقام
+                                              LengthLimitingTextInputFormatter(9),// أقصى طول 9
+                                              NoLeadingZeroFormatter(), //ممنوع يدخل صفر
+                                            ],
                                             validator: (v) {
                                               final val = (v ?? '').trim();
+
                                               if (val.isEmpty) {
                                                 return "auth.enter_phone".tr();
                                               }
-                                              if (val.length < 8) {
-                                                return "auth.invalid_phone".tr();
+
+                                              if (!RegExp(r'^[0-9]+$').hasMatch(val)) {
+                                                return "auth.only_numbers".tr(); // لازم تضيفها بالترجمة
                                               }
+
+                                              if (val.length != 9) {
+                                                return "auth.phone_must_be_9_digits".tr();
+                                              }
+
                                               return null;
                                             },
                                           ),
@@ -341,12 +355,8 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
                                         Checkbox(
                                           value: _acceptedTerms,
                                           activeColor: AppColor.primaryColor,
-                                          onChanged: (v) async {
-                                            if (v == true) {
-                                              await _openTermsAndMaybeAccept();
-                                            } else {
-                                              setState(() => _acceptedTerms = false);
-                                            }
+                                          onChanged: (v) {
+                                            setState(() => _acceptedTerms = v ?? false);
                                           },
                                         ),
                                         Expanded(
@@ -381,13 +391,13 @@ class _LoginState extends State<Login> with WidgetsBindingObserver {
                                         onTap: _acceptedTerms
                                             ? _handleLogin
                                             : () {
-                                                _showSnackBar(
-                                                  context,
-                                                  message: "terms.must_accept".tr(),
-                                                  background: Colors.orange,
-                                                  icon: Icons.warning_amber_rounded,
-                                                );
-                                              },
+                                          _showSnackBar(
+                                            context,
+                                            message: "terms.must_accept".tr(),
+                                            background: Colors.orange,
+                                            icon: Icons.warning_amber_rounded,
+                                          );
+                                        },
                                         child: Container(
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
@@ -431,14 +441,14 @@ class _CustomTextFormField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final bool isPassword;
-
+  final List<TextInputFormatter>? inputFormatters;
   const _CustomTextFormField({
     super.key,
     this.controller,
     required this.hintText,
     this.keyboardType = TextInputType.text,
     this.validator,
-    this.isPassword = false,
+    this.isPassword = false, this.inputFormatters,
   });
 
   @override
@@ -459,6 +469,7 @@ class __CustomTextFormFieldState extends State<_CustomTextFormField> {
     final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: widget.controller,
+      inputFormatters: widget.inputFormatters,
       obscureText: _obscure,
       keyboardType: widget.keyboardType,
       validator: widget.validator,
@@ -472,5 +483,18 @@ class __CustomTextFormFieldState extends State<_CustomTextFormField> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r), borderSide: BorderSide.none),
       ),
     );
+  }
+}
+class NoLeadingZeroFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    // إذا أول رقم هو 0 → امنعه
+    if (newValue.text.startsWith('0')) {
+      return oldValue;
+    }
+    return newValue;
   }
 }
