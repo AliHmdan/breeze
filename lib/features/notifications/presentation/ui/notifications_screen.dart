@@ -1,4 +1,5 @@
 import 'package:breezefood/core/component/color.dart';
+import 'package:breezefood/features/help_center/help_center.dart';
 import 'package:breezefood/features/notifications/presentation/ui/widget/notification_card.dart';
 import 'package:breezefood/features/notifications/presentation/cubit/notification_cubit.dart';
 import 'package:breezefood/features/profile/presentation/widget/custom_appbar_profile.dart';
@@ -7,6 +8,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../stores/presentation/ui/screens/restaurant_details/screens/restaurant_details_screen.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -107,7 +110,16 @@ class _NotificationPageState extends State<NotificationPage> {
                               final time = _timeLabel(n.sentAt ?? n.createdAt);
 
                               return GestureDetector(
-                                onTap: () => setState(() => selectedIndex = index),
+                                onTap: ()
+                                {
+                                  setState(() => selectedIndex = index);
+                                  switch(n.type){
+                                    case "system":;
+                                    case"order":
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ResturantDetails(restaurant_id: n.data["restaurant_id"],)));
+                                    case "chat":Navigator.of(context).push(MaterialPageRoute(builder: (context)=>HelpCenter()));
+                                  }
+                                },
                                 child: notificationCard(
                                   title: title.isEmpty ? "-" : title,
                                   subtitle: subtitle.isEmpty ? "-" : subtitle,

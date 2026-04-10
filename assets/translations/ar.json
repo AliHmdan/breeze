@@ -257,8 +257,8 @@
     "count": "الإشعارات ({0})",
     "time": {
       "now": "الآن",
-      "minutes": "{0}د",
-      "hours": "{0}س"
+      "minutes": "{}د",
+      "hours": "{}س"
     }
   },
   "reviews": {

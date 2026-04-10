@@ -16,6 +16,7 @@ class DioFactory {
 
   static const _timeout = Duration(seconds: 30);
   static const _baseUrl = "https://breezefood.cloud/api";
+  // static const _baseUrl = "http://212.11.196.193/api";
 
   static Dio getDio() {
     _dio ??= _createConfiguredDio();
@@ -77,9 +78,11 @@ class _AuthInterceptor extends Interceptor {
   ) async {
     try {
       final token = await AuthStorageHelper.getToken();
+      log("🔑 TOKEN => $token");
       if (token != null && token.isNotEmpty) {
         options.headers["Authorization"] = "Bearer $token";
       }
+      log("📦 HEADERS => ${options.headers}");
     } catch (e) {
       log("⚠️ AuthInterceptor Error: $e");
     }

@@ -298,6 +298,7 @@ class _InfoProfileState extends State<InfoProfile> {
                           hint: "0938204147",
                           controller: _phoneCtrl,
                           keyboardType: TextInputType.phone,
+                          readOnly: true,
                           // readOnly: true,
                         ),
                         SizedBox(height: 30.h),

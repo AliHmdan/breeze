@@ -20,13 +20,11 @@ class CartCubit extends Cubit<CartState> {
     if (!isClosed) emit(s);
   }
 
-  _CartLoaded? _loaded() =>
-      state is _CartLoaded ? state as _CartLoaded : null;
-  bool get _hasLoaded =>
-      state.maybeWhen(
-        cartLoaded: (cart, updatingIds, toast, isRefreshing) => true,
-        orElse: () => false,
-      );
+  _CartLoaded? _loaded() => state is _CartLoaded ? state as _CartLoaded : null;
+  bool get _hasLoaded => state.maybeWhen(
+    cartLoaded: (cart, updatingIds, toast, isRefreshing) => true,
+    orElse: () => false,
+  );
 
   // ===========================================================
   // ✅ LOAD CART (supports silent refresh)
@@ -185,8 +183,7 @@ class CartCubit extends Cubit<CartState> {
 
       await add(req);
 
-      final isError =
-      state.maybeWhen(error: (_) => true, orElse: () => false);
+      final isError = state.maybeWhen(error: (_) => true, orElse: () => false);
 
       if (isError) failed.add(item.title);
     }
@@ -199,7 +196,7 @@ class CartCubit extends Cubit<CartState> {
         _safeEmit(
           st.copyWith(
             toast:
-            "تعذر إضافة: ${failed.take(3).join(", ")}${failed.length > 3 ? "..." : ""}",
+                "تعذر إضافة: ${failed.take(3).join(", ")}${failed.length > 3 ? "..." : ""}",
           ),
         );
       }
@@ -207,7 +204,7 @@ class CartCubit extends Cubit<CartState> {
   }
 
   // ===========================================================
-  // ✅ UPDATE QTY (Optimistic)
+  // UPDATE QTY (Optimistic)
   // ===========================================================
   Future<void> updateQty({
     required int cartItemId,
@@ -248,18 +245,25 @@ class CartCubit extends Cubit<CartState> {
     }
 
     await loadCart(silent: true);
+
+    // Remove the updatingId after successful update
+    final stNow = _loaded();
+    if (stNow != null && stNow.updatingIds.contains(cartItemId)) {
+      _safeEmit(
+        stNow.copyWith(updatingIds: {...stNow.updatingIds}..remove(cartItemId)),
+      );
+    }
   }
 
   // ===========================================================
-  // ✅ REMOVE ITEM (Optimistic)
+  // REMOVE ITEM (Optimistic)
   // ===========================================================
   Future<void> removeItem(int cartItemId) async {
     final st = _loaded();
     if (st == null) return;
 
     final prevCart = st.cart;
-    final newItems =
-    prevCart.items.where((e) => e.id != cartItemId).toList();
+    final newItems = prevCart.items.where((e) => e.id != cartItemId).toList();
 
     _safeEmit(
       st.copyWith(
@@ -275,5 +279,83 @@ class CartCubit extends Cubit<CartState> {
     }
 
     await loadCart(silent: true);
+
+    // Remove the updatingId after successful removal
+    final stNow = _loaded();
+    if (stNow != null && stNow.updatingIds.contains(cartItemId)) {
+      _safeEmit(
+        stNow.copyWith(updatingIds: {...stNow.updatingIds}..remove(cartItemId)),
+      );
+    }
+  }
+
+  // ===========================================================
+  // CLEAR ALL CART
+  // ===========================================================
+  Future<void> clearCart() async {
+    // Show loading state
+    _safeEmit(const CartState.loading());
+
+    try {
+      final st = _loaded();
+      if (st != null && st.cart.items.isNotEmpty) {
+        log("Removing all items from cart one by one...");
+
+        // Remove all items one by one using existing API
+        for (final item in st.cart.items) {
+          try {
+            await repo.removeItem(cartItemId: item.id);
+            log("Removed item ${item.id} successfully");
+          } catch (e) {
+            log("Failed to remove item ${item.id}: $e");
+          }
+        }
+      }
+
+      log("All items removed, clearing cart locally");
+      // Clear cart locally
+      _clearCartLocally();
+    } catch (e, s) {
+      log("clearCart exception: $e\n$s, falling back to local clear only");
+      // Fallback: clear cart locally even if exception occurs
+      _clearCartLocally();
+    }
+  }
+
+  void _clearCartLocally() {
+    // Create empty cart response
+    final emptyCart = CartResponse(
+      primaryAddress: null,
+      addresses: [],
+      orderId: 0,
+      orderStatus: "",
+      restaurantId: 0,
+      restaurantName: "",
+      restaurantLogo: "",
+      items: [],
+      appetizers: [],
+      itemsTotalBefore: 0,
+      itemsTotalAfter: 0,
+      itemsDiscount: 0,
+      appetizersTotal: 0,
+      deliveryBefore: 0,
+      deliveryAfter: 0,
+      deliveryDiscount: 0,
+      grandBefore: 0,
+      grandAfter: 0,
+      vip: null,
+    );
+
+    // Emit empty cart state
+    _safeEmit(
+      CartState.cartLoaded(
+        cart: emptyCart,
+        updatingIds: {},
+        toast: null,
+        isRefreshing: false,
+      ),
+    );
+
+    log("Cart cleared locally successfully");
   }
 }

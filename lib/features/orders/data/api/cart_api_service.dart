@@ -21,7 +21,9 @@ abstract class CartApiService {
 
   // ✅ NEW: remove item
   @GET("/cart/item/{id}/remove-item")
-  Future<HttpResponse<dynamic>> removeItem(
-    @Path("id") int itemId,
-  );
+  Future<HttpResponse<dynamic>> removeItem(@Path("id") int itemId);
+
+  // NEW: clear all cart
+  @DELETE("/cart/clear")
+  Future<HttpResponse<dynamic>> clearCart();
 }

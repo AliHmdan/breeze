@@ -16,13 +16,18 @@ class SuccessPopup extends StatefulWidget {
   final String message;
   final String buttonText;
 
-  const SuccessPopup({super.key, required this.message, required this.buttonText});
+  const SuccessPopup({
+    super.key,
+    required this.message,
+    required this.buttonText,
+  });
 
   @override
   State<SuccessPopup> createState() => _SuccessPopupState();
 }
 
-class _SuccessPopupState extends State<SuccessPopup> with SingleTickerProviderStateMixin {
+class _SuccessPopupState extends State<SuccessPopup>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
   late Animation<double> _fade;
@@ -31,7 +36,10 @@ class _SuccessPopupState extends State<SuccessPopup> with SingleTickerProviderSt
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 350));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
 
     _scale = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
 
@@ -53,26 +61,50 @@ class _SuccessPopupState extends State<SuccessPopup> with SingleTickerProviderSt
       child: ScaleTransition(
         scale: _scale,
         child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
           backgroundColor: AppColor.Dark,
           child: Padding(
             padding: EdgeInsets.all(24.w),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.check_circle, color: AppColor.primaryColor, size: 70.w),
+                Icon(
+                  Icons.check_circle,
+                  color: AppColor.primaryColor,
+                  size: 70.w,
+                ),
                 SizedBox(height: 16.h),
                 Text(
                   widget.message,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: AppColor.white),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.white,
+                  ),
                 ),
                 SizedBox(height: 20.h),
                 ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // اغلاق الديالوج
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (_) => const MainShell(isOrderFinished: true),
+                      ),
+                    );
+                  },
                   // onPressed: () => Navigator.pop(context),
-                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell(isOrderFinished: true))),
-                  style: ElevatedButton.styleFrom(foregroundColor: AppColor.primaryColor, backgroundColor: AppColor.primaryColor),
-                  child: Text(widget.buttonText, style: TextStyle(color: Colors.white)),
+                  // onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell(isOrderFinished: true))),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: AppColor.primaryColor,
+                    backgroundColor: AppColor.primaryColor,
+                  ),
+                  child: Text(
+                    widget.buttonText,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -87,7 +119,11 @@ class TrackingSheet extends StatefulWidget {
   final int orderId;
   final ScrollController scrollController;
 
-  const TrackingSheet({super.key, required this.orderId, required this.scrollController});
+  const TrackingSheet({
+    super.key,
+    required this.orderId,
+    required this.scrollController,
+  });
 
   @override
   State<TrackingSheet> createState() => _TrackingSheetState();
@@ -96,7 +132,7 @@ class TrackingSheet extends StatefulWidget {
 class _TrackingSheetState extends State<TrackingSheet> {
   dynamic _cachedDetails;
   String? _cachedErrorKey;
-
+  bool _shownDialog = false; // ✅ مهم
   // ================= Helpers =================
 
   String absUrl(String path) {
@@ -134,26 +170,46 @@ class _TrackingSheetState extends State<TrackingSheet> {
           context: context,
           useRootNavigator: true,
           barrierDismissible: true,
-          builder: (_) => SuccessPopup(message: "reviews.Your_order_was_complete_successfully".tr(), buttonText: 'reviews.done'.tr()),
+          builder: (_) => SuccessPopup(
+            message: "reviews.Your_order_was_complete_successfully".tr(),
+            buttonText: 'reviews.done'.tr(),
+          ),
         );
       });
     });
   }
 
+  // bool _isStepCompleted(String stepKey, String currentStatus) {
+  //   const order = ["pending", "preparing", "inway", "delivered"];
+  //   final a = order.indexOf(stepKey);
+  //   final b = order.indexOf(currentStatus);
+  //   final ali = currentStatus;
+  //   print('the name of my order');
+  //   print('stepKey :$a');
+  //   print('currentStatus : $b');
+  //   print('currentStatus for ali : $ali');
+  //   // if (b == 3) {
+  //   //   popUpWhenOrderIsCompleted();
+  //   //   //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell(isOrderFinished: true)));
+  //   // } else {}
+  //   bool _isStepCompleted(String stepKey, String currentStatus) {
+  //     const order = ["pending", "preparing", "inway", "delivered"];
+  //     final a = order.indexOf(stepKey);
+  //     final b = order.indexOf(currentStatus);
+  //
+  //     if (a == -1 || b == -1) return false;
+  //     return a <= b;
+  //   }
+  //   bool _shownDialog = false;
+  //   print('the name of my order');
+  //   if (a == -1 || b == -1) return false;
+  //   return a <= b;
+  // }
   bool _isStepCompleted(String stepKey, String currentStatus) {
     const order = ["pending", "preparing", "inway", "delivered"];
     final a = order.indexOf(stepKey);
     final b = order.indexOf(currentStatus);
-    final ali = currentStatus;
-    print('the name of my order');
-    print('stepKey :$a');
-    print('currentStatus : $b');
-    print('currentStatus for ali : $ali');
-    if (b == 3) {
-      popUpWhenOrderIsCompleted();
-      //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell(isOrderFinished: true)));
-    } else {}
-    print('the name of my order');
+
     if (a == -1 || b == -1) return false;
     return a <= b;
   }
@@ -185,7 +241,11 @@ class _TrackingSheetState extends State<TrackingSheet> {
       padding: EdgeInsets.only(top: 6.h, bottom: 10.h),
       child: Text(
         title,
-        style: TextStyle(color: AppColor.white, fontSize: 14.sp, fontWeight: FontWeight.w900),
+        style: TextStyle(
+          color: AppColor.white,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     );
   }
@@ -201,13 +261,20 @@ class _TrackingSheetState extends State<TrackingSheet> {
           Expanded(
             child: Text(
               k,
-              style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp),
+              style: TextStyle(
+                color: AppColor.white.withOpacity(0.7),
+                fontSize: 12.sp,
+              ),
             ),
           ),
           SizedBox(width: 10.w),
           Text(
             vv,
-            style: TextStyle(color: AppColor.white, fontSize: 12.sp, fontWeight: FontWeight.w800),
+            style: TextStyle(
+              color: AppColor.white,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -225,7 +292,10 @@ class _TrackingSheetState extends State<TrackingSheet> {
           opacity: disabled ? 0.45 : 1,
           child: Ink(
             padding: EdgeInsets.all(12.w),
-            decoration: const BoxDecoration(color: AppColor.primaryColor, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: AppColor.primaryColor,
+              shape: BoxShape.circle,
+            ),
             child: Icon(icon, color: AppColor.white, size: 20.sp),
           ),
         ),
@@ -237,8 +307,15 @@ class _TrackingSheetState extends State<TrackingSheet> {
     return Container(
       width: 30.w,
       height: 30.w,
-      decoration: BoxDecoration(color: isCompleted ? AppColor.primaryColor : AppColor.LightActive, shape: BoxShape.circle),
-      child: Icon(isCompleted ? Icons.check : Icons.circle_outlined, color: AppColor.white, size: 16.sp),
+      decoration: BoxDecoration(
+        color: isCompleted ? AppColor.primaryColor : AppColor.LightActive,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        isCompleted ? Icons.check : Icons.circle_outlined,
+        color: AppColor.white,
+        size: 16.sp,
+      ),
     );
   }
 
@@ -250,7 +327,15 @@ class _TrackingSheetState extends State<TrackingSheet> {
           Column(
             children: [
               _buildStepIcon(isCompleted),
-              if (!isLast) Expanded(child: Container(width: 2, color: isCompleted ? AppColor.primaryColor : AppColor.LightActive)),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: isCompleted
+                        ? AppColor.primaryColor
+                        : AppColor.LightActive,
+                  ),
+                ),
             ],
           ),
           SizedBox(width: 12.w),
@@ -262,12 +347,19 @@ class _TrackingSheetState extends State<TrackingSheet> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(color: AppColor.white, fontWeight: FontWeight.w900, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: AppColor.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13.sp,
+                    ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     time.trim().isEmpty ? "—" : time,
-                    style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp),
+                    style: TextStyle(
+                      color: AppColor.white.withOpacity(0.7),
+                      fontSize: 12.sp,
+                    ),
                   ),
                   SizedBox(height: isLast ? 0 : 18.h),
                 ],
@@ -291,13 +383,17 @@ class _TrackingSheetState extends State<TrackingSheet> {
 
     if (ok != true) return;
 
-    final success = await context.read<OrdersDetailsCubit>().cancel(widget.orderId);
+    final success = await context.read<OrdersDetailsCubit>().cancel(
+      widget.orderId,
+    );
     if (!context.mounted) return;
 
     if (success) {
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("orders.cancel_failed".tr())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("orders.cancel_failed".tr())));
     }
   }
 
@@ -310,13 +406,32 @@ class _TrackingSheetState extends State<TrackingSheet> {
     return BlocListener<OrdersDetailsCubit, OrdersDetailsState>(
       listener: (context, state) {
         // ✅ خزّن آخر نجاح
+        // state.whenOrNull(
+        //   success: (d) {
+        //     _cachedDetails = d;
+        //     _cachedErrorKey = null;
+        //   },
+        //   error: (mKey) {
+        //     // ✅ ما نفضي البيانات؛ بس نخزن آخر error key
+        //     _cachedErrorKey = mKey;
+        //   },
+        // );
         state.whenOrNull(
           success: (d) {
             _cachedDetails = d;
             _cachedErrorKey = null;
+
+            final status = (d.order.status ?? "")
+                .toString()
+                .toLowerCase()
+                .trim();
+
+            if (status == "delivered" && !_shownDialog) {
+              _shownDialog = true;
+              popUpWhenOrderIsCompleted();
+            }
           },
           error: (mKey) {
-            // ✅ ما نفضي البيانات؛ بس نخزن آخر error key
             _cachedErrorKey = mKey;
           },
         );
@@ -326,11 +441,19 @@ class _TrackingSheetState extends State<TrackingSheet> {
           // ✅ قلل rebuilds: بنعيد البناء بس عند success أو أول load بدون cache أو error أول مرة
           final hasCache = _cachedDetails != null;
 
-          return curr.maybeWhen(success: (_) => true, loading: () => !hasCache, error: (_) => !hasCache, orElse: () => false);
+          return curr.maybeWhen(
+            success: (_) => true,
+            loading: () => !hasCache,
+            error: (_) => !hasCache,
+            orElse: () => false,
+          );
         },
         builder: (context, state) {
           // ✅ source of truth للعرض: cache إذا موجود
-          final details = state.maybeWhen(success: (d) => d, orElse: () => _cachedDetails);
+          final details = state.maybeWhen(
+            success: (d) => d,
+            orElse: () => _cachedDetails,
+          );
 
           // ✅ أول مرة فقط: إذا ما في cache نهائياً
           final hasDetails = details != null;
@@ -341,7 +464,10 @@ class _TrackingSheetState extends State<TrackingSheet> {
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColor.Dark,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(25.r), topRight: Radius.circular(25.r)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(25.r),
+                    topRight: Radius.circular(25.r),
+                  ),
                 ),
                 child: SafeArea(
                   top: false,
@@ -378,7 +504,9 @@ class _TrackingSheetState extends State<TrackingSheet> {
 
           final codeInt = order.orderCustomerCode;
           final code = (codeInt == null) ? "" : codeInt.toString();
-          final codeDigits = code.isEmpty ? ["-", "-", "-", "-"] : code.padLeft(4, "0").split("");
+          final codeDigits = code.isEmpty
+              ? ["-", "-", "-", "-"]
+              : code.padLeft(4, "0").split("");
 
           final timeline = details.timeline ?? const [];
           final items = details.items ?? const [];
@@ -390,21 +518,34 @@ class _TrackingSheetState extends State<TrackingSheet> {
                   padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 0),
                   child: Row(
                     children: [
-                      const Icon(Iconsax.warning_2, color: Colors.amber, size: 16),
+                      const Icon(
+                        Iconsax.warning_2,
+                        color: Colors.amber,
+                        size: 16,
+                      ),
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
                           _cachedErrorKey!.tr(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12.sp,
+                          ),
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.read<OrdersDetailsCubit>().load(widget.orderId),
+                        onTap: () => context.read<OrdersDetailsCubit>().load(
+                          widget.orderId,
+                        ),
                         child: Text(
                           "common.retry".tr(),
-                          style: TextStyle(color: AppColor.primaryColor, fontWeight: FontWeight.w800, fontSize: 12.sp),
+                          style: TextStyle(
+                            color: AppColor.primaryColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12.sp,
+                          ),
                         ),
                       ),
                     ],
@@ -417,8 +558,16 @@ class _TrackingSheetState extends State<TrackingSheet> {
             child: Container(
               decoration: BoxDecoration(
                 color: AppColor.Dark,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(25.r), topRight: Radius.circular(25.r)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 18)],
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25.r),
+                  topRight: Radius.circular(25.r),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 18,
+                  ),
+                ],
               ),
               child: SafeArea(
                 top: false,
@@ -434,7 +583,10 @@ class _TrackingSheetState extends State<TrackingSheet> {
                           child: Container(
                             width: 44.w,
                             height: 5.h,
-                            decoration: BoxDecoration(color: AppColor.search, borderRadius: BorderRadius.circular(99)),
+                            decoration: BoxDecoration(
+                              color: AppColor.search,
+                              borderRadius: BorderRadius.circular(99),
+                            ),
                           ),
                         ),
                       ),
@@ -453,14 +605,20 @@ class _TrackingSheetState extends State<TrackingSheet> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppColor.LightActive,
-                                border: Border.all(color: AppColor.primaryColor.withOpacity(0.6), width: 2),
+                                border: Border.all(
+                                  color: AppColor.primaryColor.withOpacity(0.6),
+                                  width: 2,
+                                ),
                               ),
                               child: driverImg.isEmpty
                                   ? Icon(Icons.person, color: AppColor.white)
                                   : Image.network(
                                       driverImg,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: AppColor.white),
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.person,
+                                        color: AppColor.white,
+                                      ),
                                     ),
                             ),
                             SizedBox(width: 12.w),
@@ -475,21 +633,41 @@ class _TrackingSheetState extends State<TrackingSheet> {
                                           driverName,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(color: AppColor.white, fontWeight: FontWeight.w900, fontSize: 16.sp),
+                                          style: TextStyle(
+                                            color: AppColor.white,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 16.sp,
+                                          ),
                                         ),
                                       ),
                                       if (isVip)
                                         Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                                          decoration: BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(999)),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 4.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColor.primaryColor,
+                                            borderRadius: BorderRadius.circular(
+                                              999,
+                                            ),
+                                          ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.emoji_events, size: 14.sp, color: AppColor.white),
+                                              Icon(
+                                                Icons.emoji_events,
+                                                size: 14.sp,
+                                                color: AppColor.white,
+                                              ),
                                               SizedBox(width: 4.w),
                                               Text(
                                                 "orders.vip_badge".tr(),
-                                                style: TextStyle(color: AppColor.white, fontSize: 11.sp, fontWeight: FontWeight.w800),
+                                                style: TextStyle(
+                                                  color: AppColor.white,
+                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -505,15 +683,28 @@ class _TrackingSheetState extends State<TrackingSheet> {
                                           height: 18.w,
                                           margin: EdgeInsets.only(right: 6.w),
                                           clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(color: AppColor.LightActive, borderRadius: BorderRadius.circular(6.r)),
-                                          child: Image.network(restLogo, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                                          decoration: BoxDecoration(
+                                            color: AppColor.LightActive,
+                                            borderRadius: BorderRadius.circular(
+                                              6.r,
+                                            ),
+                                          ),
+                                          child: Image.network(
+                                            restLogo,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                const SizedBox.shrink(),
+                                          ),
                                         ),
                                       Expanded(
                                         child: Text(
                                           restaurantName,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(color: AppColor.white, fontSize: 13.sp),
+                                          style: TextStyle(
+                                            color: AppColor.white,
+                                            fontSize: 13.sp,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -522,13 +713,21 @@ class _TrackingSheetState extends State<TrackingSheet> {
                                     SizedBox(height: 6.h),
                                     Text(
                                       driverPhone,
-                                      style: TextStyle(color: AppColor.white, fontSize: 12.sp),
+                                      style: TextStyle(
+                                        color: AppColor.white,
+                                        fontSize: 12.sp,
+                                      ),
                                     ),
                                   ],
                                 ],
                               ),
                             ),
-                            _actionCircle(icon: Icons.call, onTap: driverPhone.isEmpty ? null : () => _callPhone(driverPhone)),
+                            _actionCircle(
+                              icon: Icons.call,
+                              onTap: driverPhone.isEmpty
+                                  ? null
+                                  : () => _callPhone(driverPhone),
+                            ),
                           ],
                         ),
                       ),
@@ -547,21 +746,35 @@ class _TrackingSheetState extends State<TrackingSheet> {
                           _sectionTitle("tracking.customer_code_title".tr()),
                           Text(
                             "tracking.show_code_hint".tr(),
-                            style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 13.sp),
+                            style: TextStyle(
+                              color: AppColor.white.withOpacity(0.7),
+                              fontSize: 13.sp,
+                            ),
                           ),
                           SizedBox(height: 10.h),
                           Directionality(
                             textDirection: my.TextDirection.ltr,
                             child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 14.w),
-                              decoration: BoxDecoration(color: AppColor.search, borderRadius: BorderRadius.circular(12.r)),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12.h,
+                                horizontal: 14.w,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColor.search,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: List.generate(
                                   4,
                                   (i) => Text(
                                     codeDigits[i],
-                                    style: TextStyle(color: AppColor.white, fontSize: 24.sp, fontWeight: FontWeight.w900),
+                                    style: TextStyle(
+                                      color: AppColor.white,
+                                      fontSize: 24.sp,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -571,9 +784,18 @@ class _TrackingSheetState extends State<TrackingSheet> {
                           _divider(),
 
                           _sectionTitle("tracking.order_details".tr()),
-                          _kv("tracking.status".tr(), st.isEmpty ? "—" : "order_status.$st".tr()),
-                          _kv("tracking.items_total".tr(), context.syp(itemsTotal)),
-                          _kv("tracking.delivery_fee".tr(), context.syp(deliveryFee)),
+                          _kv(
+                            "tracking.status".tr(),
+                            st.isEmpty ? "—" : "order_status.$st".tr(),
+                          ),
+                          _kv(
+                            "tracking.items_total".tr(),
+                            context.syp(itemsTotal),
+                          ),
+                          _kv(
+                            "tracking.delivery_fee".tr(),
+                            context.syp(deliveryFee),
+                          ),
                           _kv("tracking.total".tr(), context.syp(total)),
 
                           if (canCancel) ...[
@@ -587,7 +809,9 @@ class _TrackingSheetState extends State<TrackingSheet> {
                                   backgroundColor: AppColor.red,
                                   foregroundColor: Colors.white,
                                   padding: EdgeInsets.symmetric(vertical: 12.h),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
                                 ),
                                 onPressed: () => _confirmAndCancel(context),
                               ),
@@ -600,7 +824,12 @@ class _TrackingSheetState extends State<TrackingSheet> {
                           ...List.generate(stepKeys.length, (i) {
                             final k = stepKeys[i];
                             final t = _timeFor(timeline, k);
-                            return _buildStep(_stepTitle(k), t, _isStepCompleted(k, st), i == stepKeys.length - 1);
+                            return _buildStep(
+                              _stepTitle(k),
+                              t,
+                              _isStepCompleted(k, st),
+                              i == stepKeys.length - 1,
+                            );
                           }),
 
                           _divider(),
@@ -609,7 +838,10 @@ class _TrackingSheetState extends State<TrackingSheet> {
                           if (items.isEmpty)
                             Padding(
                               padding: EdgeInsets.only(top: 4.h),
-                              child: Text("common.empty".tr(), style: TextStyle(color: AppColor.gry)),
+                              child: Text(
+                                "common.empty".tr(),
+                                style: TextStyle(color: AppColor.gry),
+                              ),
                             )
                           else
                             ...items.map((it) {
@@ -617,61 +849,111 @@ class _TrackingSheetState extends State<TrackingSheet> {
                               return Container(
                                 margin: EdgeInsets.only(bottom: 10.h),
                                 padding: EdgeInsets.all(12.w),
-                                decoration: BoxDecoration(color: AppColor.search, borderRadius: BorderRadius.circular(14.r)),
+                                decoration: BoxDecoration(
+                                  color: AppColor.search,
+                                  borderRadius: BorderRadius.circular(14.r),
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
                                       width: 52.w,
                                       height: 52.w,
                                       clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r), color: AppColor.Dark),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
+                                        color: AppColor.Dark,
+                                      ),
                                       child: img.isEmpty
-                                          ? Icon(Icons.fastfood, color: AppColor.white)
+                                          ? Icon(
+                                              Icons.fastfood,
+                                              color: AppColor.white,
+                                            )
                                           : Image.network(
                                               img,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) => Icon(Icons.fastfood, color: AppColor.white),
+                                              errorBuilder: (_, __, ___) =>
+                                                  Icon(
+                                                    Icons.fastfood,
+                                                    color: AppColor.white,
+                                                  ),
                                             ),
                                     ),
                                     SizedBox(width: 12.w),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             it.title,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(color: AppColor.white, fontWeight: FontWeight.w900, fontSize: 13.sp),
+                                            style: TextStyle(
+                                              color: AppColor.white,
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 13.sp,
+                                            ),
                                           ),
                                           SizedBox(height: 6.h),
                                           Wrap(
                                             spacing: 8.w,
                                             runSpacing: 6.h,
                                             children: [
-                                              _chipKV("tracking.qty".tr(), "${it.quantity}"),
-                                              _chipKV("tracking.item_price".tr(), context.syp(it.totalPrice)),
-                                              _chipKV("tracking.delivery_time".tr(), "${it.deliveryTime}"),
+                                              _chipKV(
+                                                "tracking.qty".tr(),
+                                                "${it.quantity}",
+                                              ),
+                                              _chipKV(
+                                                "tracking.item_price".tr(),
+                                                context.syp(it.totalPrice),
+                                              ),
+                                              _chipKV(
+                                                "tracking.delivery_time".tr(),
+                                                "${it.deliveryTime}",
+                                              ),
                                             ],
                                           ),
                                           if (it.withSpicy)
                                             Padding(
-                                              padding: EdgeInsets.only(top: 8.h),
+                                              padding: EdgeInsets.only(
+                                                top: 8.h,
+                                              ),
                                               child: Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 10.w,
+                                                  vertical: 6.h,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   color: AppColor.Dark,
-                                                  borderRadius: BorderRadius.circular(999),
-                                                  border: Border.all(color: Colors.white12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                  border: Border.all(
+                                                    color: Colors.white12,
+                                                  ),
                                                 ),
                                                 child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
-                                                    Icon(Icons.local_fire_department, color: AppColor.white, size: 16.sp),
+                                                    Icon(
+                                                      Icons
+                                                          .local_fire_department,
+                                                      color: AppColor.white,
+                                                      size: 16.sp,
+                                                    ),
                                                     SizedBox(width: 6.w),
                                                     Text(
                                                       "tracking.spicy".tr(),
-                                                      style: TextStyle(color: AppColor.white, fontSize: 12.sp, fontWeight: FontWeight.w800),
+                                                      style: TextStyle(
+                                                        color: AppColor.white,
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -713,12 +995,20 @@ Widget _chipKV(String label, String value) {
       children: [
         Text(
           "$label:",
-          style: TextStyle(color: AppColor.white.withOpacity(0.7), fontSize: 12.sp, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: AppColor.white.withOpacity(0.7),
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         SizedBox(width: 6.w),
         Text(
           v,
-          style: TextStyle(color: AppColor.white, fontSize: 12.sp, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            color: AppColor.white,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ],
     ),

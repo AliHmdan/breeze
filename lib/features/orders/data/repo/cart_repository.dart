@@ -2,7 +2,8 @@ import 'package:breezefood/features/orders/data/api/cart_api_service.dart';
 import 'package:breezefood/features/orders/model/add_to_cart_request.dart';
 import 'package:dio/dio.dart';
 import 'package:breezefood/core/network/api_result.dart';
-import 'package:breezefood/core/network/api_result.dart' show AppResponseHandler;
+import 'package:breezefood/core/network/api_result.dart'
+    show AppResponseHandler;
 
 class CartRepository {
   final CartApiService api;
@@ -53,6 +54,18 @@ class CartRepository {
       return AppResponseHandler.handleError(e);
     } catch (_) {
       return AppResponse.fail(message: "فشل حذف العنصر");
+    }
+  }
+
+  // NEW: clear all cart
+  Future<AppResponse> clearCart() async {
+    try {
+      final res = await api.clearCart();
+      return AppResponse.ok(data: res.data);
+    } on DioException catch (e) {
+      return AppResponseHandler.handleError(e);
+    } catch (_) {
+      return AppResponse.fail(message: "فشل حذف السلة");
     }
   }
 }

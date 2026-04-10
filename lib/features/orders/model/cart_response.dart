@@ -520,7 +520,10 @@ class VipModel {
 
   VipModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    price = json['price'];
+    // price = json['price'];
+    price = json['price'] is int
+        ? json['price']
+        : int.tryParse(json['price'].toString());
     if (json['images'] != null) {
       images = <Images>[];
       json['images'].forEach((v) {

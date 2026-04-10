@@ -10,7 +10,7 @@ class SearchRepo {
     final body = <String, dynamic>{"query": query};
 
     if (restaurantId != null && restaurantId != 0) {
-      body["restaurant_id"] = restaurantId; // أو "rest_id" حسب السيرفر
+      body["rest_id"] = restaurantId; // أو "rest_id" حسب السيرفر
     }
 
     final res = await api.search(body);

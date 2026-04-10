@@ -5,7 +5,6 @@ class AppNotification {
   final int id;
   final String type;
   final String status;
-
   final Map<String, dynamic> title;
   final Map<String, dynamic> body;
 

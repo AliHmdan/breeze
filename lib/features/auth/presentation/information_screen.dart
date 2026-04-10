@@ -17,6 +17,8 @@ class InformationScreen extends StatefulWidget {
 }
 
 class _InformationScreenState extends State<InformationScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   late TextEditingController firstnameController;
   late TextEditingController lastnameController;
   bool _isLoading = false;
@@ -32,13 +34,12 @@ class _InformationScreenState extends State<InformationScreen> {
   }
 
   void _saveInformation() {
-    final first = firstnameController.text.trim();
-    final last = lastnameController.text.trim();
-
-    if (first.isEmpty || last.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('auth.enter_first_last'.tr())));
+    if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    final first = firstnameController.text.trim();
+    final last = lastnameController.text.trim();
 
     cubit.updateProfile(firstName: first, lastName: last);
   }
@@ -59,10 +60,12 @@ class _InformationScreenState extends State<InformationScreen> {
             color: colorScheme.shadow.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 5),
-          )
+          ),
         ],
       ),
       child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction, // 🔥 مهم
+
         controller: controller,
         cursorColor: AppColor.primaryColor,
         style: TextStyle(color: AppColor.white, fontSize: 16.sp),
@@ -97,8 +100,10 @@ class _InformationScreenState extends State<InformationScreen> {
             color: colorScheme.onSurface.withOpacity(0.6),
             fontSize: 16.sp,
           ),
-          contentPadding:
-          EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 20.w,
+            vertical: 15.h,
+          ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: OutlineInputBorder(
@@ -109,6 +114,7 @@ class _InformationScreenState extends State<InformationScreen> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -119,11 +125,18 @@ class _InformationScreenState extends State<InformationScreen> {
           loading: () => EasyLoading.show(status: "common.saving".tr()),
           error: (msg) {
             EasyLoading.dismiss();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg.tr()), backgroundColor: colorScheme.error));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(msg.tr()),
+                backgroundColor: colorScheme.error,
+              ),
+            );
           },
           profileUpdated: (_) {
             EasyLoading.dismiss();
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const UpdateAddressScreen()));
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const UpdateAddressScreen()),
+            );
           },
         );
       },
@@ -138,61 +151,93 @@ class _InformationScreenState extends State<InformationScreen> {
               errorBuilder: (_, __, ___) => Container(
                 color: colorScheme.surface,
                 alignment: Alignment.center,
-                child: Text("common.placeholder".tr(), style: TextStyle(color: colorScheme.onSurface)),
+                child: Text(
+                  "common.placeholder".tr(),
+                  style: TextStyle(color: colorScheme.onSurface),
+                ),
               ),
             ),
             SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        width: 40.w,
-                        height: 40.h,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: colorScheme.outline.withOpacity(0.35)),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Icon(Icons.arrow_back_ios, color: colorScheme.onSurface, size: 16.sp),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      "auth.enter_info_title".tr(),
-                      style: TextStyle(fontSize: 18.sp, color: colorScheme.onSurface, fontFamily: "Manrope", fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 35.h),
-                    _buildTextField(hint: "auth.first_name".tr(), controller: firstnameController),
-                    SizedBox(height: 20.h),
-                    _buildTextField(hint: "auth.last_name".tr(), controller: lastnameController),
-                    SizedBox(height: 30.h),
-                    InkWell(
-                      onTap: _isLoading ? null : _saveInformation,
-                      child: Container(
-                        width: double.infinity,
-                        height: 55.h,
-                        decoration: BoxDecoration(
-                          color: _isLoading ? colorScheme.onSurface.withOpacity(0.35) : AppColor.primaryColor,
-                          borderRadius: BorderRadius.circular(15.r),
-                        ),
-                        alignment: Alignment.center,
-                        child: _isLoading
-                            ? CircularProgressIndicator(color: AppColor.primaryColor)
-                            : Text(
-                          "common.save".tr(),
-                          style: TextStyle(fontSize: 16.sp, color: colorScheme.onPrimary, fontWeight: FontWeight.bold, fontFamily: 'Manrope'),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 40.w,
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: colorScheme.outline.withOpacity(0.35),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              color: colorScheme.onSurface,
+                              size: 16.sp,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 40.h),
-                  ],
+                      SizedBox(height: 16.h),
+                      Text(
+                        "auth.enter_info_title".tr(),
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          color: colorScheme.onSurface,
+                          fontFamily: "Manrope",
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 35.h),
+                      _buildTextField(
+                        hint: "auth.first_name".tr(),
+                        controller: firstnameController,
+                      ),
+                      SizedBox(height: 20.h),
+                      _buildTextField(
+                        hint: "auth.last_name".tr(),
+                        controller: lastnameController,
+                      ),
+                      SizedBox(height: 30.h),
+                      InkWell(
+                        onTap: _isLoading ? null : _saveInformation,
+                        child: Container(
+                          width: double.infinity,
+                          height: 55.h,
+                          decoration: BoxDecoration(
+                            color: _isLoading
+                                ? colorScheme.onSurface.withOpacity(0.35)
+                                : AppColor.primaryColor,
+                            borderRadius: BorderRadius.circular(15.r),
+                          ),
+                          alignment: Alignment.center,
+                          child: _isLoading
+                              ? CircularProgressIndicator(
+                                  color: AppColor.primaryColor,
+                                )
+                              : Text(
+                                  "common.save".tr(),
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 40.h),
+                    ],
+                  ),
                 ),
               ),
             ),

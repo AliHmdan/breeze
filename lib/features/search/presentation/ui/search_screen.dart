@@ -318,9 +318,11 @@ class _SearchState extends State<Search> {
                       ],
                     ),
                     SizedBox(height: 16.h),
+                    if(s.results.length>0)
                     Expanded(
                       child: ListView.builder(itemCount: s.results.length, itemBuilder: (context, i) => _apiRestaurantBlock(s.results[i])),
-                    ),
+                    )
+                    else Center(child:Text("هذه الوجبة غير موجودة")),
                   ],
                 ),
               ),
